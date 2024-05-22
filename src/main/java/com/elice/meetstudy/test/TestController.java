@@ -8,7 +8,7 @@ public class TestController {
 
   @GetMapping("/")
   public String testHello() {
-    return "team09 H I &#x0021 &#x0021 &#x005E;&#x3145;&#x005E &#x2661;";
+    return "team09 H I &#x0021 &#x0021 &#x005E&#x3145&#x005E &#x2661;";
   }
 
 }
