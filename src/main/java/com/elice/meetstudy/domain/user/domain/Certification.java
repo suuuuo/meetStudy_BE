@@ -1,6 +1,6 @@
 package com.elice.meetstudy.domain.user.domain;
 
-import com.elice.meetstudy.domain.category.domain.Category;
+import com.elice.meetstudy.domain.category.entity.Category;
 import jakarta.persistence.*;
 import lombok.Getter;
 
