@@ -1,6 +1,8 @@
-package com.elice.meetstudy.domain.category.domain;
+package com.elice.meetstudy.domain.category.entity;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 
 /**
  *  category Entity
@@ -14,10 +16,13 @@ public class Category {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String name;
 
   @Column(nullable = false)
   private String description;
+
+//  @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
+//  private List<Post> posts = new ArrayList<>();
 
 }
