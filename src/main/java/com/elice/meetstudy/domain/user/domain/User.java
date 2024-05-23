@@ -2,6 +2,10 @@ package com.elice.meetstudy.domain.user.domain;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Role;
 
 /**
@@ -9,6 +13,8 @@ import org.springframework.context.annotation.Role;
  */
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
