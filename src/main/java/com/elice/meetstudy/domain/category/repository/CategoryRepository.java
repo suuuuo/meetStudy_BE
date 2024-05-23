@@ -1,0 +1,1 @@
+package com.elice.meetstudy.domain.category.repository;
