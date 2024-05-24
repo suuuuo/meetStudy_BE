@@ -40,6 +40,10 @@ dependencies {
 	implementation 'com.google.code.gson:gson:2.8.9'
 	// Json
 	implementation 'org.json:json:20210307'
+	//mapper
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
+	compileOnly 'org.projectlombok:lombok'
 
 }
 

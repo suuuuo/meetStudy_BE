@@ -9,8 +9,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Getter
@@ -33,33 +36,42 @@ public class Calendar_detail {
     private String content;
 
     @NotNull
-    private String start_day;
+    @JoinColumn(name = "start_day")
+    private String startDay;
 
     @NotNull
-    private String end_day;
+    @JoinColumn(name = "end_day")
+    private String endDay;
 
     @NotNull
-    private String start_time;
+    @JoinColumn(name = "start_time")
+    private String startTime;
 
     @NotNull
-    private String end_time;
+    @JoinColumn(name = "end_time")
+    private String endTime;
 
     @NotNull
+    @ColumnDefault("false")
     private boolean isHoliday;
 
-    //메모 내용 빠진 일정 추가하기 위함
-    public Calendar_detail(Calendar calendar, String title, String start_day,
-        String end_day, String start_time, String end_time, boolean isHoliday) {
-        this.calendar = calendar;
+    @Builder
+    public Calendar_detail(String title, String content, String startDay, String endDay,
+        String startTime, String endTime, boolean isHoliday) {
         this.title = title;
-        this.start_day = start_day;
-        this.end_day = end_day;
-        this.start_time = start_time;
-        this.end_time = end_time;
+        this.content = content;
+        this.startDay = startDay;
+        this.endDay = endDay;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.isHoliday = isHoliday;
     }
 
     public void setHoliday(boolean holiday) {
         isHoliday = holiday;
+    }
+
+    public void setCalendar(Calendar calendar) {
+        this.calendar = calendar;
     }
 }
