@@ -108,7 +108,6 @@ public class HolidayController {
         System.out.println();
 
         holidayService.addHoliday(locdate, dateName);
-        holidayService.checkHoliday();
     }
 }
 
