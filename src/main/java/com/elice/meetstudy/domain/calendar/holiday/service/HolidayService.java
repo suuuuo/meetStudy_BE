@@ -1,12 +1,8 @@
 package com.elice.meetstudy.domain.calendar.holiday.service;
 
-import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
 import com.elice.meetstudy.domain.calendar.holiday.domain.Holiday;
 import com.elice.meetstudy.domain.calendar.holiday.repository.HolidayRepository;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,35 +24,16 @@ public class HolidayService {
         }
     }
 
-    // 일정의 날짜가 공휴일인지 확인
-    public boolean checkHoliday(){
-        LocalDate now = LocalDate.now();
-        String year = Integer.toString(now.getYear());
+    // 연도, 달로 공휴일 리스트 뽑아서 전달 (일정 등록하기 위함)
+    @Transactional
+    public List<Holiday> Holiday(String year, String month){
+        //LocalDate now = LocalDate.now();
+        int Month = Integer.parseInt(month);
+        if(Month < 10) month = "0" + month;
 
-        String month = Integer.toString(now.getMonthValue());
-        if(now.getMonthValue() < 10) month = "0"+month;
+        String date = year + month;
 
-        String day = Integer.toString(now.getDayOfMonth());
-        if(now.getDayOfMonth() < 10) day = "0" + day;
-
-        String date = year + month + day;
-
-        System.out.println("year = " + year);
-        System.out.println("month = " + month);
-        System.out.println("day = " + day);
-        System.out.println("date = " + date);
-
-         Optional<Holiday> optionalHoliday = holidayRepository.findByDate(date);
-        List<Holiday> holidayList = holidayRepository.findByDateStartingWith("202405");
-        System.out.println("holidayList.size = " + holidayList.size());
-
-         if(optionalHoliday.isPresent()){
-             Holiday holiday = optionalHoliday.get();
-             //일정의 isholiday true로 바꿔주기
-             //일정의 날짜
-             return true;
-         }else{
-             return false;
-         }
+        return holidayRepository.findByDateStartingWith(date);
     }
 }
+
