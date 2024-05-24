@@ -25,17 +25,18 @@ public class Calendar {
     @JoinColumn(name = "user_id")
     private User user;
 
-    //스터디룸 id가 없는 캘린더 = 개인 캘린더
+    //스터디룸 id가 없는 캘린더 = 개인 캘린더 = api/user-calendar
+    //스터디룸 있는 캘린더 = 공용 캘린더 = api/study-calendar
 //    @OneToOne
 //    @JoinColumn(name = "study_room_id")
 //    private Studyroom studyroom;
 
-    public Calendar(User user){
-        this.user = user;
-    }
-
-//    public Calendar(StudyRoom studyRoom){
-//        this.studyRoom = studyRoom;
+//    public Calendar(User user, Studyroom studyroom) {
+//        this.user = user;
+//        this.studyroom = studyroom;
 //    }
 
+    public Calendar(User user){
+    this.user = user;
+}
 }
