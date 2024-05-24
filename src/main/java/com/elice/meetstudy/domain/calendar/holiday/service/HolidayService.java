@@ -28,35 +28,18 @@ public class HolidayService {
         }
     }
 
-    // 일정의 날짜가 공휴일인지 확인
-    public boolean checkHoliday(){
-        LocalDate now = LocalDate.now();
-        String year = Integer.toString(now.getYear());
+    // 연도, 달로 공휴일 리스트 뽑아서 전달 (일정 등록하기 위함)
+    @Transactional
+    public List<Holiday> Holiday(int year, int month){
+        //LocalDate now = LocalDate.now();
+        String Year = Integer.toString(year);
 
-        String month = Integer.toString(now.getMonthValue());
-        if(now.getMonthValue() < 10) month = "0"+month;
+        String Month = Integer.toString(month);
+        if(month < 10) Month = "0" + Month;
 
-        String day = Integer.toString(now.getDayOfMonth());
-        if(now.getDayOfMonth() < 10) day = "0" + day;
+        String date = Year + Month;
 
-        String date = year + month + day;
-
-        System.out.println("year = " + year);
-        System.out.println("month = " + month);
-        System.out.println("day = " + day);
-        System.out.println("date = " + date);
-
-         Optional<Holiday> optionalHoliday = holidayRepository.findByDate(date);
-        List<Holiday> holidayList = holidayRepository.findByDateStartingWith("202405");
-        System.out.println("holidayList.size = " + holidayList.size());
-
-         if(optionalHoliday.isPresent()){
-             Holiday holiday = optionalHoliday.get();
-             //일정의 isholiday true로 바꿔주기
-             //일정의 날짜
-             return true;
-         }else{
-             return false;
-         }
+        return holidayRepository.findByDateStartingWith(date);
     }
 }
+
