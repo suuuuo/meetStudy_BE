@@ -20,7 +20,7 @@ public class PostLike {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @Column(name = "created_at", nullable = false)
+  @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private LocalDateTime createdAt;
 
 }
