@@ -1,7 +1,9 @@
 package com.elice.meetstudy.domain.category.service;
 
+import com.elice.meetstudy.domain.category.dto.CategoryDto;
 import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.category.repository.CategoryRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +17,38 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    // 모든 카테고리를 DB에서 조회해 반환
-    public List<Category> findAll() {
+    // 모든 카테고리를 조회
+    public List<Category> findAllCategories() {
         return categoryRepository.findAll();
+    }
+
+    // id에 해당하는 카테고리 조회
+    public Category findCategory(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+    }
+
+    // 카테고리 생성
+    public Category createCategory(Category category) {
+        return categoryRepository.save(category);
+    }
+
+    // 카테고리 수정
+    /*public Category updateCategory(Long id, CategoryDto categoryDto) {
+        Category existingCategory = categoryRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        existingCategory.setName(categoryDto.getName());
+        existingCategory.setDescription(categoryDto.getDescription());
+
+        return categoryRepository.save(existingCategory);
+    }*/
+
+    // 카테고리 삭제
+    public void deleteCategory(Long categoryId) {
+        Category foundCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        categoryRepository.delete(foundCategory);
     }
 }
