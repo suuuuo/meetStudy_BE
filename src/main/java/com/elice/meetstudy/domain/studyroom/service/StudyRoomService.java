@@ -17,7 +17,11 @@ public class StudyRoomService {
     @Autowired
     private StudyRoomRepository studyRoomRepository;
 
-    // 모든 Study Room을 탐색 후 DTO 리스트로 반환합니다.
+    /**
+     * 모든 스터디룸을 조회하여 스터디룸 DTO 리스트로 반환합니다.
+     *
+     * @return 모든 스터디룸의 StudyRoomDTO 객체 리스트
+     */
     public List<StudyRoomDTO> getAllStudyRooms() {
         return studyRoomRepository
                 .findAll()
@@ -26,14 +30,25 @@ public class StudyRoomService {
                 .collect(Collectors.toList());
     }
 
-    // ID로 스터디룸을 탐색합니다.
+    /**
+     * 주어진 ID에 해당하는 스터디룸을 조회하여 StudyRoomDTO 객체로 반환합니다.
+     *
+     * @param id 조회할 스터디룸의 ID
+     * @return 주어진 ID에 해당하는 StudyRoomDTO 객체를 포함한 Optional 객체,
+     *         스터디룸이 존재하지 않으면 빈 Optional 객체
+     */
     public Optional<StudyRoomDTO> getStudyRoomById(Long id) {
         return studyRoomRepository
                 .findById(id)
                 .map(this::convertToDTO);
     }
 
-    // 새로운 스터디룸을 제작합니다. 중복검사 없음
+    /**
+     * 새로운 스터디룸을 생성하고 저장한 후, 해당 스터디룸을 StudyRoomDTO 객체로 변환하여 반환합니다.
+     *
+     * @param studyRoomDTO 생성할 스터디룸의 정보를 담고 있는 StudyRoomDTO 객체
+     * @return 생성되고 저장된 스터디룸의 StudyRoomDTO 객체
+     */
     public StudyRoomDTO createStudyRoom(StudyRoomDTO studyRoomDTO) {
         StudyRoom studyRoom = convertToEntity(studyRoomDTO);
         studyRoom.setCreatedDate(new Date());
@@ -41,7 +56,14 @@ public class StudyRoomService {
         return convertToDTO(savedStudyRoom);
     }
 
-    // ID를 기준으로 스터디룸을 업데이트합니다.
+    /**
+     * 주어진 ID에 해당하는 스터디룸을 업데이트하고, 업데이트된 스터디룸을 StudyRoomDTO 객체로 반환합니다.
+     *
+     * @param id 업데이트할 스터디룸의 ID
+     * @param studyRoomDTO 업데이트할 스터디룸의 정보를 담고 있는 StudyRoomDTO 객체
+     * @return 주어진 ID에 해당하는 업데이트된 StudyRoomDTO 객체를 포함한 Optional 객체,
+     *         스터디룸이 존재하지 않으면 빈 Optional 객체
+     */
     public Optional<StudyRoomDTO> updateStudyRoom(Long id, StudyRoomDTO studyRoomDTO) {
         return studyRoomRepository.findById(id)
                 .map(existingStudyRoom -> {
@@ -52,13 +74,22 @@ public class StudyRoomService {
                 });
     }
 
-    // 스터디룸을 삭제합니다.
+    /**
+     * 주어진 ID에 해당하는 스터디룸을 삭제합니다.
+     *
+     * @param id 삭제할 스터디룸의 ID
+     */
     public void deleteStudyRoom(Long id) {
         studyRoomRepository.deleteById(id);
     }
 
-    // mapper를 추가하기전 구현부를 위한 임시적인 함수입니다.
-    // 스터디룸 Entity를 DTO로 변환합니다.
+    /**
+     * 주어진 StudyRoom 객체를 StudyRoomDTO 객체로 변환합니다.
+     * 이 메서드는 구현부를 위한 임시 함수입니다.
+     *
+     * @param studyRoom 변환할 StudyRoom 객체
+     * @return 변환된 StudyRoomDTO 객체
+     */
     private StudyRoomDTO convertToDTO(StudyRoom studyRoom) {
         return new StudyRoomDTO(
                 studyRoom.getId(),
@@ -69,7 +100,13 @@ public class StudyRoomService {
         );
     }
 
-    // 스터디룸 DTO를 Entity로 변환합니다.
+    /**
+     * 주어진 StudyRoomDTO 객체를 StudyRoom 객체로 변환합니다.
+     * 이 메서드는 구현부를 위한 임시 함수입니다.
+     *
+     * @param studyRoomDTO 변환할 StudyRoomDTO 객체
+     * @return 변환된 StudyRoom 객체
+     */
     private StudyRoom convertToEntity(StudyRoomDTO studyRoomDTO) {
         return new StudyRoom(
                 studyRoomDTO.getId(),
