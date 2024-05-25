@@ -28,7 +28,7 @@ public class StudyRoomController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<StudyRoomDTO> createStudyRoom(@RequestBody StudyRoomDTO studyRoomDTO) {
         StudyRoomDTO createdStudyRoom = studyRoomService.createStudyRoom(studyRoomDTO);
         return ResponseEntity.ok(createdStudyRoom);
