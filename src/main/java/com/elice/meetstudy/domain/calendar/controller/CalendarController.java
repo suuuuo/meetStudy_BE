@@ -1,6 +1,7 @@
 package com.elice.meetstudy.domain.calendar.controller;
 
 import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
+import com.elice.meetstudy.domain.calendar.dto.DeleteRequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.RequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.calendar.service.CalendarDetailService;
@@ -126,10 +127,10 @@ public class CalendarController {
     //일정 삭제 - delete
     @DeleteMapping("/calendar_detail")
     public void deleteCalendarDetail(
-        @RequestBody RequestCalendarDetail requestCalendarDetail
+        @RequestBody DeleteRequestCalendarDetail deleteRequestCalendarDetail
         /*userId .. 헤더 액세스 jwt 토큰?*/){
 
-        calendarDetailService.deleteCalendarDetail(requestCalendarDetail);
+        calendarDetailService.deleteCalendarDetail(deleteRequestCalendarDetail);
     }
 
     //회원 삭제 - 개인 / 공용 캘린더 삭제 delete

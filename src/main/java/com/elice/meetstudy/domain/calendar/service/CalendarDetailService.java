@@ -2,6 +2,7 @@ package com.elice.meetstudy.domain.calendar.service;
 
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
 import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
+import com.elice.meetstudy.domain.calendar.dto.DeleteRequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.RequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.calendar.holiday.domain.Holiday;
@@ -114,14 +115,16 @@ public class CalendarDetailService {
 
     //일정 삭제 - delete
     @Transactional
-    public void deleteCalendarDetail(RequestCalendarDetail requestCalendarDetail) {
+    public void deleteCalendarDetail(DeleteRequestCalendarDetail deleteRequestCalendarDetail) {
         Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(
-            requestCalendarDetail.id());
+            deleteRequestCalendarDetail.id());
         if(originCalendarDetail.isPresent())
-            calendarDetailRepository.deleteById(requestCalendarDetail.id());
+            calendarDetailRepository.deleteById(deleteRequestCalendarDetail.id());
     }
 
     //회원 삭제 - 개인 / 공용 캘린더 삭제 delete
+
+
     //스터디룸 삭제 - 공용 캘린더 삭제 delete
 
 }
