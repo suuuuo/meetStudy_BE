@@ -1,6 +1,8 @@
 package com.elice.meetstudy.domain.calendar.service;
 
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
+import com.elice.meetstudy.domain.calendar.dto.DeleteRequestCalendarDetail;
+import com.elice.meetstudy.domain.calendar.repository.CalendarDetailRepository;
 import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
@@ -16,6 +18,8 @@ public class CalendarService {
     CalendarRepository calendarRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    CalendarDetailRepository calendarDetailRepository;
 
     //캘린더 조회(생성) - 작성 완료, 개인 회원 : 캘린더 생성 확인,
     @Transactional
@@ -55,7 +59,14 @@ public class CalendarService {
         }
     }
 
-
+    @Transactional
+    public void deleteCalendar(DeleteRequestCalendarDetail deleteRequestCalendarDetail){
+        Optional<Calendar> calendar = calendarRepository.findById(deleteRequestCalendarDetail.id());
+        if(calendar.isPresent()){
+            calendarDetailRepository.deleteAllByCalendar(calendar.get());
+            calendarRepository.deleteById(deleteRequestCalendarDetail.id());
+        }
+    }
 
 
 
