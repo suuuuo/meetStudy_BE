@@ -4,7 +4,6 @@ import com.elice.meetstudy.domain.calendar.dto.RequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.calendar.service.CalendarDetailService;
 import com.elice.meetstudy.domain.calendar.service.CalendarService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,7 +27,7 @@ public class CalendarController {
     @Autowired
     CalendarDetailService calendarDetailService;
 
-    //개인 캘린더 조회 : 테스트 전
+    //개인 캘린더 조회 : postman 테스트 완료
     @GetMapping("/calendar" ) //개인 캘린더 조회, userId 받아오는 건 추후에 추가예정
     public ResponseEntity<?> getCalendarDetails(
 
@@ -71,22 +70,40 @@ public class CalendarController {
 
 
 
-    //개인 캘린더 일정 추가 - post : 테스트 전
-    @PostMapping("/calendar/{study_room_id}")
+    //개인 캘린더 일정 추가 - post : postman 테스트 완료 , 테스트 시 주의점 : 조회해야 공휴일 정보 추가됨.
+    @PostMapping("/calendar")
     public ResponseEntity<?> postCalendarDetail(
-        @RequestParam(value = "study_room_id", required = false, defaultValue = "0") long study_room_id,
         @RequestBody RequestCalendarDetail requestCalendarDetail
         /*userId .. 헤더 액세스 jwt 토큰?*/){
 
         //user Id 구하는 로직
         Long userId = 1L;
 
+        System.out.println(requestCalendarDetail);
+
+        ResponseCalendarDetail responseCalendarDetail =
+            calendarDetailService.saveCalendarDetail(requestCalendarDetail, userId, 0L);
+        return ResponseEntity.ok(responseCalendarDetail);
+    }
+
+    //공용 캘린더 일정 추가 - post : 테스트 전
+    @PostMapping("/calendar/{study_room_id}")
+    public ResponseEntity<?> postCalendarDetail(
+        @RequestBody RequestCalendarDetail requestCalendarDetail,
+        @PathVariable long study_room_id
+        /*userId .. 헤더 액세스 jwt 토큰?*/){
+
+        //user Id 구하는 로직
+        Long userId = 1L;
+
+        System.out.println(requestCalendarDetail);
+
         ResponseCalendarDetail responseCalendarDetail =
             calendarDetailService.saveCalendarDetail(requestCalendarDetail, userId, study_room_id);
         return ResponseEntity.ok(responseCalendarDetail);
 
-        //저장 실패 오류 메시지 추가?
     }
+
 
     //일정 수정 - put
 
