@@ -18,6 +18,7 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Calendar_detail {
