@@ -21,7 +21,7 @@ public class CalendarService {
     @Autowired
     CalendarDetailRepository calendarDetailRepository;
 
-    //캘린더 조회(생성) - 작성 완료, 개인 회원 : 캘린더 생성 확인,
+    //캘린더 조회(생성)
     @Transactional
     public Calendar findCalendar(long userId, long studyRoomId) {
         Optional<Calendar> userCalendar;
@@ -68,7 +68,13 @@ public class CalendarService {
         }
     }
 
-
-
-
+    //유저 삭제 시 같이 삭제되게? cascade 설정하면 공용 캘린더가 유저 한명만 삭제되어도 같이 삭제됨.
+    @Transactional
+    public void deleteCalendar(Long userId){
+        Optional<Calendar> calendar = calendarRepository.findByUserId(userId);
+        if(calendar.isPresent()){
+            calendarDetailRepository.deleteAllByCalendar(calendar.get());
+            calendarRepository.deleteById(calendar.get().getId());
+        }
+    }
 }
