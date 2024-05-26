@@ -17,22 +17,27 @@ public class CalendarService {
     @Autowired
     UserRepository userRepository;
 
-    //캘린더 조회(생성) - 작성 완료, 테스트 전
+    //캘린더 조회(생성) - 작성 완료, 개인 회원 : 캘린더 생성 확인,
     @Transactional
     public Calendar findCalendar(long userId, long studyRoomId) {
-        Calendar userCalendar;
+        Optional<Calendar> userCalendar;
         Calendar studyCalendar;
 
-        if (studyRoomId == 0) {//스터디룸 아이디 없음 -> 개인 캘린더
-            userCalendar = calendarRepository.findByUserIdAndRoomIdIsNull(userId);
+        if (studyRoomId == 0L) {//스터디룸 아이디 없음 -> 개인 캘린더
+            System.out.println("개인 캘린더 탐색을 시작합니다.");
+            userCalendar = calendarRepository.findByUserId(userId);
 
-            if (userCalendar == null) {
+            if (userCalendar.isEmpty()) {
+                System.out.println("캘린더가 없으므로 생성을 진행합니다.");
                 Optional<User> user = userRepository.findById(userId);
-                userCalendar = new Calendar(user.get());
-                calendarRepository.save(userCalendar);
-                return userCalendar;
-            } else
-                return userCalendar;
+                Calendar findUserCalendar = new Calendar(user.get());
+                calendarRepository.save(findUserCalendar);
+                return findUserCalendar;
+            } else{
+                System.out.println("이미 존재하는 캘린더를 반환합니다.");
+                return userCalendar.get();
+            }
+
 
         } else {// 스터디룸 아이디 있음 -> 공용 캘린더 조회
 //            studyCalendar = calendarRepository.findByRoomId(studyRoomId);
@@ -46,6 +51,7 @@ public class CalendarService {
 //            } else
 //                return studyCalendar;
             return null;
+
         }
     }
 
