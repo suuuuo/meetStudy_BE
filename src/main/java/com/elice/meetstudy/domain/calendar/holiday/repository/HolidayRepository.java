@@ -1,7 +1,6 @@
 package com.elice.meetstudy.domain.calendar.holiday.repository;
 
 import com.elice.meetstudy.domain.calendar.holiday.domain.Holiday;
-import com.elice.meetstudy.domain.calendar.holiday.service.HolidayService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

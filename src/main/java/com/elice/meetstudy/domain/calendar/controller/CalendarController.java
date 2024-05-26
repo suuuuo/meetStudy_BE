@@ -1,6 +1,5 @@
 package com.elice.meetstudy.domain.calendar.controller;
 
-import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
 import com.elice.meetstudy.domain.calendar.dto.DeleteRequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.RequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
@@ -25,23 +24,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class CalendarController {
+    //임의 생성한 회원으로 개인 캘린더 기능은 postman으로 확인 완료, 테스트 코드 작성 중
+    //공용 캘린더는 작성만
 
     @Autowired
     CalendarService calendarService;
     @Autowired
     CalendarDetailService calendarDetailService;
 
-    //개인 캘린더 전체 조회 : postman 테스트 완료
-    @GetMapping("/calendar") //개인 캘린더 조회, userId 받아오는 건 추후에 추가예정
+    //개인 캘린더 전체 조회
+    @GetMapping("/calendar") //userId 받아오는 건 추후에 추가
     public ResponseEntity<?> getCalendarDetails(
         @RequestHeader("year") String year, @RequestHeader("month") String month
-        /*userId .. 헤더 액세스 jwt 토큰?*/) {
+        /*userId ..*/) {
 
-        //user Id 구하는 로직
+        //user Id 구하는 로직, 임시
         long userId = 1L;
 
         if (userId == 1L /*유효한 유저 id라면*/) {
-            //userId로 캘린더 찾아서 year, month로 해당 월의 일정들 반환
+            // 캘린더 찾아서 year, month로 해당 월의 일정들 반환
             List<ResponseCalendarDetail> calendarDetailList =
                 calendarDetailService.getAllCalendarDetail(year, month, userId, 0L);
             return ResponseEntity.ok(calendarDetailList);
@@ -71,18 +72,18 @@ public class CalendarController {
     //캘린더 - 일정 개별 조회
     @GetMapping("/calendar_detail/{calendar_detail_id}")
     public ResponseEntity<?> getCalendarDetail(
-        /*userId .. 헤더 액세스 jwt 토큰?*/
+        /*userId ..*/
         @PathVariable long calendar_detail_id) {
         ResponseCalendarDetail responseCalendarDetail = calendarDetailService.getCalendarDetail(
             calendar_detail_id);
         return ResponseEntity.ok(responseCalendarDetail);
     }
 
-    //개인 캘린더 일정 추가 - post : postman 테스트 완료 , 테스트 시 주의점 : 조회해야 공휴일 정보 추가됨.
+    //개인 캘린더 일정 추가
     @PostMapping("/calendar")
     public ResponseEntity<?> postCalendarDetail(
         @RequestBody RequestCalendarDetail requestCalendarDetail
-        /*userId .. 헤더 액세스 jwt 토큰?*/) {
+        /*userId .. */) {
 
         //user Id 구하는 로직
         Long userId = 1L;
@@ -92,7 +93,7 @@ public class CalendarController {
         return ResponseEntity.ok(responseCalendarDetail);
     }
 
-    //공용 캘린더 일정 추가 - post : 테스트 전
+    //공용 캘린더 일정 추가
     @PostMapping("/calendar/{study_room_id}")
     public ResponseEntity<?> postCalendarDetail(
         @RequestBody RequestCalendarDetail requestCalendarDetail,
