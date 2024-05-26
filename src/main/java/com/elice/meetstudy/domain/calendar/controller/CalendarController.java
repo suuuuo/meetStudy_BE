@@ -10,6 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,15 +29,12 @@ public class CalendarController {
     @Autowired
     CalendarDetailService calendarDetailService;
 
-    //개인 캘린더 조회 : postman 테스트 완료
+    //개인 캘린더 전체 조회 : postman 테스트 완료
     @GetMapping("/calendar") //개인 캘린더 조회, userId 받아오는 건 추후에 추가예정
     public ResponseEntity<?> getCalendarDetails(
 
         @RequestHeader("year") String year, @RequestHeader("month") String month
         /*userId .. 헤더 액세스 jwt 토큰?*/) {
-
-        System.out.println(year);
-        System.out.println(month);
 
         //user Id 구하는 로직
         long userId = 1L;
@@ -54,7 +52,7 @@ public class CalendarController {
         }
     }
 
-    //공용 캘린더 조회
+    //공용 캘린더 전체 조회
     @GetMapping("/calendar/{study_room_id}")
     public ResponseEntity<?> getCalendarDetails(
         @RequestHeader("year") String year, @RequestHeader("month") String month,
@@ -70,7 +68,7 @@ public class CalendarController {
     }
 
     //캘린더 - 일정 개별 조회
-    @GetMapping("/calendar/detail/{calendar_detail_id}")
+    @GetMapping("/calendar_detail/{calendar_detail_id}")
     public ResponseEntity<?> getCalendarDetail(
         /*userId .. 헤더 액세스 jwt 토큰?*/
         @PathVariable long calendar_detail_id) {
@@ -106,24 +104,33 @@ public class CalendarController {
         ResponseCalendarDetail responseCalendarDetail =
             calendarDetailService.saveCalendarDetail(requestCalendarDetail, userId, study_room_id);
         return ResponseEntity.ok(responseCalendarDetail);
-
     }
 
 
-    //개인 캘린더 일정 수정 - put
-    @PutMapping("/calendar")
+    //캘린더 일정 수정 - put
+    @PutMapping("/calendar_detail")
     public ResponseEntity<?> putCalendarDetail(
         @RequestBody RequestCalendarDetail requestCalendarDetail
         /*userId .. 헤더 액세스 jwt 토큰?*/) {
 
-        System.out.println(requestCalendarDetail);
-
         ResponseCalendarDetail responseCalendarDetail =
             calendarDetailService.putCalendarDetail(requestCalendarDetail);
-        return ResponseEntity.ok(responseCalendarDetail);
+
+        if(requestCalendarDetail == null){
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "바꾸려는 일정이 유효하지 않은 일정입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } return ResponseEntity.ok(responseCalendarDetail);
     }
 
     //일정 삭제 - delete
+    @DeleteMapping("/calendar_detail")
+    public void deleteCalendarDetail(
+        @RequestBody RequestCalendarDetail requestCalendarDetail
+        /*userId .. 헤더 액세스 jwt 토큰?*/){
+
+        calendarDetailService.deleteCalendarDetail(requestCalendarDetail);
+    }
 
     //회원 삭제 - 개인 / 공용 캘린더 삭제 delete
     //스터디룸 삭제 - 공용 캘린더 삭제 delete
