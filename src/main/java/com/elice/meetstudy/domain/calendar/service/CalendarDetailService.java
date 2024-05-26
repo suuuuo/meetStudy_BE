@@ -100,29 +100,26 @@ public class CalendarDetailService {
         Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(
             requestCalendarDetail.id());
         if(originCalendarDetail.isPresent()){
-            if(requestCalendarDetail.title() != null)
-            originCalendarDetail.get().setTitle(requestCalendarDetail.title());
-
-            if(requestCalendarDetail.content() != null)
-            originCalendarDetail.get().setContent(requestCalendarDetail.content());
-
-            if(requestCalendarDetail.startDay() != null)
-            originCalendarDetail.get().setStartDay(requestCalendarDetail.startDay());
-
-            if(requestCalendarDetail.endDay() != null)
-            originCalendarDetail.get().setEndDay(requestCalendarDetail.endDay());
-
-            if(requestCalendarDetail.startTime() != null)
-            originCalendarDetail.get().setStartTime(requestCalendarDetail.startTime());
-
-            if(requestCalendarDetail.endTime() != null)
-            originCalendarDetail.get().setEndDay(requestCalendarDetail.endTime());
+            Calendar_detail calendarDetail = originCalendarDetail.get();
+            if(requestCalendarDetail.title() != null) calendarDetail.setTitle(requestCalendarDetail.title());
+            if(requestCalendarDetail.content() != null) calendarDetail.setContent(requestCalendarDetail.content());
+            if(requestCalendarDetail.startDay() != null) calendarDetail.setStartDay(requestCalendarDetail.startDay());
+            if(requestCalendarDetail.endDay() != null) calendarDetail.setEndDay(requestCalendarDetail.endDay());
+            if(requestCalendarDetail.startTime() != null) calendarDetail.setStartTime(requestCalendarDetail.startTime());
+            if(requestCalendarDetail.endTime() != null) calendarDetail.setEndDay(requestCalendarDetail.endTime());
+            return calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
         }
-        return calendarDetailMapper.toResponseCalendarDetail(originCalendarDetail.get());
-
+        return null;
     }
 
     //일정 삭제 - delete
+    @Transactional
+    public void deleteCalendarDetail(RequestCalendarDetail requestCalendarDetail) {
+        Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(
+            requestCalendarDetail.id());
+        if(originCalendarDetail.isPresent())
+            calendarDetailRepository.deleteById(requestCalendarDetail.id());
+    }
 
     //회원 삭제 - 개인 / 공용 캘린더 삭제 delete
     //스터디룸 삭제 - 공용 캘린더 삭제 delete
