@@ -133,6 +133,12 @@ public class CalendarController {
     }
 
     //회원 삭제 - 개인 / 공용 캘린더 삭제 delete
-    //스터디룸 삭제 - 공용 캘린더 삭제 delete
+    @DeleteMapping("/calendar")
+    public void deleteCalendar(
+        @RequestBody DeleteRequestCalendarDetail deleteRequestCalendarDetail
+        /*userId .. 헤더 액세스 jwt 토큰?*/
+    ){
+        calendarService.deleteCalendar(deleteRequestCalendarDetail);
+    }
 
 }
