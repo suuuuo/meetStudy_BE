@@ -31,8 +31,7 @@ public class Calendar {
     @OneToMany(mappedBy = "calendar", cascade = CascadeType.REMOVE)
     private List<Calendar_detail> details;
 
-    //스터디룸 id가 없는 캘린더 = 개인 캘린더 = api/user-calendar
-    //스터디룸 있는 캘린더 = 공용 캘린더 = api/study-calendar
+    //스터디룸 id가 없는 캘린더 = 개인 캘린더, 있는 캘린더 = 공용 캘린더
 //    @OneToOne
 //    @JoinColumn(name = "study_room_id")
 //    private Studyroom studyroom;
