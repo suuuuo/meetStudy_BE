@@ -61,23 +61,33 @@ public class CalendarDetailService {
 
     //일정 리스트 출력 - 작성 완료, 테스트 전
     @Transactional
-    public List<ResponseCalendarDetail> getAllCalendarDetail(String year, String month, Long userId, Long studyRoomId){
+    public List<ResponseCalendarDetail> getAllCalendarDetail(String year, String month, Long userId,
+        Long studyRoomId) {
         Calendar calendar = calendarService.findCalendar(userId, studyRoomId); //캘린더 찾아서
         saveHolidays(year, month, calendar.getId()); //공휴일 일정 등록
-        List<Calendar_detail> calendarDetailList = calendarDetailRepository.findAllByCalendar(calendar); //해당 캘린더의 일정들 리스트로 출력
+        List<Calendar_detail> calendarDetailList = calendarDetailRepository.findAllByCalendar(
+            calendar); //해당 캘린더의 일정들 리스트로 출력
 
         List<ResponseCalendarDetail> responseCalendarDetails = new ArrayList<>();
         for (Calendar_detail calendarDetail : calendarDetailList) {
-            responseCalendarDetails.add(calendarDetailMapper.toResponseCalendarDetail(calendarDetail));
+            responseCalendarDetails.add(
+                calendarDetailMapper.toResponseCalendarDetail(calendarDetail));
         }
         return responseCalendarDetails;
+    }
+
+    @Transactional
+    public ResponseCalendarDetail getCalendarDetail(long id){
+        Optional<Calendar_detail> calendarDetail = calendarDetailRepository.findById(id);
+        return calendarDetailMapper.toResponseCalendarDetail(calendarDetail.get());
     }
 
     //request 받아서 일정 추가 - 작성 완료, 테스트 전
     @Transactional
     public ResponseCalendarDetail saveCalendarDetail(RequestCalendarDetail requestCalendarDetail,
         Long userId, Long studyRoomId) { //request로 받으면
-        Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
+        Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(
+            requestCalendarDetail);
         Calendar calendar = calendarService.findCalendar(userId, studyRoomId); //캘린더 찾아서
         calendarDetail.setCalendar(calendar); //캘린더 추가해주고
         calendarDetailRepository.save(calendarDetail); //저장
@@ -85,6 +95,32 @@ public class CalendarDetailService {
     }
 
     //일정 수정 - put
+    @Transactional
+    public ResponseCalendarDetail putCalendarDetail(RequestCalendarDetail requestCalendarDetail) {
+        Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(
+            requestCalendarDetail.id());
+        if(originCalendarDetail.isPresent()){
+            if(requestCalendarDetail.title() != null)
+            originCalendarDetail.get().setTitle(requestCalendarDetail.title());
+
+            if(requestCalendarDetail.content() != null)
+            originCalendarDetail.get().setContent(requestCalendarDetail.content());
+
+            if(requestCalendarDetail.startDay() != null)
+            originCalendarDetail.get().setStartDay(requestCalendarDetail.startDay());
+
+            if(requestCalendarDetail.endDay() != null)
+            originCalendarDetail.get().setEndDay(requestCalendarDetail.endDay());
+
+            if(requestCalendarDetail.startTime() != null)
+            originCalendarDetail.get().setStartTime(requestCalendarDetail.startTime());
+
+            if(requestCalendarDetail.endTime() != null)
+            originCalendarDetail.get().setEndDay(requestCalendarDetail.endTime());
+        }
+        return calendarDetailMapper.toResponseCalendarDetail(originCalendarDetail.get());
+
+    }
 
     //일정 삭제 - delete
 
