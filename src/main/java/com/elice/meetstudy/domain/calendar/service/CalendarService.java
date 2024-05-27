@@ -8,6 +8,10 @@ import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
 import com.elice.meetstudy.domain.studyroom.repository.StudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,21 +66,38 @@ public class CalendarService {
     }
 
     @Transactional
-    public void deleteCalendar(DeleteRequestCalendarDetail deleteRequestCalendarDetail){
-        Optional<Calendar> calendar = calendarRepository.findById(deleteRequestCalendarDetail.id());
+    public void deleteCalendar(Long userId){
+        Optional<Calendar> calendar = calendarRepository.findByUserIdAndStudyRoomIsNull(userId);
         if(calendar.isPresent()){
             calendarDetailRepository.deleteAllByCalendar(calendar.get());
-            calendarRepository.deleteById(deleteRequestCalendarDetail.id());
+            calendarRepository.deleteById(calendar.get().getId());
         }
     }
 
-    //유저 삭제 시 같이 삭제되게? cascade 설정하면 공용 캘린더가 유저 한명만 삭제되어도 같이 삭제됨.
-//    @Transactional
-//    public void deleteCalendar(Long userId){
-//        Optional<Calendar> calendar = calendarRepository.findByUserId(userId);
-//        if(calendar.isPresent()){
-//            calendarDetailRepository.deleteAllByCalendar(calendar.get());
-//            calendarRepository.deleteById(calendar.get().getId());
-//        }
-//    }
+    @Transactional
+    public void deleteStudyCalendar(Long studyRoomId){
+        Optional<Calendar> calendar = calendarRepository.findByStudyRoomId(studyRoomId);
+        if(calendar.isPresent()){
+            calendarDetailRepository.deleteAllByCalendar(calendar.get());
+            calendarRepository.deleteById(calendar.get().getId());
+        }
+    }
+
+    @Transactional
+    public String findFirstDay(String year, String month){
+
+
+        LocalDate firstDayOfMonth = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), 1);
+        //월요일이 1, 일요일이 7
+        DayOfWeek dayOfWeek = firstDayOfMonth.getDayOfWeek();
+        return dayOfWeek.toString();
+    }
+
+    @Transactional
+    public String findLastDay(String year, String month){
+
+        YearMonth yearMonth = YearMonth.of(Integer.parseInt(year),Integer.parseInt(month));
+        int day = yearMonth.lengthOfMonth();
+        return String.valueOf(day);
+    }
 }

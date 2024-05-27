@@ -28,7 +28,7 @@ public class CalendarDetailService {
     private CalendarService calendarService;
     @Autowired
     private HolidayService holidayService;
-
+    @Autowired
     private final CalendarDetailMapper calendarDetailMapper;
 
     public CalendarDetailService(CalendarDetailMapper calendarDetailMapper) {
@@ -85,10 +85,8 @@ public class CalendarDetailService {
 
     //request 받아서 일정 추가 - 작성 완료, 테스트 전
     @Transactional
-    public ResponseCalendarDetail saveCalendarDetail(RequestCalendarDetail requestCalendarDetail,
+    public ResponseCalendarDetail saveCalendarDetail(Calendar_detail calendarDetail,
         Long userId, Long studyRoomId) { //request로 받으면
-        Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(
-            requestCalendarDetail);
         Calendar calendar = calendarService.findCalendar(userId, studyRoomId); //캘린더 찾아서
         calendarDetail.setCalendar(calendar); //캘린더 추가해주고
         calendarDetailRepository.save(calendarDetail); //저장
@@ -97,17 +95,17 @@ public class CalendarDetailService {
 
     //일정 수정 - put
     @Transactional
-    public ResponseCalendarDetail putCalendarDetail(RequestCalendarDetail requestCalendarDetail) {
+    public ResponseCalendarDetail putCalendarDetail(Calendar_detail c) {
         Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(
-            requestCalendarDetail.id());
+            c.getId());
         if(originCalendarDetail.isPresent()){
             Calendar_detail calendarDetail = originCalendarDetail.get();
-            if(requestCalendarDetail.title() != null) calendarDetail.setTitle(requestCalendarDetail.title());
-            if(requestCalendarDetail.content() != null) calendarDetail.setContent(requestCalendarDetail.content());
-            if(requestCalendarDetail.startDay() != null) calendarDetail.setStartDay(requestCalendarDetail.startDay());
-            if(requestCalendarDetail.endDay() != null) calendarDetail.setEndDay(requestCalendarDetail.endDay());
-            if(requestCalendarDetail.startTime() != null) calendarDetail.setStartTime(requestCalendarDetail.startTime());
-            if(requestCalendarDetail.endTime() != null) calendarDetail.setEndDay(requestCalendarDetail.endTime());
+            if(c.getTitle() != null) calendarDetail.setTitle(c.getTitle());
+            if(c.getContent() != null) calendarDetail.setContent(c.getContent());
+            if(c.getStartDay() != null) calendarDetail.setStartDay(c.getStartDay());
+            if(c.getEndDay() != null) calendarDetail.setEndDay(c.getEndDay());
+            if(c.getStartTime() != null) calendarDetail.setStartTime(c.getStartTime());
+            if(c.getEndTime() != null) calendarDetail.setEndDay(c.getEndTime());
             return calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
         }
         return null;
@@ -115,11 +113,9 @@ public class CalendarDetailService {
 
     //일정 삭제 - delete
     @Transactional
-    public void deleteCalendarDetail(DeleteRequestCalendarDetail deleteRequestCalendarDetail) {
-        Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(
-            deleteRequestCalendarDetail.id());
+    public void deleteCalendarDetail(long id) {
+        Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(id);
         if(originCalendarDetail.isPresent())
-            calendarDetailRepository.deleteById(deleteRequestCalendarDetail.id());
+            calendarDetailRepository.deleteById(id);
     }
-
 }
