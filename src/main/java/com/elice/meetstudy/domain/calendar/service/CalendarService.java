@@ -4,6 +4,8 @@ import com.elice.meetstudy.domain.calendar.domain.Calendar;
 import com.elice.meetstudy.domain.calendar.dto.DeleteRequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.repository.CalendarDetailRepository;
 import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
+import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
+import com.elice.meetstudy.domain.studyroom.repository.StudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import java.util.Optional;
@@ -20,41 +22,46 @@ public class CalendarService {
     UserRepository userRepository;
     @Autowired
     CalendarDetailRepository calendarDetailRepository;
+    @Autowired
+    StudyRoomRepository studyRoomRepository;
 
     //캘린더 조회(생성)
     @Transactional
     public Calendar findCalendar(long userId, long studyRoomId) {
         Optional<Calendar> userCalendar;
-        Calendar studyCalendar;
+        Optional<Calendar> studyCalendar;
 
         if (studyRoomId == 0L) {//스터디룸 아이디 없음 -> 개인 캘린더
-            System.out.println("개인 캘린더 탐색을 시작합니다.");
+            //리포지토리에서 유저 아이디로 캘린더 있나 확인
             userCalendar = calendarRepository.findByUserId(userId);
 
-            if (userCalendar.isEmpty()) {
-                System.out.println("캘린더가 없으므로 생성을 진행합니다.");
+            if (userCalendar.isEmpty()) { // 없으면
                 Optional<User> user = userRepository.findById(userId);
-                Calendar findUserCalendar = new Calendar(user.get());
-                calendarRepository.save(findUserCalendar);
+                Calendar findUserCalendar = new Calendar(user.get()); // 생성
+                calendarRepository.save(findUserCalendar); // 저장
                 return findUserCalendar;
             } else{
-                System.out.println("이미 존재하는 캘린더를 반환합니다.");
                 return userCalendar.get();
             }
 
 
         } else {// 스터디룸 아이디 있음 -> 공용 캘린더 조회
-//            studyCalendar = calendarRepository.findByRoomId(studyRoomId);
-//
-//            if (studyCalendar == null) {
-//                Optional<User> user = userRepository.findById(userId);
-//                StudyRoom studyRoom = StudyRoomRepository.findById(studyRoomId);
-//                studyCalendar = new Calendar(user.get(), studyRoom);
-//                calendarRepository.save(studyCalendar);
-//                return studyCalendar;
-//            } else
-//                return studyCalendar;
-            return null;
+            System.out.println("스터디룸 공용 캘린더를 탐색합니다.");
+            //캘린더 리포지토리에서 스터디룸 아이디로 캘린더 조회
+            studyCalendar = calendarRepository.findByStudyRoomId(studyRoomId);
+
+            if (studyCalendar.isEmpty()) { // 없으면
+                Optional<User> user = userRepository.findById(userId);
+                Optional<StudyRoom> studyRoom = studyRoomRepository.findById(studyRoomId);
+                System.out.println(studyRoom.get().getTitle());
+                Calendar newStudyCalendar = new Calendar(user.get(), studyRoom.get()); // 생성
+                calendarRepository.save(newStudyCalendar); // 저장
+                return newStudyCalendar;
+            } else{
+                System.out.println("이미 있는 캘린더이므로 반환합니다.");
+                return studyCalendar.get();
+
+            }
 
         }
     }

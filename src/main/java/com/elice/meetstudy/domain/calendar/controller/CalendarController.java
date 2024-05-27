@@ -41,7 +41,7 @@ public class CalendarController {
         //user Id 구하는 로직, 임시
         long userId = 1L;
 
-        if (userId == 1L /*유효한 유저 id라면*/) {
+        if (userId == 1L /*유효한 유저 id라면 */) {
             // 캘린더 찾아서 year, month로 해당 월의 일정들 반환
             List<ResponseCalendarDetail> calendarDetailList =
                 calendarDetailService.getAllCalendarDetail(year, month, userId, 0L);
@@ -62,6 +62,8 @@ public class CalendarController {
 
         //user Id 구하는 로직
         long userId = 1L;
+
+        System.out.println("스터디룸 공용 캘린더 조회를 시작합니다");
 
         //userId, studyroomId로 캘린더 찾아서 year, month로 해당 월의 일정들 반환
         List<ResponseCalendarDetail> calendarDetailList =

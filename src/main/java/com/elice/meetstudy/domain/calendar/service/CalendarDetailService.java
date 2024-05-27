@@ -42,7 +42,7 @@ public class CalendarDetailService {
         Optional<Calendar> calendar = calendarRepository.findById(calendarId);
 
         for (Holiday holiday : holidayList) {
-            if (calendarDetailRepository.existsByStartDay(holiday.getDate())) {
+            if (calendarDetailRepository.existsByStartDayAndCalendarId(holiday.getDate(), calendarId)) {
                 continue;
             } else { //현재 캘린더에 공휴일 정보가 없으면 등록함
                 Calendar_detail c = Calendar_detail.builder()
@@ -65,6 +65,7 @@ public class CalendarDetailService {
     public List<ResponseCalendarDetail> getAllCalendarDetail(String year, String month, Long userId,
         Long studyRoomId) {
         Calendar calendar = calendarService.findCalendar(userId, studyRoomId); //캘린더 찾아서
+        System.out.println("탐색된 캘린더 : " + calendar.getId());
         saveHolidays(year, month, calendar.getId()); //공휴일 일정 등록
         List<Calendar_detail> calendarDetailList = calendarDetailRepository.findAllByCalendar(
             calendar); //해당 캘린더의 일정들 리스트로 출력
