@@ -15,8 +15,6 @@ public class HolidayCheck {
 
     @PostConstruct
     public void checkAndDoSomething() throws IOException {
-
-        System.out.println("홀리데이 레코드 수: "+holidayRepository.count());
         if(holidayRepository.count() == 0){
             holidayController.getHoliday();
         }
