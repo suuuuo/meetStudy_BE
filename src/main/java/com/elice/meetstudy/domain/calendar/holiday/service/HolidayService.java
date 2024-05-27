@@ -16,11 +16,9 @@ public class HolidayService {
     public void addHoliday(String date, String name){
         boolean isExist = holidayRepository.existsByDate(date);
         if (isExist) {
-            System.out.println("이미 존재하는 공휴일입니다. 저장을 건너뜁니다.");
         } else{
             Holiday holiday = new Holiday(date, name);
             holidayRepository.save(holiday);
-            System.out.println(name + "(" +date+")이(가) 저장되었습니다");
         }
     }
 
