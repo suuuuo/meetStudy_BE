@@ -1,6 +1,5 @@
 package com.elice.meetstudy.domain.calendar.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,11 +11,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Calendar_detail {
@@ -65,10 +65,6 @@ public class Calendar_detail {
         this.startTime = startTime;
         this.endTime = endTime;
         this.isHoliday = isHoliday;
-    }
-
-    public void setHoliday(boolean holiday) {
-        isHoliday = holiday;
     }
 
     public void setCalendar(Calendar calendar) {
