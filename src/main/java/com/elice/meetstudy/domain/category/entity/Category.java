@@ -3,12 +3,14 @@ package com.elice.meetstudy.domain.category.entity;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import lombok.Getter;
 
 /**
  *  category Entity
  */
 
 @Entity
+@Getter
 @Table(name = "category")
 public class Category {
 

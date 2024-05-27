@@ -1,6 +1,8 @@
 package com.elice.meetstudy.domain.post.domain;
 
 import com.elice.meetstudy.domain.category.entity.Category;
+import com.elice.meetstudy.domain.post.dto.PostEditor;
+import com.elice.meetstudy.domain.post.dto.RequestPostEdit;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,7 +50,7 @@ public class Post {
   @Column(nullable = false)
   private Long hit = 0L;
 
-  @Column(name = "created_at", nullable = false)
+  @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
   @PrePersist
@@ -63,6 +65,17 @@ public class Post {
     this.user = user;
     this.title = title;
     this.content = content;
+  }
+
+  public PostEditor.PostEditorBuilder toEditor() {
+    return PostEditor.builder()
+        .title(this.title)
+        .content(this.content);
+  }
+
+  public void edit(PostEditor postEditor) {
+    this.title = postEditor.getTitle();
+    this.content = postEditor.getContent();
   }
 
 
