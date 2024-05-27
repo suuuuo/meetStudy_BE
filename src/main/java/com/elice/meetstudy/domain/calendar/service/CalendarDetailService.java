@@ -64,9 +64,7 @@ public class CalendarDetailService {
     @Transactional
     public List<ResponseCalendarDetail> getAllCalendarDetail(String year, String month, Long userId,
         Long studyRoomId) {
-        System.out.println("1. 캘린더를 탐색합니다.");
         Calendar calendar = calendarService.findCalendar(userId, studyRoomId); //캘린더 찾아서
-        System.out.println("탐색된 캘린더 : " + calendar.getId());
         saveHolidays(year, month, calendar.getId()); //공휴일 일정 등록
         List<Calendar_detail> calendarDetailList = calendarDetailRepository.findAllByCalendar(
             calendar); //해당 캘린더의 일정들 리스트로 출력
@@ -123,10 +121,5 @@ public class CalendarDetailService {
         if(originCalendarDetail.isPresent())
             calendarDetailRepository.deleteById(deleteRequestCalendarDetail.id());
     }
-
-    //회원 삭제 - 개인 / 공용 캘린더 삭제 delete
-
-
-    //스터디룸 삭제 - 공용 캘린더 삭제 delete
 
 }

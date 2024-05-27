@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class CalendarController {
-    //임의 생성한 회원으로 개인 캘린더 기능은 postman으로 확인 완료, 테스트 코드 작성 중
-    //공용 캘린더는 작성만
 
     @Autowired
     CalendarService calendarService;
@@ -43,7 +41,6 @@ public class CalendarController {
 
         if (userId == 1L /*유효한 유저 id라면 */) {
             // 캘린더 찾아서 year, month로 해당 월의 일정들 반환
-            System.out.println("탐색을 시작합니다.");
             List<ResponseCalendarDetail> calendarDetailList =
                 calendarDetailService.getAllCalendarDetail(year, month, userId, 0L);
             return ResponseEntity.ok(calendarDetailList);
@@ -63,8 +60,6 @@ public class CalendarController {
 
         //user Id 구하는 로직
         long userId = 1L;
-
-        System.out.println("스터디룸 공용 캘린더 조회를 시작합니다");
 
         //userId, studyroomId로 캘린더 찾아서 year, month로 해당 월의 일정들 반환
         List<ResponseCalendarDetail> calendarDetailList =
