@@ -1,7 +1,6 @@
 package com.elice.meetstudy.domain.calendar.service;
 
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
-import com.elice.meetstudy.domain.calendar.dto.DeleteRequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.repository.CalendarDetailRepository;
 import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
