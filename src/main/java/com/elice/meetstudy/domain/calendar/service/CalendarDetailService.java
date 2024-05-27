@@ -64,6 +64,7 @@ public class CalendarDetailService {
     @Transactional
     public List<ResponseCalendarDetail> getAllCalendarDetail(String year, String month, Long userId,
         Long studyRoomId) {
+        System.out.println("1. 캘린더를 탐색합니다.");
         Calendar calendar = calendarService.findCalendar(userId, studyRoomId); //캘린더 찾아서
         System.out.println("탐색된 캘린더 : " + calendar.getId());
         saveHolidays(year, month, calendar.getId()); //공휴일 일정 등록

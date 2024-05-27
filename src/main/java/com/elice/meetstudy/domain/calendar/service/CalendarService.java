@@ -32,19 +32,20 @@ public class CalendarService {
         Optional<Calendar> studyCalendar;
 
         if (studyRoomId == 0L) {//스터디룸 아이디 없음 -> 개인 캘린더
+            System.out.println("개인 캘린더를 탐색합니다.");
             //리포지토리에서 유저 아이디로 캘린더 있나 확인
-            userCalendar = calendarRepository.findByUserId(userId);
+            userCalendar = calendarRepository.findByUserIdAndStudyRoomIsNull(userId);
 
             if (userCalendar.isEmpty()) { // 없으면
+                System.out.println("캘린더를 생성합니다.");
                 Optional<User> user = userRepository.findById(userId);
                 Calendar findUserCalendar = new Calendar(user.get()); // 생성
                 calendarRepository.save(findUserCalendar); // 저장
                 return findUserCalendar;
             } else{
+                System.out.println("검색된 캘린더를 반환합니다.");
                 return userCalendar.get();
             }
-
-
         } else {// 스터디룸 아이디 있음 -> 공용 캘린더 조회
             System.out.println("스터디룸 공용 캘린더를 탐색합니다.");
             //캘린더 리포지토리에서 스터디룸 아이디로 캘린더 조회
@@ -76,12 +77,12 @@ public class CalendarService {
     }
 
     //유저 삭제 시 같이 삭제되게? cascade 설정하면 공용 캘린더가 유저 한명만 삭제되어도 같이 삭제됨.
-    @Transactional
-    public void deleteCalendar(Long userId){
-        Optional<Calendar> calendar = calendarRepository.findByUserId(userId);
-        if(calendar.isPresent()){
-            calendarDetailRepository.deleteAllByCalendar(calendar.get());
-            calendarRepository.deleteById(calendar.get().getId());
-        }
-    }
+//    @Transactional
+//    public void deleteCalendar(Long userId){
+//        Optional<Calendar> calendar = calendarRepository.findByUserId(userId);
+//        if(calendar.isPresent()){
+//            calendarDetailRepository.deleteAllByCalendar(calendar.get());
+//            calendarRepository.deleteById(calendar.get().getId());
+//        }
+//    }
 }
