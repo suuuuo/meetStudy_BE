@@ -9,24 +9,29 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Getter;
 
 @Entity
 @Getter
+@Builder
 public class Message {
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  //@OneToMany
   @ManyToOne
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "chat_room_id")
+  private ChatRoom chatRoom;
+
+  @ManyToOne
+  @JoinColumn(name="user_id",nullable = false)
   private User user;
 
   @Column(name = "content")
   private String content;
 
   @Column(name = "create_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-  private LocalDateTime create_at;
+  private LocalDateTime createAt;
 
 }
