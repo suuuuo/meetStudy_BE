@@ -153,18 +153,32 @@ public class CalendarController {
         @RequestBody DeleteRequestCalendarDetail deleteRequestCalendarDetail
         /*userId .. 헤더 액세스 jwt 토큰?*/){
 
-
-
         calendarDetailService.deleteCalendarDetail(deleteRequestCalendarDetail.id());
     }
 
-    //회원 삭제 - 개인 / 공용 캘린더 삭제 delete
+    //회원 삭제 - 개인 캘린더 삭제(초기화)
     @DeleteMapping("/calendar")
-    public void deleteCalendar(
-        @RequestBody DeleteRequestCalendarDetail deleteRequestCalendarDetail
-        /*userId .. 헤더 액세스 jwt 토큰?*/
-    ){
-        calendarService.deleteCalendar(deleteRequestCalendarDetail.id());
+    public void deleteUserCalendar(
+        /*userId .. 헤더 액세스 jwt 토큰?*/){
+
+        //id구하는 로직
+        //임시 id
+        long userId = 1L;
+
+        calendarService.deleteCalendar(userId);
     }
+
+    //회원 삭제 - 공용 캘린더 삭제(초기화)
+    @DeleteMapping("/calendar/{study_room_id}")
+    public void deleteStudyCalendar(
+        /*userId .. 헤더 액세스 jwt 토큰?*/ @PathVariable long study_room_id){
+
+        //id구하는 로직
+        //임시 id
+        long userId = 1L;
+
+        calendarService.deleteStudyCalendar(study_room_id);
+    }
+
 
 }
