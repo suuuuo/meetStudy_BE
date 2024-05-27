@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CalendarDetailRepository extends JpaRepository<Calendar_detail, Long> {
 
-    boolean existsByStartDay(String startDay);
+    boolean existsByStartDayAndCalendarId(String startDay, long calendarId);
 
     void deleteAllByCalendar(Calendar calendar);
 

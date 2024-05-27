@@ -16,5 +16,5 @@ CalendarRepository extends JpaRepository<Calendar, Long> {
     Optional<Calendar> findByUserId(Long userId);
 
     //roomId 있는, 공용 캘린더 찾기
-    //Optional<Calendar> findByroomId(Long roomId);
+    Optional<Calendar> findByStudyRoomId(Long studyRoomId);
 }
