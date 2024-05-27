@@ -43,6 +43,7 @@ public class CalendarController {
 
         if (userId == 1L /*유효한 유저 id라면 */) {
             // 캘린더 찾아서 year, month로 해당 월의 일정들 반환
+            System.out.println("탐색을 시작합니다.");
             List<ResponseCalendarDetail> calendarDetailList =
                 calendarDetailService.getAllCalendarDetail(year, month, userId, 0L);
             return ResponseEntity.ok(calendarDetailList);

@@ -13,7 +13,7 @@ public interface
 CalendarRepository extends JpaRepository<Calendar, Long> {
 
     //roomId가 없는, 개인 캘린더 찾기 : 스터디룸 아이디 없는 조건 추가해야함
-    Optional<Calendar> findByUserId(Long userId);
+    Optional<Calendar> findByUserIdAndStudyRoomIsNull(Long userId);
 
     //roomId 있는, 공용 캘린더 찾기
     Optional<Calendar> findByStudyRoomId(Long studyRoomId);
