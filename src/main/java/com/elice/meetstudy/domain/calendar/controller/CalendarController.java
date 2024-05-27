@@ -1,14 +1,17 @@
 package com.elice.meetstudy.domain.calendar.controller;
 
+import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
 import com.elice.meetstudy.domain.calendar.dto.DeleteRequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.RequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
+import com.elice.meetstudy.domain.calendar.mapper.CalendarDetailMapper;
 import com.elice.meetstudy.domain.calendar.service.CalendarDetailService;
 import com.elice.meetstudy.domain.calendar.service.CalendarService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,6 +33,12 @@ public class CalendarController {
     @Autowired
     CalendarDetailService calendarDetailService;
 
+    private final CalendarDetailMapper calendarDetailMapper;
+
+    public CalendarController(CalendarDetailMapper calendarDetailMapper) {
+        this.calendarDetailMapper = calendarDetailMapper;
+    }
+
     //개인 캘린더 전체 조회
     @GetMapping("/calendar") //userId 받아오는 건 추후에 추가
     public ResponseEntity<?> getCalendarDetails(
@@ -43,7 +52,12 @@ public class CalendarController {
             // 캘린더 찾아서 year, month로 해당 월의 일정들 반환
             List<ResponseCalendarDetail> calendarDetailList =
                 calendarDetailService.getAllCalendarDetail(year, month, userId, 0L);
-            return ResponseEntity.ok(calendarDetailList);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("first-day", calendarService.findFirstDay(year,month));
+            headers.add("last-day", calendarService.findLastDay(year,month));
+            return new ResponseEntity<>(calendarDetailList, headers, HttpStatus.OK);
+
         } else {
             //유효한 유저 아님 에러 = 회원이 아니라 캘린더 조회할 수 없음
             Map<String, Object> response = new HashMap<>();
@@ -64,7 +78,11 @@ public class CalendarController {
         //userId, studyroomId로 캘린더 찾아서 year, month로 해당 월의 일정들 반환
         List<ResponseCalendarDetail> calendarDetailList =
             calendarDetailService.getAllCalendarDetail(year, month, userId, study_room_id);
-        return ResponseEntity.ok(calendarDetailList);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("first-day", calendarService.findFirstDay(year,month));
+        headers.add("last-day", calendarService.findLastDay(year,month));
+        return new ResponseEntity<>(calendarDetailList, headers, HttpStatus.OK);
     }
 
     //캘린더 - 일정 개별 조회
@@ -86,8 +104,10 @@ public class CalendarController {
         //user Id 구하는 로직
         Long userId = 1L;
 
+        Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
+
         ResponseCalendarDetail responseCalendarDetail =
-            calendarDetailService.saveCalendarDetail(requestCalendarDetail, userId, 0L);
+            calendarDetailService.saveCalendarDetail(calendarDetail, userId, 0L);
         return ResponseEntity.ok(responseCalendarDetail);
     }
 
@@ -101,8 +121,10 @@ public class CalendarController {
         //user Id 구하는 로직
         Long userId = 1L;
 
+        Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
+
         ResponseCalendarDetail responseCalendarDetail =
-            calendarDetailService.saveCalendarDetail(requestCalendarDetail, userId, study_room_id);
+            calendarDetailService.saveCalendarDetail(calendarDetail, userId, study_room_id);
         return ResponseEntity.ok(responseCalendarDetail);
     }
 
@@ -113,8 +135,10 @@ public class CalendarController {
         @RequestBody RequestCalendarDetail requestCalendarDetail
         /*userId .. 헤더 액세스 jwt 토큰?*/) {
 
+        Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
+
         ResponseCalendarDetail responseCalendarDetail =
-            calendarDetailService.putCalendarDetail(requestCalendarDetail);
+            calendarDetailService.putCalendarDetail(calendarDetail);
 
         if(requestCalendarDetail == null){
             Map<String, Object> response = new HashMap<>();
@@ -129,7 +153,9 @@ public class CalendarController {
         @RequestBody DeleteRequestCalendarDetail deleteRequestCalendarDetail
         /*userId .. 헤더 액세스 jwt 토큰?*/){
 
-        calendarDetailService.deleteCalendarDetail(deleteRequestCalendarDetail);
+
+
+        calendarDetailService.deleteCalendarDetail(deleteRequestCalendarDetail.id());
     }
 
     //회원 삭제 - 개인 / 공용 캘린더 삭제 delete
@@ -138,7 +164,7 @@ public class CalendarController {
         @RequestBody DeleteRequestCalendarDetail deleteRequestCalendarDetail
         /*userId .. 헤더 액세스 jwt 토큰?*/
     ){
-        calendarService.deleteCalendar(deleteRequestCalendarDetail);
+        calendarService.deleteCalendar(deleteRequestCalendarDetail.id());
     }
 
 }

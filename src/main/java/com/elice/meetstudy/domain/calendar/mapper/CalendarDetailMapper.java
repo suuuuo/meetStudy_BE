@@ -13,4 +13,7 @@ public interface CalendarDetailMapper {
     ResponseCalendarDetail toResponseCalendarDetail(Calendar_detail calendarDetail);
 
     Calendar_detail toCalendarDetail(RequestCalendarDetail requestCalendarDetail);
+
+    //테스트용
+    RequestCalendarDetail toRequestCalendarDetail(Calendar_detail calendarDetail);
 }
