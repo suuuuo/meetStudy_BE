@@ -1,7 +1,5 @@
 package com.elice.meetstudy.domain.chatroom.domain;
 
-import com.elice.meetstudy.domain.chatroom.dto.MessageDto;
-import com.elice.meetstudy.domain.chatroom.service.ChatService;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,8 +14,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import lombok.Builder;
 import lombok.Getter;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 @Entity
@@ -35,7 +33,19 @@ public class ChatRoom {
   @OneToMany(mappedBy = "chatRoom")
   private List<Message> messages = new ArrayList<>();
 
+  @Column(name="notice", nullable = true)
+  private String notice;
+
   private Set<WebSocketSession> sessions = new HashSet<>();
 
 
+
+  @Builder
+  public ChatRoom(StudyRoom studyRoom) {
+    this.studyRoom = studyRoom;
+  }
+
+  public void updateNotice(String notice){
+    this.notice =notice;
+  }
 }

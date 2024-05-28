@@ -14,7 +14,6 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Builder
 public class Message {
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,4 +33,11 @@ public class Message {
   @Column(name = "create_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private LocalDateTime createAt;
 
+  @Builder
+  public Message(ChatRoom chatRoom, User user, String content, LocalDateTime createAt) {
+    this.chatRoom = chatRoom;
+    this.user = user;
+    this.content = content;
+    this.createAt = createAt;
+  }
 }
