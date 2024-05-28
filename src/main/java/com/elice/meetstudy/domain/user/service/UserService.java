@@ -3,16 +3,22 @@ package com.elice.meetstudy.domain.user.service;
 import com.elice.meetstudy.domain.user.domain.Role;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.dto.UserJoinDto;
+import com.elice.meetstudy.domain.user.jwt.token.TokenProvider;
+import com.elice.meetstudy.domain.user.jwt.token.dto.TokenInfo;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
-
+@Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserService {
 
@@ -22,6 +28,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenProvider tokenProvider;
 
 
     // 회원가입
@@ -39,7 +46,7 @@ public class UserService {
                 .role(Role.USER)
                 .build();
 
-        user.setJoinAt(LocalDateTime.now());
+        user.setCreatedAt(LocalDateTime.now());
 
 
         return userRepository.save(user);
@@ -84,18 +91,41 @@ public class UserService {
 
     // 관심분야 선택 (최대 3개)
 
+
     // 로그인
+    // 로그인
+    public TokenInfo login(String email, String password) {
+        User user = findUserByEmail(email);
+
+        if (user.getDeletedAt() == null) {
+            try {
+                checkPassword(password, user);
+                return tokenProvider.createToken(user);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("계정이 존재하지 않거나 비밀번호가 잘못되었습니다");
+            }
+        } else {
+            throw new IllegalArgumentException("계정이 존재하지 않거나 비밀번호가 잘못되었습니다");
+        }
+    }
 
     // 로그인 - 이메일 확인
+    private User findUserByEmail(String email){
+
+        return userRepository.findByEmail(email).orElseThrow(() -> {
+            return new IllegalArgumentException("계정이 존재하지 않습니다.");
+        });
+    }
 
     // 로그인 - 비밀번호 확인
+    private void checkPassword(String loginPwd, User user){
+        if (!passwordEncoder.matches(loginPwd, user.getPassword())) {
+            throw new BadCredentialsException("기존 비밀번호 확인에 실패하셨습니다");
+        }
+    }
 
 
 
     // + 소셜 로그인, 비밀번호 찾기
-
-
-
-
 
 }

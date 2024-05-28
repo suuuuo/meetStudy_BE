@@ -2,9 +2,13 @@ package com.elice.meetstudy.domain.user.controller;
 
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.dto.UserJoinDto;
+import com.elice.meetstudy.domain.user.dto.UserLoginDto;
+import com.elice.meetstudy.domain.user.jwt.token.dto.TokenInfo;
+import com.elice.meetstudy.domain.user.jwt.web.json.ApiResponseJson;
 import com.elice.meetstudy.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -45,12 +49,11 @@ public class UserController {
     // 관심분야 선택 (최대 3개)
 
     // 로그인
-
-    // 로그인 - 이메일 확인
-
-    // 로그인 - 비밀번호 확인
-
-
+    @PostMapping("/login")
+    public ApiResponseJson login(@RequestBody UserLoginDto userLoginDto){
+        TokenInfo tokenInfo = userService.login(userLoginDto.getEmail(), userLoginDto.getPassword());
+        return new ApiResponseJson(HttpStatus.OK, tokenInfo);
+    }
 
     // + 소셜 로그인, 비밀번호 찾기
 }
