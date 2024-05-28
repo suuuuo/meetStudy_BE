@@ -8,7 +8,7 @@ import lombok.Getter;
 public class MessageDto {
 
   private Long chatRoomId;
-  private Long userId;
+  private String nickName;
   private String content;
   private String createdAt;
 }
