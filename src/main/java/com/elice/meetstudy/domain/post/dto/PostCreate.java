@@ -7,14 +7,11 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@ToString
 public class PostCreate {
 
-  @NotNull
-  private Long categoryId;
+  @NotNull private Long categoryId;
 
-  @NotNull
-  private Long userId;
+  @NotNull private Long userId;
 
   @NotBlank(message = "제목을 입력해주세요.")
   private String title;
@@ -29,5 +26,4 @@ public class PostCreate {
     this.title = title;
     this.content = content;
   }
-
 }
