@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.user.dto;
 
+import com.elice.meetstudy.domain.user.domain.Interest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,4 +14,5 @@ public class UserJoinDto {
     private String password;
     private String username;
     private String nickname;
+    private Interest interest;
 }
