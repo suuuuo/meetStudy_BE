@@ -13,5 +13,4 @@ public interface CalendarDetailMapper {
     ResponseCalendarDetail toResponseCalendarDetail(Calendar_detail calendarDetail);
 
     Calendar_detail toCalendarDetail(RequestCalendarDetail requestCalendarDetail);
-
 }
