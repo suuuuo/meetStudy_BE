@@ -2,7 +2,6 @@ package com.elice.meetstudy.domain.post.domain;
 
 import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.post.dto.PostEditor;
-import com.elice.meetstudy.domain.post.dto.RequestPostEdit;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,10 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/**
- *  post Entity
- */
-
+/** post Entity */
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -43,7 +39,7 @@ public class Post {
   @Column(nullable = false)
   private String title;
 
-  //@Lob
+  // @Lob
   @Column(nullable = false)
   private String content;
 
@@ -58,7 +54,6 @@ public class Post {
     createdAt = LocalDateTime.now();
   }
 
-
   @Builder
   public Post(Category category, User user, String title, String content) {
     this.category = category;
@@ -68,15 +63,11 @@ public class Post {
   }
 
   public PostEditor.PostEditorBuilder toEditor() {
-    return PostEditor.builder()
-        .title(this.title)
-        .content(this.content);
+    return PostEditor.builder().title(this.title).content(this.content);
   }
 
   public void edit(PostEditor postEditor) {
     this.title = postEditor.getTitle();
     this.content = postEditor.getContent();
   }
-
-
 }

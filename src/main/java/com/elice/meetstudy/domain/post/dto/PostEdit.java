@@ -5,19 +5,15 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class RequestPostEdit {
+public class PostEdit {
 
-  @NotNull
-  private Long categoryId;
+  @NotNull private Long categoryId;
 
-  @NotNull
-  private Long userId;
+  @NotNull private Long userId;
 
   @NotBlank(message = "제목을 입력해주세요.")
   private String title;
 
   @NotBlank(message = "내용을 입력해주세요.")
   private String content;
-
 }
-

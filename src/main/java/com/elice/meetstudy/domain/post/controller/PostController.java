@@ -1,8 +1,8 @@
 package com.elice.meetstudy.domain.post.controller;
 
 import com.elice.meetstudy.domain.post.dto.PostCreate;
+import com.elice.meetstudy.domain.post.dto.PostEdit;
 import com.elice.meetstudy.domain.post.dto.PostGet;
-import com.elice.meetstudy.domain.post.dto.RequestPostEdit;
 import com.elice.meetstudy.domain.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,8 +47,8 @@ public class PostController {
 
   @Operation(summary = "게시글 수정")
   @PatchMapping("/{postId}")
-  public ResponseEntity<RequestPostEdit> editPost(
-      @PathVariable Long postId, @RequestBody @Valid RequestPostEdit request) {
+  public ResponseEntity<PostEdit> editPost(
+      @PathVariable Long postId, @RequestBody @Valid PostEdit request) {
     postService.edit(postId, request);
     return ResponseEntity.ok().build();
   }

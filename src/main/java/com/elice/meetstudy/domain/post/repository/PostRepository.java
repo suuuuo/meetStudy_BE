@@ -2,9 +2,7 @@ package com.elice.meetstudy.domain.post.repository;
 
 import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.post.domain.Post;
-import com.elice.meetstudy.domain.post.dto.RequestPostEdit;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,19 +24,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   // 게시글 작성
 
   // 게시글 수정
-  // 게시글 수정시 외래키만 별도 업데이트하여 복잡성 해결
-  @Query("UPDATE Post p "
-      + "SET p.category.id = :categoryId "
-      + "WHERE p.id = :id")
-  void updateCategoryIdById(@Param("categoryId") Long categoryId, @Param("id") Long id);
-
-  @Query("UPDATE Post p "
-      + "SET p.user.id = :userId "
-      + "WHERE p.id = :id")
-  void updateUserIdById(@Param("userId") Long userId, @Param("id") Long id);
-
-//  Optional<Post> findById(Long id);
-//  void save(RequestPostEdit editPost);
 
   // 게시글 삭제
 

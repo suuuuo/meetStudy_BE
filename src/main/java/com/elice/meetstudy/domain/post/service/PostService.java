@@ -3,10 +3,10 @@ package com.elice.meetstudy.domain.post.service;
 import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.category.repository.CategoryRepository;
 import com.elice.meetstudy.domain.post.domain.Post;
-import com.elice.meetstudy.domain.post.dto.PostEditor;
 import com.elice.meetstudy.domain.post.dto.PostCreate;
-import com.elice.meetstudy.domain.post.dto.RequestPostEdit;
+import com.elice.meetstudy.domain.post.dto.PostEditor;
 import com.elice.meetstudy.domain.post.dto.PostGet;
+import com.elice.meetstudy.domain.post.dto.PostEdit;
 import com.elice.meetstudy.domain.post.repository.PostRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
@@ -38,10 +38,7 @@ public class PostService {
   /* 게시글 작성 */
   public Post write(PostCreate postCreate) {
     // User와 Category를 가져와서 엔티티로 설정
-    User user =
-        userRepository
-            .findById(postCreate.getUserId())
-            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 X."));
+    User user = userRepository.findById(postCreate.getUserId()).orElseThrow();
     Category category =
         categoryRepository
             .findById(postCreate.getCategoryId())
@@ -60,7 +57,7 @@ public class PostService {
   }
 
   /* 게시글 수정 */
-  public void edit(Long id, RequestPostEdit request) {
+  public void edit(Long id, PostEdit request) {
     // postId로 게시글 찾기
     Post post =
         postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 X."));
