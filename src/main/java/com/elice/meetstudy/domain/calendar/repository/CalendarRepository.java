@@ -1,10 +1,7 @@
 package com.elice.meetstudy.domain.calendar.repository;
 
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
-import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
-import java.util.List;
 import java.util.Optional;
-import org.mapstruct.ap.shaded.freemarker.template.utility.OptimizerUtil;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

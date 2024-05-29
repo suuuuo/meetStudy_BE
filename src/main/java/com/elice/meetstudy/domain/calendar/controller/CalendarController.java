@@ -6,6 +6,7 @@ import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.calendar.mapper.CalendarDetailMapper;
 import com.elice.meetstudy.domain.calendar.service.CalendarDetailService;
 import com.elice.meetstudy.domain.calendar.service.CalendarService;
+import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,27 +28,35 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class CalendarController {
 
-    @Autowired
-    CalendarService calendarService;
-    @Autowired
-    CalendarDetailService calendarDetailService;
-
+    private final CalendarService calendarService;
+    private final CalendarDetailService calendarDetailService;
     private final CalendarDetailMapper calendarDetailMapper;
+   //private final TokenProvider tokenProvider;
 
-    public CalendarController(CalendarDetailMapper calendarDetailMapper) {
+    @Autowired
+    public CalendarController(CalendarService calendarService,
+        CalendarDetailService calendarDetailService, CalendarDetailMapper calendarDetailMapper
+        /*,TokenProvider tokenProvider*/) {
+        this.calendarService = calendarService;
+        this.calendarDetailService = calendarDetailService;
         this.calendarDetailMapper = calendarDetailMapper;
+        //this.tokenProvider = tokenProvider;
     }
 
     //개인 캘린더 전체 조회
-    @GetMapping("/calendar") //userId 받아오는 건 추후에 추가
+    @GetMapping("/calendar")
     public ResponseEntity<?> getCalendarDetails(
         @RequestHeader("year") String year, @RequestHeader("month") String month
-        /*userId ..*/) {
+        /*,@RequestHeader("access") String token*/) {
 
-        //user Id 구하는 로직, 임시
+        //user Id 구하는 로직
+        //TokenValidationResult validationResult = tokenProvider.validateToken(token);
+        //임시
         long userId = 1L;
 
-        if (userId == 1L /*유효한 유저 id라면 */) {
+        if (userId == 1L /*validationResult.isValid() 유효한 토큰이면?*/) {
+            //String loginId = validationResult.getLoginId();
+
             // 캘린더 찾아서 year, month로 해당 월의 일정들 반환
             List<ResponseCalendarDetail> calendarDetailList =
                 calendarDetailService.getAllCalendarDetail(year, month, userId, 0L);
@@ -69,9 +78,9 @@ public class CalendarController {
     @GetMapping("/calendar/{study_room_id}")
     public ResponseEntity<?> getCalendarDetails(
         @RequestHeader("year") String year, @RequestHeader("month") String month,
-        @PathVariable long study_room_id /*userId .. 헤더 액세스 jwt 토큰?*/) {
+        @PathVariable long study_room_id  /*@RequestHeader("access") String token 토큰 ..*/) {
 
-        //user Id 구하는 로직
+        //user Id 구하는 로직, 아래는 임시
         long userId = 1L;
 
         //userId, studyroomId로 캘린더 찾아서 year, month로 해당 월의 일정들 반환
@@ -87,7 +96,7 @@ public class CalendarController {
     //캘린더 - 일정 개별 조회
     @GetMapping("/calendar_detail/{calendar_detail_id}")
     public ResponseEntity<?> getCalendarDetail(
-        /*userId ..*/
+        /*@RequestHeader("access") String token 토큰 ..*/
         @PathVariable long calendar_detail_id) {
         ResponseCalendarDetail responseCalendarDetail = calendarDetailService.getCalendarDetail(
             calendar_detail_id);
@@ -97,8 +106,8 @@ public class CalendarController {
     //개인 캘린더 일정 추가
     @PostMapping("/calendar")
     public ResponseEntity<?> postCalendarDetail(
-        @RequestBody RequestCalendarDetail requestCalendarDetail
-        /*userId .. */) {
+        @RequestBody @Valid RequestCalendarDetail requestCalendarDetail
+        /*@RequestHeader("access") String token 토큰 ..*/) {
 
         //user Id 구하는 로직
         Long userId = 1L;
@@ -113,9 +122,9 @@ public class CalendarController {
     //공용 캘린더 일정 추가
     @PostMapping("/calendar/{study_room_id}")
     public ResponseEntity<?> postCalendarDetail(
-        @RequestBody RequestCalendarDetail requestCalendarDetail,
+        @RequestBody @Valid RequestCalendarDetail requestCalendarDetail,
         @PathVariable long study_room_id
-        /*userId .. 헤더 액세스 jwt 토큰?*/) {
+        /*@RequestHeader("access") String token 토큰 ..*/) {
 
         //user Id 구하는 로직
         Long userId = 1L;
@@ -129,54 +138,48 @@ public class CalendarController {
 
 
     //캘린더 일정 수정 - put
-    @PutMapping("/calendar_detail")
+    @PutMapping("/calendar_detail/{calendar_detail_id}")
     public ResponseEntity<?> putCalendarDetail(
-        @RequestBody RequestCalendarDetail requestCalendarDetail
-        /*userId .. 헤더 액세스 jwt 토큰?*/) {
-
-        Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
-
-        ResponseCalendarDetail responseCalendarDetail =
-            calendarDetailService.putCalendarDetail(calendarDetail);
+        @RequestBody @Valid RequestCalendarDetail requestCalendarDetail,
+        @PathVariable long calendar_detail_id
+        /*@RequestHeader("access") String token 토큰 ..*/) {
 
         if(requestCalendarDetail == null){
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "바꾸려는 일정이 유효하지 않은 일정입니다.");
+            response.put("message", "유효하지 않은 일정입니다.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        } return ResponseEntity.ok(responseCalendarDetail);
+        }else{
+            Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
+            ResponseCalendarDetail responseCalendarDetail =
+                calendarDetailService.putCalendarDetail(calendarDetail, calendar_detail_id);
+            return ResponseEntity.ok(responseCalendarDetail);
+        }
     }
 
     //일정 삭제 - delete
     @DeleteMapping("/calendar_detail/{calendar_detail_id}")
     public void deleteCalendarDetail(
-        /*userId .. 헤더 액세스 jwt 토큰?*/@PathVariable long calendar_detail_id){
-
+        /*@RequestHeader("access") String token 토큰 ..*/@PathVariable long calendar_detail_id){
         calendarDetailService.deleteCalendarDetail(calendar_detail_id);
     }
 
-    //회원 삭제 - 개인 캘린더 삭제(초기화)
+    //회원 삭제 - 개인 캘린더 삭제
     @DeleteMapping("/calendar")
     public void deleteUserCalendar(
-        /*userId .. 헤더 액세스 jwt 토큰?*/){
+        /*@RequestHeader("access") String token 토큰 ..*/){
 
-        //id구하는 로직
         //임시 id
         long userId = 1L;
-
         calendarService.deleteCalendar(userId);
     }
 
-    //회원 삭제 - 공용 캘린더 삭제(초기화)
+    //회원 삭제 - 공용 캘린더 삭제
     @DeleteMapping("/calendar/{study_room_id}")
     public void deleteStudyCalendar(
-        /*userId .. 헤더 액세스 jwt 토큰?*/ @PathVariable long study_room_id){
+        /*@RequestHeader("access") String token 토큰 ..*/ @PathVariable long study_room_id){
 
-        //id구하는 로직
         //임시 id
-        long userId = 1L;
-
+        long userId = 1L; //회원인지만 확인
         calendarService.deleteStudyCalendar(study_room_id);
     }
-
-
 }
