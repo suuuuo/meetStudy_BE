@@ -55,6 +55,7 @@ public class Calendar_detail {
     @ColumnDefault("false")
     private boolean isHoliday;
 
+
     @Builder
     public Calendar_detail(String title, String content, String startDay, String endDay,
         String startTime, String endTime, boolean isHoliday) {
@@ -67,7 +68,13 @@ public class Calendar_detail {
         this.isHoliday = isHoliday;
     }
 
-    public void setCalendar(Calendar calendar) {
-        this.calendar = calendar;
+  public void update( String title, String content, String startDay,
+      String endDay, String startTime, String endTime) {
+    this.title = title;
+    this.content = content;
+    this.startDay = startDay;
+    this.endDay = endDay;
+    this.startTime = startTime;
+    this.endTime = endTime;
     }
 }
