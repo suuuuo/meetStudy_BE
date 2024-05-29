@@ -26,7 +26,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
       @Param("postId") Long postId, @Param("keyword") String keyword, Pageable pageable);
 
   // 전체 댓글 조회
+  List<Comment> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-  // 특정 댓글 조회(commentId)
-
+  // 전체 댓글 내 키워드 검색
+  @Query("SELECT c FROM Comment c WHERE c.content LIKE %:keyword% ORDER BY c.createdAt DESC")
+  List<Comment> findAllByKeywordOrderByCreatedAtDesc(
+      @Param("keyword") String keyword, Pageable pageable);
 }

@@ -74,7 +74,6 @@ public class CommentService {
 
   /* 댓글 삭제 */
   public void delete(Long id) {
-    // 예외 발생시
     Comment comment = findCommentById(id);
     commentRepository.deleteById(id);
   }
@@ -88,15 +87,11 @@ public class CommentService {
     List<Comment> commentsList = commentRepository.findAllByPostId(postId, pageable);
 
     // 댓글을 응답객체로 변환
-    //    List<CommentResponse> commentResponses =
-    //        commentsPage.stream().map(CommentResponse::new).collect(Collectors.toList());
-
-    // 댓글을 응답객체로 변환
     return commentsList.stream().map(CommentResponse::new).collect(Collectors.toList());
   }
 
   /** 게시글에 달린 댓글을 키워드로 조회 */
-  public List<CommentResponse> geyByKeyword(Long postId, String keyword, Pageable pageable) {
+  public List<CommentResponse> getByPostAndKeyword(Long postId, String keyword, Pageable pageable) {
     // 게시글 조회
     Post post = findPostById(postId);
 
@@ -109,8 +104,17 @@ public class CommentService {
   }
 
   /** 전체 댓글 조회 (관리자 페이지) */
+  public List<CommentResponse> getAll(Pageable pageable) {
+    List<Comment> commentList = commentRepository.findAllByOrderByCreatedAtDesc(pageable);
+    return commentList.stream().map(CommentResponse::new).collect(Collectors.toList());
+  }
 
   /** 전체 댓글 내 키워드 검색 (관리자 페이지) */
+  public List<CommentResponse> getByKeyword(String keyword, Pageable pageable) {
+    List<Comment> commentList =
+        commentRepository.findAllByKeywordOrderByCreatedAtDesc(keyword, pageable);
+    return commentList.stream().map(CommentResponse::new).collect(Collectors.toList());
+  }
 
   /** 게시글 찾는 메서드 */
   private Post findPostById(Long postId) {

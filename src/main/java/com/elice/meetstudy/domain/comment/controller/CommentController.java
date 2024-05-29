@@ -65,6 +65,20 @@ public class CommentController {
   @GetMapping("/{postId}/search")
   public ResponseEntity<List<CommentResponse>> getCommentByKeyword(
       @PathVariable Long postId, @RequestParam String keyword, @PageableDefault Pageable pageable) {
-    return ResponseEntity.ok(commentService.geyByKeyword(postId, keyword, pageable));
+    return ResponseEntity.ok(commentService.getByPostAndKeyword(postId, keyword, pageable));
+  }
+
+  /** 추후 AdminController로 이동을 고려! API endpoint 변경 예정 */
+  @Operation(summary = "(관리자 페이지 - 전체 댓글 모니터링) 전체 댓글 조회")
+  @GetMapping
+  public ResponseEntity<List<CommentResponse>> getComment(@PageableDefault Pageable pageable) {
+    return ResponseEntity.ok(commentService.getAll(pageable));
+  }
+
+  @Operation(summary = "(관리자 페이지 - 전체 댓글 모니터링) 전체 댓글 내 키워드 검색")
+  @GetMapping("/search")
+  public ResponseEntity<List<CommentResponse>> getAllCommentByKeyword(
+      @RequestParam String keyword, @PageableDefault Pageable pageable) {
+    return ResponseEntity.ok(commentService.getByKeyword(keyword, pageable));
   }
 }
