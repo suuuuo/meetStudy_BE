@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -57,6 +58,13 @@ public class CommentController {
   @GetMapping("/{postId}")
   public ResponseEntity<List<CommentResponse>> getCommentByPost(
       @PathVariable Long postId, @PageableDefault Pageable pageable) {
-    return ResponseEntity.ok().body(commentService.getByPost(postId, pageable));
+    return ResponseEntity.ok(commentService.getByPost(postId, pageable));
+  }
+
+  @Operation(summary = "게시글에 달린 댓글을 키워드로 조회")
+  @GetMapping("/{postId}/search")
+  public ResponseEntity<List<CommentResponse>> getCommentByKeyword(
+      @PathVariable Long postId, @RequestParam String keyword, @PageableDefault Pageable pageable) {
+    return ResponseEntity.ok(commentService.geyByKeyword(postId, keyword, pageable));
   }
 }

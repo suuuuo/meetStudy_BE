@@ -9,7 +9,10 @@ import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.post.repository.PostRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,17 +79,38 @@ public class CommentService {
     commentRepository.deleteById(id);
   }
 
-  /* 게시글에 달린 댓글 조회 */
-//  public ResponseEntity<List<CommentResponse>> getByPost(Long postId, Pageable pageable) {
-//
-//    return;
-//  }
+  /** 게시글에 달린 댓글 조회 */
+  public List<CommentResponse> getByPost(Long postId, Pageable pageable) {
+    // 게시글을 조회
+    Post post = findPostById(postId);
 
-  /* 게시글 내 특정 댓글 조회 */
+    // 댓글 조회
+    List<Comment> commentsList = commentRepository.findAllByPostId(postId, pageable);
 
-  /* 전체 댓글 조회 (관리자 페이지) */
+    // 댓글을 응답객체로 변환
+    //    List<CommentResponse> commentResponses =
+    //        commentsPage.stream().map(CommentResponse::new).collect(Collectors.toList());
 
-  /* 전체 댓글 내 키워드 검색 (관리자 페이지) */
+    // 댓글을 응답객체로 변환
+    return commentsList.stream().map(CommentResponse::new).collect(Collectors.toList());
+  }
+
+  /** 게시글에 달린 댓글을 키워드로 조회 */
+  public List<CommentResponse> geyByKeyword(Long postId, String keyword, Pageable pageable) {
+    // 게시글 조회
+    Post post = findPostById(postId);
+
+    // 댓글 조회
+    List<Comment> commentList =
+        commentRepository.findAllByPostIdAndKeyword(postId, keyword, pageable);
+
+    // 댓글을 응답객체로 변환
+    return commentList.stream().map(CommentResponse::new).collect(Collectors.toList());
+  }
+
+  /** 전체 댓글 조회 (관리자 페이지) */
+
+  /** 전체 댓글 내 키워드 검색 (관리자 페이지) */
 
   /** 게시글 찾는 메서드 */
   private Post findPostById(Long postId) {
