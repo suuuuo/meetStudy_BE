@@ -13,6 +13,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -58,11 +62,11 @@ public class ChatRoomService {
   }
 
   //채팅방의 메세지 조회
-  public List<MessageDto> messages (Long chatRoomId){
+  public Page<MessageDto> messages (Long chatRoomId) {
+    Pageable pageable = PageRequest.of(0,50, Sort.by("createdAt").descending());
 
-    return chatRoomRepository.findById(chatRoomId).get().getMessages()
-    .stream().map(MessageService::toDto)
-        .collect(Collectors.toList());
+    Page<Message> messages = chatRoomRepository.findChatMessageByChatRoomId(
+        chatRoomId, pageable);
+    return messages.map(message -> new MessageDto(message));
   }
-
 }
