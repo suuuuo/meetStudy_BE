@@ -58,13 +58,4 @@ public class MessageService {
   }
 
 
-  // entity -> dto로 변경
-  public static MessageDto toDto(Message message){
-    return MessageDto.builder()
-        .chatRoomId(message.getChatRoom().getId())
-        .nickName(message.getUser().getNickname())
-        .content(message.getContent())
-        .createdAt(message.getCreateAt().toString())
-        .build();
-  }
 }
