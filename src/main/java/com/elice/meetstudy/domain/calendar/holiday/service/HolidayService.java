@@ -48,7 +48,7 @@ public class HolidayService {
 
     for(int i = year; i < year+3; i++){ // 올해 +2년 치 가져오기
           for (int j = 1; j <= 12; j++){
-              String jsonString = getJsonResponse(year, j);
+              String jsonString = getJsonResponse(i, j);
               JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
               JsonElement itemsElement = jsonObject.getAsJsonObject("response").getAsJsonObject("body").get("items");
 
