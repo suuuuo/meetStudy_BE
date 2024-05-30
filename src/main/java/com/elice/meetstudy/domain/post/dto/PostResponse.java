@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class PostGet {
+public class PostResponse {
 
   // 상수로 설정. read only
   private final Long id;
@@ -20,7 +20,7 @@ public class PostGet {
   private final Long hit;
   private final LocalDateTime createdAt;
 
-  public PostGet(Post post) {
+  public PostResponse(Post post) {
     this.id = post.getId();
     this.categoryId = post.getCategory().getId();
     this.userId = post.getUser().getId();
@@ -29,5 +29,4 @@ public class PostGet {
     this.hit = post.getHit();
     this.createdAt = post.getCreatedAt();
   }
-
 }
