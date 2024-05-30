@@ -6,9 +6,8 @@ import com.elice.meetstudy.domain.comment.dto.CommentEditor;
 import com.elice.meetstudy.domain.comment.dto.CommentResponse;
 import com.elice.meetstudy.domain.comment.repository.CommentRepository;
 import com.elice.meetstudy.domain.post.domain.Post;
-import com.elice.meetstudy.domain.post.repository.PostRepository;
 import com.elice.meetstudy.domain.user.domain.User;
-import com.elice.meetstudy.domain.user.repository.UserRepository;
+import com.elice.meetstudy.util.EntityFinder;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,24 +20,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
   private final CommentRepository commentRepository;
-  private final PostRepository postRepository;
-  private final UserRepository userRepository;
+  private final EntityFinder entityFinder;
 
   @Autowired
-  public CommentService(
-      CommentRepository commentRepository,
-      PostRepository postRepository,
-      UserRepository userRepository) {
+  public CommentService(CommentRepository commentRepository, EntityFinder entityFinder) {
     this.commentRepository = commentRepository;
-    this.postRepository = postRepository;
-    this.userRepository = userRepository;
+    this.entityFinder = entityFinder;
   }
 
   /* 댓글 작성 */
   public CommentResponse write(Long postId, CommentCreate commentCreate) {
     // 예외 발생시
-    Post post = findPostById(postId);
-    User user = findUserById(commentCreate.getUserId());
+    Post post = entityFinder.findPostById(postId);
+    User user = entityFinder.findUserById(commentCreate.getUserId());
 
     // post, user 있으면 댓글 생성
     Comment newComment =
@@ -51,7 +45,7 @@ public class CommentService {
   /* 댓글 수정 */
   public CommentResponse edit(Long id, CommentCreate editRequest) {
     // 예외 발생시
-    Comment comment = findCommentById(id);
+    Comment comment = entityFinder.findCommentById(id);
 
     // 위에서 조회된 Comment로 CommentEditorBuilder 생성 (현재 상태를 기반으로 한 빌더 객체)
     CommentEditor.CommentEditorBuilder commentEditorBuilder = comment.toEditor();
@@ -74,14 +68,14 @@ public class CommentService {
 
   /* 댓글 삭제 */
   public void delete(Long commentId) {
-    Comment comment = findCommentById(commentId);
+    entityFinder.findCommentById(commentId);
     commentRepository.deleteById(commentId);
   }
 
   /** 게시글에 달린 댓글 조회 */
   public List<CommentResponse> getByPost(Long postId, Pageable pageable) {
     // 게시글을 조회
-    Post post = findPostById(postId);
+    entityFinder.findPostById(postId);
 
     // 댓글 조회
     List<Comment> commentsList = commentRepository.findAllByPostId(postId, pageable);
@@ -93,7 +87,7 @@ public class CommentService {
   /** 게시글에 달린 댓글을 키워드로 조회 */
   public List<CommentResponse> getByPostAndKeyword(Long postId, String keyword, Pageable pageable) {
     // 게시글 조회
-    Post post = findPostById(postId);
+    entityFinder.findPostById(postId);
 
     // 댓글 조회
     List<Comment> commentList =
@@ -114,26 +108,5 @@ public class CommentService {
     List<Comment> commentList =
         commentRepository.findAllByKeywordOrderByCreatedAtDesc(keyword, pageable);
     return commentList.stream().map(CommentResponse::new).collect(Collectors.toList());
-  }
-
-  /** 게시글 찾는 메서드 */
-  private Post findPostById(Long postId) {
-    return postRepository
-        .findById(postId)
-        .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 X."));
-  }
-
-  /** 회원 찾는 메서드 */
-  private User findUserById(Long userId) {
-    return userRepository
-        .findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 X."));
-  }
-
-  /** 댓글 찾는 메서드 */
-  private Comment findCommentById(Long commentId) {
-    return commentRepository
-        .findById(commentId)
-        .orElseThrow(() -> new IllegalArgumentException("댓글 찾을 수 X."));
   }
 }

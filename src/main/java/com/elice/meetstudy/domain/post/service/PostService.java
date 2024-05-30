@@ -1,7 +1,6 @@
 package com.elice.meetstudy.domain.post.service;
 
 import com.elice.meetstudy.domain.category.entity.Category;
-import com.elice.meetstudy.domain.category.repository.CategoryRepository;
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.post.dto.PostCreate;
 import com.elice.meetstudy.domain.post.dto.PostEdit;
@@ -9,7 +8,7 @@ import com.elice.meetstudy.domain.post.dto.PostEditor;
 import com.elice.meetstudy.domain.post.dto.PostResponse;
 import com.elice.meetstudy.domain.post.repository.PostRepository;
 import com.elice.meetstudy.domain.user.domain.User;
-import com.elice.meetstudy.domain.user.repository.UserRepository;
+import com.elice.meetstudy.util.EntityFinder;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,24 +21,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
 
   private final PostRepository postRepository;
-  private final UserRepository userRepository;
-  private final CategoryRepository categoryRepository;
+  private final EntityFinder entityFinder;
 
   @Autowired
   public PostService(
       PostRepository postRepository,
-      UserRepository userRepository,
-      CategoryRepository categoryRepository) {
+      EntityFinder entityFinder) {
     this.postRepository = postRepository;
-    this.userRepository = userRepository;
-    this.categoryRepository = categoryRepository;
+    this.entityFinder = entityFinder;
   }
 
   /* 게시글 작성 */
   public PostResponse write(PostCreate postCreate) {
     // 예외 발생시
-    User user = findUserById(postCreate.getUserId());
-    Category category = findCategoryById(postCreate.getCategoryId());
+    User user = entityFinder.findUserById(postCreate.getUserId());
+    Category category = entityFinder.findCategoryById(postCreate.getCategoryId());
 
     // Post 엔티티 생성
     Post newPost =
@@ -56,7 +52,7 @@ public class PostService {
   /* 게시글 수정 */
   public PostResponse edit(Long postId, PostEdit editRequest) {
     // postId로 게시글 찾고 예외 발생시
-    Post post = findPostById(postId);
+    Post post = entityFinder.findPostById(postId);
 
     // 조회된 post로 postEdiorBuilder 생성 (현재 상태를 기반으로 한 빌더 객체)
     PostEditor.PostEditorBuilder postEditorBuilder = post.toEditor();
@@ -78,7 +74,7 @@ public class PostService {
 
   /* 게시글 삭제 */
   public void delete(Long postId) {
-    Post post = findPostById(postId);
+    entityFinder.findPostById(postId);
     postRepository.deleteById(postId);
   }
 
@@ -91,7 +87,7 @@ public class PostService {
 
   /* 게시글 상세 조회(postId) - (사용자가 게시글 제목을 클릭했을때) */
   public PostResponse getPost(Long postId) {
-    Post post = findPostById(postId);
+    Post post = entityFinder.findPostById(postId);
 
     // 조회수 증가
     updateHit(postId);
@@ -119,24 +115,4 @@ public class PostService {
         .collect(Collectors.toList());
   }
 
-  /** 게시글 찾는 메서드 */
-  private Post findPostById(Long postId) {
-    return postRepository
-        .findById(postId)
-        .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 X."));
-  }
-
-  /** 카테고리 찾는 메서드 */
-  private Category findCategoryById(Long categoryId) {
-    return categoryRepository
-        .findById(categoryId)
-        .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 X."));
-  }
-
-  /** 회원 찾는 메서드 */
-  private User findUserById(Long userId) {
-    return userRepository
-        .findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 X."));
-  }
 }
