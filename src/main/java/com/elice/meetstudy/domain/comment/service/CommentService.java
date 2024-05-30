@@ -35,9 +35,9 @@ public class CommentService {
   }
 
   /* 댓글 작성 */
-  public CommentResponse write(Long id, CommentCreate commentCreate) {
+  public CommentResponse write(Long postId, CommentCreate commentCreate) {
     // 예외 발생시
-    Post post = findPostById(id);
+    Post post = findPostById(postId);
     User user = findUserById(commentCreate.getUserId());
 
     // post, user 있으면 댓글 생성
@@ -73,9 +73,9 @@ public class CommentService {
   }
 
   /* 댓글 삭제 */
-  public void delete(Long id) {
-    Comment comment = findCommentById(id);
-    commentRepository.deleteById(id);
+  public void delete(Long commentId) {
+    Comment comment = findCommentById(commentId);
+    commentRepository.deleteById(commentId);
   }
 
   /** 게시글에 달린 댓글 조회 */

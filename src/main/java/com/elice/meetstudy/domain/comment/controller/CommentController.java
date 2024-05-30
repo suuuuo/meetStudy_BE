@@ -34,10 +34,10 @@ public class CommentController {
   }
 
   @Operation(summary = "댓글 작성")
-  @PostMapping("/{commentId}")
+  @PostMapping("/{postId}")
   public ResponseEntity<CommentResponse> createComment(
-      @PathVariable Long commentId, @RequestBody @Valid CommentCreate commentCreate) {
-    return ResponseEntity.ok().body(commentService.write(commentId, commentCreate));
+      @PathVariable Long postId, @RequestBody @Valid CommentCreate commentCreate) {
+    return ResponseEntity.ok().body(commentService.write(postId, commentCreate));
   }
 
   @Operation(summary = "댓글 수정")
