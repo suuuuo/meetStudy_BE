@@ -3,6 +3,7 @@ package com.elice.meetstudy.domain.category.service;
 import com.elice.meetstudy.domain.category.dto.CategoryDto;
 import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.category.repository.CategoryRepository;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,19 +30,18 @@ public class CategoryService {
     }
 
     // 카테고리 생성
-    public Category createCategory(Category category) {
+    public Category createCategory(String name) {
+        Category category = new Category();
+        category.setName(name);
         return categoryRepository.save(category);
     }
 
     // 카테고리 수정
-    public Category updateCategory(Category category, Long id) {
-        category.setId(id);
-        Category findCategory = categoryRepository.findById(category.getId())
+    public Category updateCategory(Long id, String newName) {
+        Category category = categoryRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-
-        findCategory.update(category);
-
-        return categoryRepository.save(findCategory);
+        category.setName(newName);
+        return categoryRepository.save(category);
     }
 
     // 카테고리 삭제
