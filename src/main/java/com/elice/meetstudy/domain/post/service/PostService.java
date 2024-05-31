@@ -8,30 +8,39 @@ import com.elice.meetstudy.domain.post.dto.PostWriteDTO;
 import com.elice.meetstudy.domain.post.repository.PostRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.util.EntityFinder;
+import com.elice.meetstudy.util.TokenUtility;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @Transactional
 public class PostService {
 
   private final PostRepository postRepository;
   private final EntityFinder entityFinder;
+  private final TokenUtility tokenUtility;
 
   @Autowired
-  public PostService(PostRepository postRepository, EntityFinder entityFinder) {
+  public PostService(
+      PostRepository postRepository, EntityFinder entityFinder, TokenUtility tokenUtility) {
     this.postRepository = postRepository;
     this.entityFinder = entityFinder;
+    this.tokenUtility = tokenUtility;
   }
 
   /* 게시글 작성 */
-  public PostResponseDTO write(PostWriteDTO postCreate) {
+  public PostResponseDTO write(PostWriteDTO postCreate, String jwtToken) {
+    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+    log.info("user name: {}", userId);
+
     // 예외 발생시
-    User user = entityFinder.findUserById(postCreate.getUserId());
+    User user = entityFinder.findUserById(userId);
     Category category = entityFinder.findCategoryById(postCreate.getCategoryId());
 
     // Post 엔티티 생성
