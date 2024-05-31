@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.category.controller;
 
+import com.elice.meetstudy.domain.category.dto.CategoryDto;
 import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.category.service.CategoryService;
 import org.springframework.http.ResponseEntity;
@@ -31,15 +32,15 @@ public class CategoryController {
 
     // 카테고리 생성
     @PostMapping("/add")
-    public ResponseEntity<Category> createCategory(@RequestBody String name) {
-        return ResponseEntity.ok(categoryService.createCategory(name));
+    public ResponseEntity<Category> createCategory(@RequestBody CategoryDto categoryDto) {
+        return ResponseEntity.ok(categoryService.createCategory(categoryDto.getName(), categoryDto.getDescription()));
     }
 
     // 카테고리 수정
     @PutMapping("/{id}/edit")
     public ResponseEntity<Category> updateCategory(@PathVariable Long id,
-                                                   @RequestBody String newName) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, newName));
+                                                   @RequestBody CategoryDto categoryDto) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, categoryDto.getName(), categoryDto.getDescription()));
     }
 
     // 카테고리 삭제
