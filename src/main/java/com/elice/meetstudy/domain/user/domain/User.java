@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.user.domain;
 
+import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,10 +29,10 @@ public class User {
     @Column(nullable = false, length = 100)
     private String password;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 10)
     private String username;
 
-    @Column(length = 50)
+    @Column(length = 10)
     private String nickname;
 
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -47,21 +48,28 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Interest> interests = new ArrayList<>();
 
-
-
     public void updateDeletedAt() {
         this.deletedAt = LocalDateTime.now();
     }
 
     @Builder
-    public User(String email, String password, String username, String nickname,
-                LocalDateTime createdAt, LocalDateTime deletedAt, Role role){
+    public User(String email, String password, String username, String nickname, Role role){
         this.email = email;
         this.password = password;
         this.username = username;
         this.nickname = nickname;
-        this.createdAt = createdAt;
-        this.deletedAt = deletedAt;
         this.role = role;
     }
+
+    public void addInterest(Interest interest) {
+        interests.add(interest);
+        interest.setUser(this);
+    }
+
+//    public void update(UserUpdateDto userUpdateDto){
+//        this.password = userUpdateDto.getPassword();
+//        this.username = userUpdateDto.getUsername();
+//        this.nickname = userUpdateDto.getNickname();
+//        this.interests = userUpdateDto.getInterests();
+//    }
   }

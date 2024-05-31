@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/api/vi/user")
 @RequiredArgsConstructor
 @Slf4j
@@ -47,6 +47,7 @@ public class UserController {
     }
 
     // 관심분야 선택 (최대 3개)
+
 
     // 로그인
     @PostMapping("/login")
