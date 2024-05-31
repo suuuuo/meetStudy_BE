@@ -33,7 +33,7 @@ public class CalendarController {
     @GetMapping("/calendar/{study_room_id}") //개인 캘린더 조회, userId 받아오는 건 추후에 추가예정
     public ResponseEntity<?> getCalendarDetails(
         @RequestParam(value = "study_room_id", required = false, defaultValue = "0") long study_room_id,
-        @RequestHeader("year") String year, @RequestHeader("month") String month,
+        @RequestHeader("year") String year, @RequestHeader("month") String month
         /*userId .. 헤더 액세스 jwt 토큰?*/) {
 
         //user Id 구하는 로직

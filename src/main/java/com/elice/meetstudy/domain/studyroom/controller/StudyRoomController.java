@@ -23,9 +23,8 @@ public class StudyRoomController {
 
     @GetMapping("/{id}")
     public ResponseEntity<StudyRoomDTO> getStudyRoomById(@PathVariable Long id) {
-        Optional<StudyRoomDTO> studyRoomDTO = studyRoomService.getStudyRoomById(id);
-        return studyRoomDTO.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build()); // 글로벌 exception 두고 던지기
+        StudyRoomDTO studyRoomDTO = studyRoomService.getStudyRoomById(id);
+        return ResponseEntity.ok(studyRoomDTO);
     }
 
     @PostMapping("/add")
@@ -36,9 +35,8 @@ public class StudyRoomController {
 
     @PutMapping("/{id}")
     public ResponseEntity<StudyRoomDTO> updateStudyRoom(@PathVariable Long id, @RequestBody StudyRoomDTO studyRoomDTO) {
-        Optional<StudyRoomDTO> updatedStudyRoom = studyRoomService.updateStudyRoom(id, studyRoomDTO);
-        return updatedStudyRoom.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        StudyRoomDTO updatedStudyRoom = studyRoomService.updateStudyRoom(id, studyRoomDTO);
+        return ResponseEntity.ok(updatedStudyRoom);
     }
 
     @DeleteMapping("/{id}")
