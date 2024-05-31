@@ -1,22 +1,10 @@
 package com.elice.meetstudy.domain.post.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.category.repository.CategoryRepository;
-import com.elice.meetstudy.domain.post.domain.Post;
-import com.elice.meetstudy.domain.post.dto.PostCreate;
-import com.elice.meetstudy.domain.post.dto.PostResponse;
 import com.elice.meetstudy.domain.post.repository.PostRepository;
-import com.elice.meetstudy.domain.user.domain.Role;
-import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.util.EntityFinder;
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;

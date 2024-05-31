@@ -1,6 +1,6 @@
 package com.elice.meetstudy.domain.comment.domain;
 
-import com.elice.meetstudy.domain.comment.dto.CommentEditor;
+import com.elice.meetstudy.domain.comment.dto.CommentEditDTO;
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.*;
@@ -46,11 +46,11 @@ public class Comment {
     this.content = content;
   }
 
-  public CommentEditor.CommentEditorBuilder toEditor() {
-    return CommentEditor.builder().content(this.content);
+  public CommentEditDTO.CommentEditDTOBuilder toEdit() {
+    return CommentEditDTO.builder().content(this.content);
   }
 
-  public void edit(CommentEditor commentEditor) {
-    this.content = commentEditor.getContent();
+  public void edit(CommentEditDTO commentEdit) {
+    this.content = commentEdit.getContent();
   }
 }

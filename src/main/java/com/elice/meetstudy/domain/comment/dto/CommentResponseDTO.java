@@ -5,15 +5,14 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-/** 정확히 뭐가 붙어야하는걸까? Getter Setter equals() hashCode() toString() */
-public class CommentResponse {
+public class CommentResponseDTO {
   private Long id;
   private Long userId;
   private Long postId;
   private String content;
   private LocalDateTime createdAt;
 
-  public CommentResponse(Comment comment) {
+  public CommentResponseDTO(Comment comment) {
     this.id = comment.getId();
     this.userId = comment.getUser().getId();
     this.postId = comment.getPost().getId();

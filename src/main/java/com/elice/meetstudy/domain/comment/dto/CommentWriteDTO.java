@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class CommentCreate {
+public class CommentWriteDTO {
 
   @NotNull private Long userId;
 

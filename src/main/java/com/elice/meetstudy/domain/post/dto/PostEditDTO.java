@@ -7,14 +7,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class PostEditor {
+public class PostEditDTO {
 
   private final String title;
   private final String content;
 
-  public PostEditor(String title, String content) {
+  public PostEditDTO(String title, String content) {
     this.title = title;
     this.content = content;
   }
-
 }

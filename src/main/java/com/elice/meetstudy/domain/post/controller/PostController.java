@@ -1,8 +1,7 @@
 package com.elice.meetstudy.domain.post.controller;
 
-import com.elice.meetstudy.domain.post.dto.PostCreate;
-import com.elice.meetstudy.domain.post.dto.PostEdit;
-import com.elice.meetstudy.domain.post.dto.PostResponse;
+import com.elice.meetstudy.domain.post.dto.PostResponseDTO;
+import com.elice.meetstudy.domain.post.dto.PostWriteDTO;
 import com.elice.meetstudy.domain.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,14 +39,14 @@ public class PostController {
 
   @Operation(summary = "게시글 작성", description = "userId는 추후 jwt에서 추출하여 header로 전달.")
   @PostMapping
-  public ResponseEntity<PostResponse> createPost(@RequestBody @Valid PostCreate postCreate) {
+  public ResponseEntity<PostResponseDTO> createPost(@RequestBody @Valid PostWriteDTO postCreate) {
     return ResponseEntity.ok().body(postService.write(postCreate));
   }
 
   @Operation(summary = "게시글 수정")
   @PatchMapping("/{postId}")
-  public ResponseEntity<PostResponse> editPost(
-      @PathVariable Long postId, @RequestBody @Valid PostEdit request) {
+  public ResponseEntity<PostResponseDTO> editPost(
+      @PathVariable Long postId, @RequestBody @Valid PostWriteDTO request) {
     return ResponseEntity.ok().body(postService.edit(postId, request));
   }
 
@@ -60,19 +59,19 @@ public class PostController {
 
   @Operation(summary = "전체 게시글 조회")
   @GetMapping
-  public ResponseEntity<List<PostResponse>> getPostAll(@PageableDefault Pageable pageable) {
+  public ResponseEntity<List<PostResponseDTO>> getPostAll(@PageableDefault Pageable pageable) {
     return ResponseEntity.ok(postService.getPostAll(pageable));
   }
 
   @Operation(summary = "게시글 상세 조회(postId) - (사용자가 게시글 제목을 클릭했을때)")
   @GetMapping("/{postId}")
-  public ResponseEntity<PostResponse> getPost(@PathVariable Long postId) {
+  public ResponseEntity<PostResponseDTO> getPost(@PathVariable Long postId) {
     return ResponseEntity.ok(postService.getPost(postId));
   }
 
   @Operation(summary = "전체 게시판 내 게시글 검색")
   @GetMapping("/search")
-  public ResponseEntity<List<PostResponse>> searchPost(@RequestParam String keyword) {
+  public ResponseEntity<List<PostResponseDTO>> searchPost(@RequestParam String keyword) {
     return ResponseEntity.ok(postService.searchPost(keyword));
   }
 }
