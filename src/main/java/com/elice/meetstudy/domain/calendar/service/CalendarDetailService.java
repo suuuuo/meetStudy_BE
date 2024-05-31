@@ -2,15 +2,20 @@ package com.elice.meetstudy.domain.calendar.service;
 
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
 import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
+import com.elice.meetstudy.domain.calendar.dto.RequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.calendar.holiday.domain.Holiday;
 import com.elice.meetstudy.domain.calendar.holiday.service.HolidayService;
 import com.elice.meetstudy.domain.calendar.mapper.CalendarDetailMapper;
 import com.elice.meetstudy.domain.calendar.repository.CalendarDetailRepository;
 import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,29 +40,45 @@ public class CalendarDetailService {
     this.calendarDetailMapper = calendarDetailMapper;
   }
 
-  // 캘린더 공휴일 일정 자동 등록(조회 시 공휴일 표시)
+  /**
+   * 캘린더 공휴일 자동 등록 -> 조회 시 공휴일 표시
+   *
+   * @param year
+   * @param month
+   * @param calendarId
+   */
   @Transactional
   public void saveHolidays(String year, String month, long calendarId) {
     List<Holiday> holidayList = holidayService.Holiday(year, month);
+    Optional<Calendar> calendar = calendarRepository.findById(calendarId);
 
-    for (Holiday holiday : holidayList) {
-      if (calendarDetailRepository.existsByStartDayAndCalendarIdAndIsHolidayIsTrue(
-          holiday.getDate(), calendarId)) {
-      } else { // 현재 캘린더에 공휴일 정보가 없으면 등록함
-        Optional<Calendar> calendar = calendarRepository.findById(calendarId);
-        Calendar_detail c = new Calendar_detail();
-        c.setTitle(holiday.getName());
-        c.setStartDay(holiday.getDate());
-        c.setHoliday(true);
-        c.setCalendar(calendar.get());
-        calendarDetailRepository.save(c);
+    if (calendar.isPresent()) {
+      for (Holiday holiday : holidayList) {
+        if (calendarDetailRepository.existsByStartDayAndCalendarIdAndIsHolidayIsTrue(
+            holiday.getDate(), calendarId)) {
+        } else { // 현재 캘린더에 공휴일 정보가 없으면 등록함
+          Calendar_detail c = new Calendar_detail();
+          c.setTitle(holiday.getName());
+          c.setStartDay(holiday.getDate());
+          c.setHoliday(true);
+          c.setCalendar(calendar.get());
+          calendarDetailRepository.save(c);
+        }
       }
-    }
+    } else throw new EntityNotFoundException("해당 캘린더가 존재하지 않습니다");
   }
 
-  // 한 달 일정 리스트로 조회
+  /**
+   * 한 달 일정 리스트로 조회
+   *
+   * @param year
+   * @param month
+   * @param userId
+   * @param studyRoomId
+   * @return
+   */
   @Transactional
-  public List<ResponseCalendarDetail> getAllCalendarDetail(
+  public ResponseEntity<List<ResponseCalendarDetail>> getAllCalendarDetail(
       String year, String month, Long userId, Long studyRoomId) {
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
     saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
@@ -68,48 +89,78 @@ public class CalendarDetailService {
     for (Calendar_detail calendarDetail : calendarDetailList) {
       responseCalendarDetails.add(calendarDetailMapper.toResponseCalendarDetail(calendarDetail));
     }
-    return responseCalendarDetails;
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("first-day", calendarService.findFirstDay(year, month));
+    headers.add("last-day", calendarService.findLastDay(year, month));
+    return new ResponseEntity<>(responseCalendarDetails, headers, HttpStatus.OK);
+
   }
 
-  // 개별 일정 조회
+  /**
+   * 개별 일정 조회
+   *
+   * @param id
+   * @return
+   */
   @Transactional
-  public ResponseCalendarDetail getCalendarDetail(long id) {
+  public ResponseEntity<ResponseCalendarDetail> getCalendarDetail(long id) {
     Optional<Calendar_detail> calendarDetail = calendarDetailRepository.findById(id);
-    return calendarDetailMapper.toResponseCalendarDetail(calendarDetail.get());
+    if (calendarDetail.isPresent()) {
+      return new ResponseEntity<>(
+          calendarDetailMapper.toResponseCalendarDetail(calendarDetail.get()), HttpStatus.OK);
+    } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  // request 받아서 일정 추가
+  /**
+   * 일정 추가
+   *
+   * @param requestCalendarDetail
+   * @param userId
+   * @param studyRoomId
+   * @return
+   */
   @Transactional
-  public ResponseCalendarDetail saveCalendarDetail(
-      Calendar_detail calendarDetail, Long userId, Long studyRoomId) { // request로 받으면
+  public ResponseEntity<ResponseCalendarDetail> saveCalendarDetail(
+      RequestCalendarDetail requestCalendarDetail, Long userId, Long studyRoomId) { // request로 받으면
+    Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
     calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
     calendarDetailRepository.save(calendarDetail); // 저장
-    return calendarDetailMapper.toResponseCalendarDetail(calendarDetail); // 반환
+    return new ResponseEntity<>(
+        calendarDetailMapper.toResponseCalendarDetail(calendarDetail), HttpStatus.OK); // 반환
   }
 
-  // 일정 수정 - put
+  /**
+   * 일정 수정
+   *
+   * @param re
+   * @param calendarDetailId
+   * @return
+   */
   @Transactional
-  public ResponseCalendarDetail putCalendarDetail(Calendar_detail c, long calendarDetailId) {
+  public ResponseEntity<ResponseCalendarDetail> putCalendarDetail(RequestCalendarDetail re,
+      long calendarDetailId) {
     Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(calendarDetailId);
+
     if (originCalendarDetail.isPresent()) {
       Calendar_detail calendarDetail = originCalendarDetail.get();
-      calendarDetail.update( c.getTitle(), c.getContent(),
-          c.getStartDay(), c.getEndDay(), c.getStartTime(), c.getEndTime());
-      return calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
-    } else {
-      throw new IllegalArgumentException("존재하는 일정이 아닙니다.");
-    }
+      calendarDetail.update( re.title(), re.content(), re.startDay(), re.endDay(),
+          re.startTime(), re.endTime());
+      return new ResponseEntity<>(
+          calendarDetailMapper.toResponseCalendarDetail(calendarDetail), HttpStatus.OK);
+    } else throw new IllegalArgumentException("존재하는 일정이 아닙니다.");
   }
 
-  // 일정 삭제 - delete
+  /**
+   * 일정 삭제
+   *
+   * @param id
+   * @return
+   */
   @Transactional
-  public void deleteCalendarDetail(long id) {
-    Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(id);
-    if (originCalendarDetail.isPresent()) {
-      calendarDetailRepository.deleteById(id);
-    } else {
-      throw new IllegalArgumentException("존재하는 일정이 아닙니다.");
-    }
-  }
+  public ResponseEntity<?> deleteCalendarDetail(long id) {
+    calendarDetailRepository.deleteById(id);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+      }
 }

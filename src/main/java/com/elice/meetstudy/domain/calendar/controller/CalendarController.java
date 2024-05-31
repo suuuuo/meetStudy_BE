@@ -31,155 +31,136 @@ public class CalendarController {
     private final CalendarService calendarService;
     private final CalendarDetailService calendarDetailService;
     private final CalendarDetailMapper calendarDetailMapper;
-   //private final TokenProvider tokenProvider;
 
     @Autowired
     public CalendarController(CalendarService calendarService,
-        CalendarDetailService calendarDetailService, CalendarDetailMapper calendarDetailMapper
-        /*,TokenProvider tokenProvider*/) {
+        CalendarDetailService calendarDetailService, CalendarDetailMapper calendarDetailMapper) {
         this.calendarService = calendarService;
         this.calendarDetailService = calendarDetailService;
         this.calendarDetailMapper = calendarDetailMapper;
-        //this.tokenProvider = tokenProvider;
     }
 
-    //개인 캘린더 전체 조회
+    /**
+     * 개인 캘린더 전체 조회(공휴일 포함)
+     *
+     * @param year
+     * @param month
+     * @return
+     */
     @GetMapping("/calendar")
     public ResponseEntity<?> getCalendarDetails(
-        @RequestHeader("year") String year, @RequestHeader("month") String month
-        /*,@RequestHeader("access") String token*/) {
-
-        //user Id 구하는 로직
-        //TokenValidationResult validationResult = tokenProvider.validateToken(token);
+        @RequestHeader("year") String year, @RequestHeader("month") String month) {
         //임시
         long userId = 1L;
-
-        if (userId == 1L /*validationResult.isValid() 유효한 토큰이면?*/) {
-            //String loginId = validationResult.getLoginId();
-
-            // 캘린더 찾아서 year, month로 해당 월의 일정들 반환
-            List<ResponseCalendarDetail> calendarDetailList =
-                calendarDetailService.getAllCalendarDetail(year, month, userId, 0L);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("first-day", calendarService.findFirstDay(year,month));
-            headers.add("last-day", calendarService.findLastDay(year,month));
-            return new ResponseEntity<>(calendarDetailList, headers, HttpStatus.OK);
-
-        } else {
-            //유효한 유저 아님 에러 = 회원이 아니라 캘린더 조회할 수 없음
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "캘린더 조회 권한이 없습니다.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
+        return calendarDetailService.getAllCalendarDetail(year, month, userId, 0L);
     }
 
-    //공용 캘린더 전체 조회
+    /**
+     * 공용 캘린더 전체 조회 (공휴일 포함)
+     *
+     * @param year
+     * @param month
+     * @param study_room_id
+     * @return
+     */
     @GetMapping("/calendar/{study_room_id}")
     public ResponseEntity<?> getCalendarDetails(
         @RequestHeader("year") String year, @RequestHeader("month") String month,
-        @PathVariable long study_room_id  /*@RequestHeader("access") String token 토큰 ..*/) {
-
-        //user Id 구하는 로직, 아래는 임시
+        @PathVariable long study_room_id) {
+        // 임시
         long userId = 1L;
-
-        //userId, studyroomId로 캘린더 찾아서 year, month로 해당 월의 일정들 반환
-        List<ResponseCalendarDetail> calendarDetailList =
-            calendarDetailService.getAllCalendarDetail(year, month, userId, study_room_id);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("first-day", calendarService.findFirstDay(year,month));
-        headers.add("last-day", calendarService.findLastDay(year,month));
-        return new ResponseEntity<>(calendarDetailList, headers, HttpStatus.OK);
+        return calendarDetailService.getAllCalendarDetail(year, month, userId, study_room_id);
     }
 
-    //캘린더 - 일정 개별 조회
+    /**
+     * 일정 개별 조회
+     *
+     * @param calendar_detail_id
+     * @return
+     */
     @GetMapping("/calendar_detail/{calendar_detail_id}")
-    public ResponseEntity<?> getCalendarDetail(
-        /*@RequestHeader("access") String token 토큰 ..*/
-        @PathVariable long calendar_detail_id) {
-        ResponseCalendarDetail responseCalendarDetail = calendarDetailService.getCalendarDetail(
-            calendar_detail_id);
-        return ResponseEntity.ok(responseCalendarDetail);
+    public ResponseEntity<?> getCalendarDetail(@PathVariable long calendar_detail_id) {
+        return calendarDetailService.getCalendarDetail(calendar_detail_id);
     }
 
-    //개인 캘린더 일정 추가
+    /**
+     * 개인 캘린더 일정 추가
+     *
+     * @param requestCalendarDetail
+     * @return
+     */
     @PostMapping("/calendar")
     public ResponseEntity<?> postCalendarDetail(
-        @RequestBody @Valid RequestCalendarDetail requestCalendarDetail
-        /*@RequestHeader("access") String token 토큰 ..*/) {
-
-        //user Id 구하는 로직
+        @RequestBody @Valid RequestCalendarDetail requestCalendarDetail) {
+        //임시
         Long userId = 1L;
-
-        Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
-
-        ResponseCalendarDetail responseCalendarDetail =
-            calendarDetailService.saveCalendarDetail(calendarDetail, userId, 0L);
-        return ResponseEntity.ok(responseCalendarDetail);
+        return calendarDetailService.saveCalendarDetail(requestCalendarDetail, userId, 0L);
     }
 
-    //공용 캘린더 일정 추가
+    /**
+     * 공용 캘린더 일정 추가
+     *
+     * @param requestCalendarDetail
+     * @param study_room_id
+     * @return
+     */
     @PostMapping("/calendar/{study_room_id}")
     public ResponseEntity<?> postCalendarDetail(
         @RequestBody @Valid RequestCalendarDetail requestCalendarDetail,
-        @PathVariable long study_room_id
-        /*@RequestHeader("access") String token 토큰 ..*/) {
-
-        //user Id 구하는 로직
+        @PathVariable long study_room_id) {
+        //임시
         Long userId = 1L;
-
-        Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
-
-        ResponseCalendarDetail responseCalendarDetail =
-            calendarDetailService.saveCalendarDetail(calendarDetail, userId, study_room_id);
-        return ResponseEntity.ok(responseCalendarDetail);
+        return calendarDetailService.saveCalendarDetail(requestCalendarDetail, userId, study_room_id);
     }
 
 
-    //캘린더 일정 수정 - put
+    /**
+     * 캘린더 일정 수정
+     *
+     * @param requestCalendarDetail
+     * @param calendar_detail_id
+     * @return
+     */
     @PutMapping("/calendar_detail/{calendar_detail_id}")
     public ResponseEntity<?> putCalendarDetail(
         @RequestBody @Valid RequestCalendarDetail requestCalendarDetail,
-        @PathVariable long calendar_detail_id
-        /*@RequestHeader("access") String token 토큰 ..*/) {
-
-        if(requestCalendarDetail == null){
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "유효하지 않은 일정입니다.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }else{
-            Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
-            ResponseCalendarDetail responseCalendarDetail =
-                calendarDetailService.putCalendarDetail(calendarDetail, calendar_detail_id);
-            return ResponseEntity.ok(responseCalendarDetail);
-        }
+        @PathVariable long calendar_detail_id) {
+        return calendarDetailService.putCalendarDetail(requestCalendarDetail, calendar_detail_id);
     }
 
-    //일정 삭제 - delete
+    /**
+     * 일정 삭제
+     *
+     * @param calendar_detail_id
+     * @return
+     */
     @DeleteMapping("/calendar_detail/{calendar_detail_id}")
-    public void deleteCalendarDetail(
-        /*@RequestHeader("access") String token 토큰 ..*/@PathVariable long calendar_detail_id){
-        calendarDetailService.deleteCalendarDetail(calendar_detail_id);
+    public ResponseEntity<?> deleteCalendarDetail(@PathVariable long calendar_detail_id){
+        return calendarDetailService.deleteCalendarDetail(calendar_detail_id);
     }
 
-    //회원 삭제 - 개인 캘린더 삭제
+    /**
+     * 개인 캘린더 삭제
+     *
+     * @return
+     */
     @DeleteMapping("/calendar")
-    public void deleteUserCalendar(
-        /*@RequestHeader("access") String token 토큰 ..*/){
-
+    public ResponseEntity<?> deleteUserCalendar(){
         //임시 id
         long userId = 1L;
-        calendarService.deleteCalendar(userId);
+        return calendarService.deleteCalendar(userId);
     }
 
-    //회원 삭제 - 공용 캘린더 삭제
+    /**
+     * 스터디룸 캘린더 삭제
+     *
+     * @param study_room_id
+     * @return
+     */
     @DeleteMapping("/calendar/{study_room_id}")
-    public void deleteStudyCalendar(
-        /*@RequestHeader("access") String token 토큰 ..*/ @PathVariable long study_room_id){
-
+    public ResponseEntity<?> deleteStudyCalendar(@PathVariable long study_room_id){
         //임시 id
-        long userId = 1L; //회원인지만 확인
-        calendarService.deleteStudyCalendar(study_room_id);
+        long userId = 1L;
+        return calendarService.deleteStudyCalendar(study_room_id);
     }
 }

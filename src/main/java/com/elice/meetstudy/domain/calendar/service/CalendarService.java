@@ -11,6 +11,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,28 +21,31 @@ public class CalendarService {
 
   private final CalendarRepository calendarRepository;
   private final UserRepository userRepository;
-  private final CalendarDetailRepository calendarDetailRepository;
   private final StudyRoomRepository studyRoomRepository;
 
   public CalendarService(
       CalendarRepository calendarRepository,
       UserRepository userRepository,
-      CalendarDetailRepository calendarDetailRepository,
       StudyRoomRepository studyRoomRepository) {
     this.calendarRepository = calendarRepository;
     this.userRepository = userRepository;
-    this.calendarDetailRepository = calendarDetailRepository;
     this.studyRoomRepository = studyRoomRepository;
   }
 
-  // 캘린더 조회(생성)
+  /**
+   * 캘린더 조회(생성 )
+   *
+   * @param userId
+   * @param studyRoomId
+   * @return Calendar
+   */
   @Transactional
   public Calendar findCalendar(long userId, long studyRoomId) {
     Optional<Calendar> userCalendar;
     Optional<Calendar> studyCalendar;
 
-    if (studyRoomId == 0L) { // 스터디룸 아이디 없음 -> 개인 캘린더
-      // 리포지토리에서 유저 아이디로 캘린더 있나 확인
+    if (studyRoomId == 0L) {
+      /** 스터디룸 아이디 없음 -> 개인 캘린더 */
       userCalendar = calendarRepository.findByUserIdAndStudyRoomIsNull(userId);
 
       if (userCalendar.isEmpty()) { // 없으면
@@ -48,47 +53,43 @@ public class CalendarService {
         Calendar findUserCalendar = new Calendar(user.get()); // 생성
         calendarRepository.save(findUserCalendar); // 저장
         return findUserCalendar; // 리턴
-      } else {
-        return userCalendar.get();
-      }
-    } else { // 스터디룸 아이디 있음 -> 공용 캘린더 조회
-      // 캘린더 리포지토리에서 스터디룸 아이디로 캘린더 조회
+      } else return userCalendar.get();
+    } else {
+      /** 스터디룸 아이디 있음 -> 공용 캘린더 조회 */
       studyCalendar = calendarRepository.findByStudyRoomId(studyRoomId);
 
-      if (studyCalendar.isEmpty()) { // 없으면
+      if (studyCalendar.isEmpty()) {
         Optional<User> user = userRepository.findById(userId);
         Optional<StudyRoom> studyRoom = studyRoomRepository.findById(studyRoomId);
         Calendar newStudyCalendar = new Calendar(user.get(), studyRoom.get()); // 생성
         calendarRepository.save(newStudyCalendar); // 저장
         return newStudyCalendar;
-      } else {
-        return studyCalendar.get();
-      }
+      } else return studyCalendar.get();
     }
   }
 
-  //개인 캘린더 삭제
+  /**
+   * 개인 캘린더 삭제
+   *
+   * @param userId
+   */
   @Transactional
-  public void deleteCalendar(Long userId) {
+  public ResponseEntity<?> deleteCalendar(Long userId) {
     Optional<Calendar> calendar = calendarRepository.findByUserIdAndStudyRoomIsNull(userId);
-    if (calendar.isPresent()) {
-      calendarDetailRepository.deleteAllByCalendar(calendar.get());
-      calendarRepository.deleteById(calendar.get().getId());
-    } else {
-      throw new IllegalArgumentException("존재하는 캘린더가 아닙니다.");
-    }
+    calendarRepository.deleteById(calendar.get().getId());
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  //공용 캘린더 삭제
+  /**
+   * 공용 캘린더 삭제
+   *
+   * @param studyRoomId
+   */
   @Transactional
-  public void deleteStudyCalendar(Long studyRoomId) {
+  public ResponseEntity<?> deleteStudyCalendar(Long studyRoomId) {
     Optional<Calendar> calendar = calendarRepository.findByStudyRoomId(studyRoomId);
-    if (calendar.isPresent()) {
-      calendarDetailRepository.deleteAllByCalendar(calendar.get());
-      calendarRepository.deleteById(calendar.get().getId());
-    } else {
-      throw new IllegalArgumentException("존재하는 캘린더가 아닙니다.");
-    }
+    calendarRepository.deleteById(calendar.get().getId());
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Transactional
