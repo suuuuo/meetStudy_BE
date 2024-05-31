@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.user.service;
 
+import com.elice.meetstudy.domain.category.repository.CategoryRepository;
 import com.elice.meetstudy.domain.user.domain.Role;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.dto.UserJoinDto;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -27,16 +29,23 @@ public class UserService {
     private static final int MAX_LENGTH = 10;
 
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
 
-
-    // 회원가입
-    public User join(UserJoinDto userJoinDto){
-
+    public User join(UserJoinDto userJoinDto) {
         passwordCheck(userJoinDto.getPassword());
         usernameCheck(userJoinDto.getUsername());
         nicknameCheck(userJoinDto.getNickname());
+        checkInterestsCount(userJoinDto.getInterests());
+
+        if (checkEmailDuplicate(userJoinDto.getEmail())) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
+
+        if (checkNicknameDuplicate(userJoinDto.getNickname())) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        }
 
         User user = User.builder()
                 .email(userJoinDto.getEmail())
@@ -46,53 +55,58 @@ public class UserService {
                 .role(Role.USER)
                 .build();
 
-        user.setCreatedAt(LocalDateTime.now());
+//        userJoinDto.getInterests().forEach(categoryId -> {
+//            Category category = categoryRepository.findById(categoryId)
+//                    .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + categoryId));
+//            Interest interest = new Interest(user, category);
+//            user.addInterest(interest);
+//        });
 
+        user.setCreatedAt(LocalDateTime.now());
 
         return userRepository.save(user);
     }
 
-    // 회원가입 - 비밀번호 조건 (8자 이상/ 영문+숫자+특수문자 조합)
-    private void passwordCheck(String password){
-        if (PASSWORD_PATTERN.matcher(password).matches()) {
-            return;
+
+    // 비밀번호 조건 (8자 이상/ 영문+숫자+특수문자 조합)
+    public void passwordCheck(String password) {
+        if (!PASSWORD_PATTERN.matcher(password).matches()) {
+            throw new IllegalArgumentException("비밀번호는 최소 8자리에 영어, 숫자, 특수문자를 포함해야 합니다.");
         }
-
-        //log.info("비밀번호 조건 미달");
-        throw new IllegalArgumentException("비밀번호는 최소 8자리에 영어, 숫자, 특수문자를 포함해야 합니다.");
-
     }
 
-    // 회원가입 - 이름 조건 (10자 이하)
-    private void usernameCheck(String username){
-        if (username.length() <= MAX_LENGTH) {
-            return;
+    // 이름 조건 (10자 이하)
+    public void usernameCheck(String username){
+        if (username.length() > MAX_LENGTH) {
+            throw new IllegalArgumentException("이름은 최대 10자까지 허용됩니다.");
         }
-        throw new IllegalArgumentException("이름은 최대 10자까지 허용됩니다.");
     }
 
-    // 회원가입 - 닉네임 조건 (10자 이하)
-    private void nicknameCheck(String nickname){
-        if (nickname.length() <= MAX_LENGTH) {
-            return;
+    // 닉네임 조건 (10자 이하)
+    public void nicknameCheck(String nickname){
+        if (nickname.length() > MAX_LENGTH) {
+            throw new IllegalArgumentException("닉네임은 최대 10자까지 허용됩니다.");
         }
-        throw new IllegalArgumentException("닉네임은 최대 10자까지 허용됩니다.");
     }
 
-    // 회원가입 - 이메일 중복확인, 이메일 인증
+    // 이메일 중복확인, 이메일 인증
     public boolean checkEmailDuplicate(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    // 회원가입 - 닉네임 중복확인
+    // 닉네임 중복확인
     public boolean checkNicknameDuplicate(String nickname) {
         return userRepository.existsByNickname(nickname);
     }
 
-    // 관심분야 선택 (최대 3개)
+    // 관심분야 최대 3개 선택
+    private void checkInterestsCount(List<Long> interests) {
+        if (interests.size() > 3) {
+            throw new IllegalArgumentException("관심분야는 최대 3개까지 허용됩니다.");
+        }
+    }
 
 
-    // 로그인
     // 로그인
     public TokenInfo login(String email, String password) {
         User user = findUserByEmail(email);

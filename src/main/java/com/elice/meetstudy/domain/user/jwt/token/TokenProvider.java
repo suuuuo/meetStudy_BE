@@ -39,27 +39,28 @@ public class TokenProvider {
         this.accessToKenValidationInMilliseconds = accessToKenValidationInMilliseconds;
     }
 
-    public TokenInfo createToken(User users) {
+    public TokenInfo createToken(User user) {
         long currentTime = (new Date()).getTime();
         Date accessTokenExpireTime = new Date(currentTime + accessToKenValidationInMilliseconds);
         String tokenId = UUID.randomUUID().toString();
 
         String accessToken = Jwts.builder()
-                .setSubject(users.getEmail())
-                .claim(AUTHORITIES_KEY, users.getRole())
-                .claim(USERNAME_KEY, users.getUsername())
+                .setSubject(String.valueOf(user.getId())) // 사용자의 id를 subject로 설정
+                .claim(AUTHORITIES_KEY, user.getRole())
+                .claim(USERNAME_KEY, user.getUsername())
                 .claim(TOKEN_ID_KEY, tokenId)
                 .signWith(hashKey, SignatureAlgorithm.HS512)
                 .setExpiration(accessTokenExpireTime)
                 .compact();
 
         return TokenInfo.builder()
-                .ownerLoginId(users.getEmail())
+                .ownerLoginId(user.getEmail())
                 .tokenId(tokenId)
                 .accessToken(accessToken)
                 .accessTokenExpireTime(accessTokenExpireTime)
                 .build();
     }
+
 
     //토큰 검증
     public TokenValidationResult validateToken(String token) {

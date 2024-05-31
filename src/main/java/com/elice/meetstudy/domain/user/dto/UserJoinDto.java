@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -14,5 +16,5 @@ public class UserJoinDto {
     private String password;
     private String username;
     private String nickname;
-    private Interest interest;
+    private List<Long> interests;
 }
