@@ -1,19 +1,14 @@
 package com.elice.meetstudy.domain.post.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 @Getter
-@Setter
-@ToString
-public class PostCreate {
+public class PostWriteDTO {
 
-  private Long categoryId;
-
-  private Long userId;
+  @NotNull private Long categoryId;
 
   @NotBlank(message = "제목을 입력해주세요.")
   private String title;
@@ -22,11 +17,9 @@ public class PostCreate {
   private String content;
 
   @Builder
-  public PostCreate(Long categoryId, Long userId, String title, String content) {
+  public PostWriteDTO(Long categoryId, String title, String content) {
     this.categoryId = categoryId;
-    this.userId = userId;
     this.title = title;
     this.content = content;
   }
-
 }

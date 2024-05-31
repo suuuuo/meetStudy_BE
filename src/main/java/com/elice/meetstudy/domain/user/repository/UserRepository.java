@@ -1,14 +1,26 @@
 package com.elice.meetstudy.domain.user.repository;
 
 import com.elice.meetstudy.domain.user.domain.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    boolean existsByEmail(String email);
+  boolean existsByEmail(String email);
 
-    boolean existsByNickname(String nickname);
+  boolean existsByNickname(String nickname);
+
+  Optional<User> findByEmail(String email);
+
+  @Query("SELECT u FROM User u WHERE u.id = :userId")
+  User findUserByUserId(Long userId);
+
+  @Query("SELECT u.id FROM User u WHERE u.email = :email")
+  Long findUserIdByEmail(@Param("email") String email);
+
+  @Query("SELECT u.username FROM User u WHERE u.email = :email")
+  String findUserNameByEmail(@Param("email") String email);
 }

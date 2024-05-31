@@ -31,9 +31,13 @@
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
+<<<<<<< HEAD
 build/
 *.gradle
 
+=======
+*.gradle
+/build/
 
 /src/main/generated/
 
