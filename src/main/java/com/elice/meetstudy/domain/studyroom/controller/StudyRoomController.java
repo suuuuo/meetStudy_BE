@@ -25,7 +25,7 @@ public class StudyRoomController {
     public ResponseEntity<StudyRoomDTO> getStudyRoomById(@PathVariable Long id) {
         Optional<StudyRoomDTO> studyRoomDTO = studyRoomService.getStudyRoomById(id);
         return studyRoomDTO.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build()); // 글로벌 exception 두고 던지기
     }
 
     @PostMapping("/add")

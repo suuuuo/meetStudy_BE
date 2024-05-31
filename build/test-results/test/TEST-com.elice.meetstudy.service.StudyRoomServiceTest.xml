@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.elice.meetstudy.service.StudyRoomServiceTest" tests="1" skipped="0" failures="1" errors="0" timestamp="2024-05-31T13:34:34" hostname="DESKTOP-ILJ07TB" time="1.767">
+  <properties/>
+  <testcase name="testCreateStudyRoom()" classname="com.elice.meetstudy.service.StudyRoomServiceTest" time="1.767">
+    <failure message="java.lang.NullPointerException: Cannot invoke &quot;com.elice.meetstudy.domain.studyroom.mapper.StudyRoomMapper.toStudyRoom(com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO)&quot; because &quot;this.studyRoomMapper&quot; is null" type="java.lang.NullPointerException">java.lang.NullPointerException: Cannot invoke &quot;com.elice.meetstudy.domain.studyroom.mapper.StudyRoomMapper.toStudyRoom(com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO)&quot; because &quot;this.studyRoomMapper&quot; is null
+	at com.elice.meetstudy.domain.studyroom.service.StudyRoomService.createStudyRoom(StudyRoomService.java:59)
+	at com.elice.meetstudy.service.StudyRoomServiceTest.testCreateStudyRoom(StudyRoomServiceTest.java:79)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+</failure>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
