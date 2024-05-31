@@ -30,17 +30,17 @@ public class CategoryService {
     }
 
     // 카테고리 생성
-    public Category createCategory(String name) {
-        Category category = new Category();
-        category.setName(name);
+    public Category createCategory(String name, String description) {
+        Category category = new Category(name, description);
         return categoryRepository.save(category);
     }
 
     // 카테고리 수정
-    public Category updateCategory(Long id, String newName) {
+    public Category updateCategory(Long id, String newName, String newDescription) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         category.setName(newName);
+        category.setDescription(newDescription);
         return categoryRepository.save(category);
     }
 

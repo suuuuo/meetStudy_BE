@@ -1,3 +1,4 @@
+/*
 package com.elice.meetstudy.domain.calendar.service;
 
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
@@ -55,3 +56,4 @@ public class CalendarService {
 
 
 }
+*/
