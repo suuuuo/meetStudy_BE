@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.calendar.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,7 +27,7 @@ public class Calendar_detail {
     private Long id;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "calendar_id")
     private Calendar calendar;
 
