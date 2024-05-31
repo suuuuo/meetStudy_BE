@@ -36,7 +36,7 @@ public class PostController {
     this.postService = postService;
   }
 
-  @Operation(summary = "게시글 작성", description = "userId는 추후 jwt에서 추출하여 header로 전달.")
+  @Operation(summary = "게시글 작성")
   @PostMapping
   public ResponseEntity<PostResponseDTO> createPost(
       @RequestBody @Valid PostWriteDTO postCreate,
@@ -47,18 +47,21 @@ public class PostController {
   @Operation(summary = "게시글 수정")
   @PatchMapping("/{postId}")
   public ResponseEntity<PostResponseDTO> editPost(
-      @PathVariable Long postId, @RequestBody @Valid PostWriteDTO request) {
-    return ResponseEntity.ok().body(postService.edit(postId, request));
+      @PathVariable Long postId,
+      @RequestBody @Valid PostWriteDTO postEdit,
+      @RequestHeader("Authentication") String jwtToken) {
+    return ResponseEntity.ok().body(postService.edit(postId, postEdit, jwtToken));
   }
 
-  @Operation(summary = "게시글 삭제")
+  @Operation(summary = "게시글 삭제 - (이미 삭제된 게시글이어도 204)")
   @DeleteMapping("/{postId}")
-  public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-    postService.delete(postId);
+  public ResponseEntity<Void> deletePost(
+      @PathVariable Long postId, @RequestHeader("Authentication") String jwtToken) {
+    postService.delete(postId, jwtToken);
     return ResponseEntity.noContent().build();
   }
 
-  @Operation(summary = "전체 게시글 조회")
+  @Operation(summary = "전체 게시글 조회 - (최근 작성된 순으로)")
   @GetMapping
   public ResponseEntity<List<PostResponseDTO>> getPostAll(@PageableDefault Pageable pageable) {
     return ResponseEntity.ok(postService.getPostAll(pageable));
@@ -70,9 +73,10 @@ public class PostController {
     return ResponseEntity.ok(postService.getPost(postId));
   }
 
-  @Operation(summary = "전체 게시판 내 게시글 검색")
+  @Operation(summary = "전체 게시판 내 게시글 검색 - (최근 작성된 순으로)")
   @GetMapping("/search")
-  public ResponseEntity<List<PostResponseDTO>> searchPost(@RequestParam String keyword) {
-    return ResponseEntity.ok(postService.searchPost(keyword));
+  public ResponseEntity<List<PostResponseDTO>> searchPost(
+      @RequestParam String keyword, @PageableDefault Pageable pageable) {
+    return ResponseEntity.ok(postService.searchPost(keyword, pageable));
   }
 }

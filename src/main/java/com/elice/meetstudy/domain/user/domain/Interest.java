@@ -19,5 +19,7 @@ public class Interest {
   @JoinColumn(name = "category_id")
   private Category category;
 
-  public void setUser(User user) {}
+  public Interest(User user, Category category) {}
+
+  public void setUser(User user) {} // 없으면 실행 안됨 -> 추가
 }

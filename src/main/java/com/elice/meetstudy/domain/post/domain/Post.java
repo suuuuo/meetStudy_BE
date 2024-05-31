@@ -69,12 +69,13 @@ public class Post {
     this.content = content;
   }
 
-  public PostEditDTO.PostEditDTOBuilder toEditor() {
+  public PostEditDTO.PostEditDTOBuilder toEdit() {
     return PostEditDTO.builder().title(this.title).content(this.content);
   }
 
-  public void edit(PostEditDTO postEdit) {
+  public void edit(PostEditDTO postEdit, Category category) {
     this.title = postEdit.getTitle();
     this.content = postEdit.getContent();
+    this.category = category;
   }
 }

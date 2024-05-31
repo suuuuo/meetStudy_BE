@@ -8,71 +8,92 @@ import com.elice.meetstudy.domain.comment.repository.CommentRepository;
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.util.EntityFinder;
+import com.elice.meetstudy.util.TokenUtility;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @Transactional
 public class CommentService {
 
   private final CommentRepository commentRepository;
   private final EntityFinder entityFinder;
+  private final TokenUtility tokenUtility;
 
   @Autowired
-  public CommentService(CommentRepository commentRepository, EntityFinder entityFinder) {
+  public CommentService(
+      CommentRepository commentRepository, EntityFinder entityFinder, TokenUtility tokenUtility) {
     this.commentRepository = commentRepository;
     this.entityFinder = entityFinder;
+    this.tokenUtility = tokenUtility;
   }
 
-  /* 댓글 작성 */
-  public CommentResponseDTO write(Long postId, CommentWriteDTO commentCreate) {
-    // 예외 발생시
-    Post post = entityFinder.findPostById(postId);
-    User user = entityFinder.findUserById(commentCreate.getUserId());
+  /** 댓글 작성 */
+  public CommentResponseDTO write(Long postId, CommentWriteDTO commentCreate, String jwtToken) {
+    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+    User user = entityFinder.findUserById(userId);
+    Post post = entityFinder.findPost(postId);
 
-    // post, user 있으면 댓글 생성
     Comment newComment =
         Comment.builder().post(post).user(user).content(commentCreate.getContent()).build();
 
-    // 댓글 DB에 저장, 응답 객체 반환
+    // 댓글 DB에 저장
     return new CommentResponseDTO(commentRepository.save(newComment));
   }
 
-  /* 댓글 수정 */
-  public CommentResponseDTO edit(Long id, CommentWriteDTO editRequest) {
-    // 예외 발생시
-    Comment comment = entityFinder.findCommentById(id);
+  /** 댓글 수정 */
+  public CommentResponseDTO edit(Long commentId, CommentWriteDTO editRequest, String jwtToken) {
+    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+    Comment comment = entityFinder.findComment(commentId);
 
-    // 위에서 조회된 Comment로 CommentEditorBuilder 생성 (현재 상태를 기반으로 한 빌더 객체)
-    CommentEditDTO.CommentEditDTOBuilder commentEditorBuilder = comment.toEdit();
+    if (!userId.equals(comment.getUser().getId())) {
+      throw new SecurityException("해당 댓글을 수정할 권한이 없습니다.");
+    }
 
-    // 수정된 내용으로 CommentEditor 객체 생성
+    // editRequest, comment로 분기처리하고 객체 생성
     CommentEditDTO editComment =
-        commentEditorBuilder
-            .content(editRequest.getContent()) // 수정할 내용을 설정
+        comment
+            .toEdit()
+            .content(
+                editRequest.getContent() != null ? editRequest.getContent() : comment.getContent())
             .build();
 
     // Comment 엔티티 수정
     comment.edit(editComment);
 
-    // 수정된 comment 엔티티 저장
-    commentRepository.save(comment);
-
-    // return 값 반환
-    return new CommentResponseDTO(comment);
+    // 저장
+    return new CommentResponseDTO(commentRepository.save(comment));
   }
 
-  /* 댓글 삭제 */
-  public void delete(Long commentId) {
-    entityFinder.findCommentById(commentId);
-    commentRepository.deleteById(commentId);
+  /** 댓글 삭제 - (이미 삭제된 게시글이어도 204) */
+  public void delete(Long commentId, String jwtToken) {
+    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+
+    Optional<Comment> optionalComment = entityFinder.findCommentById(commentId);
+
+    // 댓글 있으면
+    if (optionalComment.isPresent()) {
+      Comment comment = optionalComment.get();
+
+      if (userId.equals(comment.getUser().getId())) {
+        commentRepository.deleteById(commentId);
+      } else {
+        throw new SecurityException("해당 게시글을 삭제할 권한이 없습니다.");
+      }
+    } else {
+      // 게시글이 존재하지 않는 경우에도 성공으로 간주
+      log.info("댓글 X ->  이미 삭제 commentId={}", commentId);
+    }
   }
 
-  /** 게시글에 달린 댓글 조회 */
+  /** 게시글에 달린 댓글 조회 정렬 기준은 ?.? */
   public List<CommentResponseDTO> getByPost(Long postId, Pageable pageable) {
     // 게시글을 조회
     entityFinder.findPostById(postId);

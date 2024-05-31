@@ -10,16 +10,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenUtility {
 
+  private final String secretKey =
+      "dGhpcyBpcyBteSBoaWRkZW4gand0IHNlY3JldGUga2V5LCB3aGF0IGlzIHlvdXIgand0IHNlY3JldGUga2V5Pw=="; // 서명 키 설정
+
   public Long extractUserIdFromToken(String jwtToken) {
     try {
-      // 토큰 파싱을 위해 Claims 객체 생성
-      Claims claims = Jwts.parserBuilder().build().parseClaimsJws(jwtToken).getBody();
+      // 토큰 파싱을 위한 Claims 객체
+      Claims claims =
+          Jwts.parserBuilder()
+              .setSigningKey(secretKey) // 서명 키 설정
+              .build()
+              .parseClaimsJws(jwtToken)
+              .getBody();
 
-      // 토큰에서 userId 추출하여 반환
-      return Long.parseLong(claims.get("username", String.class));
+      return Long.parseLong(claims.getSubject());
     } catch (JwtException | NumberFormatException e) {
-      // 토큰 파싱 중 에러가 발생한 경우 예외 처리
-      // 예외가 발생하면 null을 반환하거나 적절한 에러 처리를 수행할 수 있습니다.
       return null;
     }
   }
@@ -33,7 +38,7 @@ public class TokenUtility {
       userId = extractUserIdFromToken(jwtToken);
     } catch (Exception e) {
       // 예외 처리
-      log.error("JWT 토큰에서 userId 추출 실패", e);
+      log.error("JWT 토큰에서 userId 추출 실패.....", e);
       throw new IllegalArgumentException("userId 추출 실패다..", e);
     }
 

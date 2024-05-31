@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,21 +37,26 @@ public class CommentController {
   @Operation(summary = "댓글 작성")
   @PostMapping("/{postId}")
   public ResponseEntity<CommentResponseDTO> createComment(
-      @PathVariable Long postId, @RequestBody @Valid CommentWriteDTO commentCreate) {
-    return ResponseEntity.ok().body(commentService.write(postId, commentCreate));
+      @PathVariable Long postId,
+      @RequestBody @Valid CommentWriteDTO commentCreate,
+      @RequestHeader("Authentication") String jwtToken) {
+    return ResponseEntity.ok().body(commentService.write(postId, commentCreate, jwtToken));
   }
 
   @Operation(summary = "댓글 수정")
   @PatchMapping("/{commentId}")
   public ResponseEntity<CommentResponseDTO> editComment(
-      @PathVariable Long commentId, @RequestBody @Valid CommentWriteDTO commentCreate) {
-    return ResponseEntity.ok().body(commentService.edit(commentId, commentCreate));
+      @PathVariable Long commentId,
+      @RequestBody @Valid CommentWriteDTO commentCreate,
+      @RequestHeader("Authentication") String jwtToken) {
+    return ResponseEntity.ok().body(commentService.edit(commentId, commentCreate, jwtToken));
   }
 
   @Operation(summary = "댓글 삭제")
   @DeleteMapping("/{commentId}")
-  public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
-    commentService.delete(commentId);
+  public ResponseEntity<Void> deleteComment(
+      @PathVariable Long commentId, @RequestHeader("Authentication") String jwtToken) {
+    commentService.delete(commentId, jwtToken);
     return ResponseEntity.noContent().build();
   }
 
@@ -69,13 +75,13 @@ public class CommentController {
   }
 
   /** 추후 AdminController로 이동을 고려! API endpoint 변경 예정 */
-  @Operation(summary = "(관리자 페이지 - 전체 댓글 모니터링) 전체 댓글 조회")
+  @Operation(summary = "(관리자 페이지 - 전체 댓글 모니터링) 전체 댓글 조회 - (최근 작성된 순으로)")
   @GetMapping
   public ResponseEntity<List<CommentResponseDTO>> getComment(@PageableDefault Pageable pageable) {
     return ResponseEntity.ok(commentService.getAll(pageable));
   }
 
-  @Operation(summary = "(관리자 페이지 - 전체 댓글 모니터링) 전체 댓글 내 키워드 검색")
+  @Operation(summary = "(관리자 페이지 - 전체 댓글 모니터링) 전체 댓글 내 키워드 검색 - (최근 작성된 순으로)")
   @GetMapping("/search")
   public ResponseEntity<List<CommentResponseDTO>> getAllCommentByKeyword(
       @RequestParam String keyword, @PageableDefault Pageable pageable) {

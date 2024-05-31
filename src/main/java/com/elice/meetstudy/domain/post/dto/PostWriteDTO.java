@@ -10,8 +10,6 @@ public class PostWriteDTO {
 
   @NotNull private Long categoryId;
 
-  @NotNull private Long userId;
-
   @NotBlank(message = "제목을 입력해주세요.")
   private String title;
 
@@ -19,9 +17,8 @@ public class PostWriteDTO {
   private String content;
 
   @Builder
-  public PostWriteDTO(Long categoryId, Long userId, String title, String content) {
+  public PostWriteDTO(Long categoryId, String title, String content) {
     this.categoryId = categoryId;
-    this.userId = userId;
     this.title = title;
     this.content = content;
   }

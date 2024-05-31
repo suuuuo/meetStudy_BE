@@ -6,13 +6,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 public class PostEditDTO {
 
+  private final Long categoryId;
   private final String title;
   private final String content;
 
-  public PostEditDTO(String title, String content) {
+  @Builder
+  public PostEditDTO(Long categoryId, String title, String content) {
+    this.categoryId = categoryId;
     this.title = title;
     this.content = content;
   }

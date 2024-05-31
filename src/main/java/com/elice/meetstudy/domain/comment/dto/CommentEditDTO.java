@@ -5,11 +5,11 @@ import lombok.Data;
 
 /** 댓글 수정시 사용 */
 @Data
-@Builder
 public class CommentEditDTO {
 
   private final String content;
 
+  @Builder
   public CommentEditDTO(String content) {
     this.content = content;
   }

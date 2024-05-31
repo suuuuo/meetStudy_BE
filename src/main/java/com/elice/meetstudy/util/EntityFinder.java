@@ -8,6 +8,7 @@ import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.post.repository.PostRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -35,16 +36,26 @@ public class EntityFinder {
   }
 
   /** 게시글 찾는 메서드 */
-  public Post findPostById(Long postId) {
+  public Post findPost(Long postId) {
     return postRepository
         .findById(postId)
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 X."));
   }
 
+  /** 게시글 찾는 메서드(Optional) */
+  public Optional<Post> findPostById(Long postId) {
+    return postRepository.findById(postId);
+  }
+
   /** 댓글 찾는 메서드 */
-  public Comment findCommentById(Long commentId) {
+  public Comment findComment(Long commentId) {
     return commentRepository
         .findById(commentId)
         .orElseThrow(() -> new IllegalArgumentException("댓글 찾을 수 X."));
+  }
+
+  /** 댓글 찾는 메서드 (Optional) */
+  public Optional<Comment> findCommentById(Long commentId) {
+    return commentRepository.findById(commentId);
   }
 }

@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.post.service;
 
+// eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNSIsImF1dGgiOiJVU0VSIiwidXNlcm5hbWUiOiLsnbTtlZjsmIEiLCJ0b2tlbklkIjoiOGFjZWY2NDMtMzAxMy00ZTI4LTkwODEtZmI5MjMyZmZlNzEyIiwiZXhwIjoyNzE3MTczMDQ5fQ.YabN4oFkg2FfDeFj5OQjzRuzxV_deTqoZ65iYXkh4Sq5AGWuafNl-t0djdlrWF_YLVfspe1xPKOGszH7TwOnlg
 import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.post.dto.PostEditDTO;
@@ -10,6 +11,7 @@ import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.util.EntityFinder;
 import com.elice.meetstudy.util.TokenUtility;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +36,13 @@ public class PostService {
     this.tokenUtility = tokenUtility;
   }
 
-  /* 게시글 작성 */
+  /** 게시글 작성 */
   public PostResponseDTO write(PostWriteDTO postCreate, String jwtToken) {
+    // jwt -> userId get -> userId 를 찾는건데,userId 를 바로 집어넣으려면 어떻게하나요? (고민)
     Long userId = tokenUtility.getUserIdFromToken(jwtToken);
-    log.info("user name: {}", userId);
+    User user = entityFinder.findUserById(userId);
 
     // 예외 발생시
-    User user = entityFinder.findUserById(userId);
     Category category = entityFinder.findCategoryById(postCreate.getCategoryId());
 
     // Post 엔티티 생성
@@ -55,47 +57,74 @@ public class PostService {
     return new PostResponseDTO(postRepository.save(newPost));
   }
 
-  /* 게시글 수정 */
-  public PostResponseDTO edit(Long postId, PostWriteDTO editRequest) {
-    // postId로 게시글 찾고 예외 발생시
-    Post post = entityFinder.findPostById(postId);
+  /** 게시글 수정 */
+  public PostResponseDTO edit(Long postId, PostWriteDTO editRequest, String jwtToken) {
+    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+    Post post = entityFinder.findPost(postId);
 
-    // 조회된 post로 postEdiorBuilder 생성 (현재 상태를 기반으로 한 빌더 객체)
-    PostEditDTO.PostEditDTOBuilder postEditorBuilder = post.toEditor();
+    if (!userId.equals(post.getUser().getId())) {
+      throw new SecurityException("해당 게시글을 수정할 권한이 없습니다.");
+    }
 
-    // 수정된 내용(editRequest)으로 postEditor 객체 생성 (title / content 내용이 null 이면 기존 값으로)
-    String title = editRequest.getTitle() != null ? editRequest.getTitle() : post.getTitle();
-    String content =
-        editRequest.getContent() != null ? editRequest.getContent() : post.getContent();
+    Category category = entityFinder.findCategoryById(editRequest.getCategoryId());
 
-    PostEditDTO editPost = postEditorBuilder.title(title).content(content).build();
+    // editRequest, post로 분기처리하고 객체 생성
+    PostEditDTO editPost =
+        post.toEdit()
+            .categoryId(
+                editRequest.getCategoryId() != null
+                    ? editRequest.getCategoryId()
+                    : post.getCategory().getId())
+            .title(editRequest.getTitle() != null ? editRequest.getTitle() : post.getTitle())
+            .content(
+                editRequest.getContent() != null ? editRequest.getContent() : post.getContent())
+            .build();
 
-    // post 엔티티를 수정
-    post.edit(editPost);
-    // 수정된 post DB에 저장
-    postRepository.save(post);
+    // post 엔티티 수정
+    post.edit(editPost, category);
 
-    return new PostResponseDTO(post);
+    // 저장
+    return new PostResponseDTO(postRepository.save(post));
   }
 
-  /* 게시글 삭제 */
-  public void delete(Long postId) {
-    postRepository.deleteById(postId);
+  /** 게시글 삭제 - (이미 삭제된 게시글이어도 204) */
+  public void delete(Long postId, String jwtToken) {
+    // 토큰 -> userId 추출
+    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+
+    // 게시글 조회
+    Optional<Post> optionalPost = entityFinder.findPostById(postId);
+
+    // 게시글이 존재할 경우
+    if (optionalPost.isPresent()) {
+      Post post = optionalPost.get();
+
+      if (userId.equals(post.getUser().getId())) {
+        postRepository.deleteById(postId);
+      } else {
+        throw new SecurityException("해당 게시글을 삭제할 권한이 없습니다.");
+      }
+    } else {
+      // 게시글이 존재하지 않는 경우에도 성공으로 간주
+      log.info("게시글 X  이미 삭제 postId={}", postId);
+    }
   }
 
-  /* 전체 게시글 조회 */
+  /** 전체 게시글 조회 - (최근 작성된 순으로) */
   public List<PostResponseDTO> getPostAll(Pageable pageable) {
-    return postRepository.findAll(pageable).stream() /* Page<Post> 객체를 스트림으로 변환 */
+    return postRepository
+        .findAllByOrderByCreatedAtDesc(pageable)
+        .stream() /* Page<Post> 객체를 스트림으로 변환 */
         .map(PostResponseDTO::new) /* 스트림 내 Post 객체 -> ResponsePostGet 객체로 변환. */
         .collect(Collectors.toList()); /* ResponsePostGet을 리스트로 반환 */
   }
 
-  /* 게시글 상세 조회(postId) - (사용자가 게시글 제목을 클릭했을때) */
+  /** 게시글 상세 조회(postId) - (사용자가 게시글 제목을 클릭했을때) */
   public PostResponseDTO getPost(Long postId) {
-    Post post = entityFinder.findPostById(postId);
+    Post post = entityFinder.findPost(postId);
 
     // 조회수 증가
-    updateHit(postId);
+    postRepository.updateHit(postId);
 
     return PostResponseDTO.builder()
         .id(post.getId())
@@ -108,14 +137,11 @@ public class PostService {
         .build();
   }
 
-  /** 게시글 view -> 게시글 조회수 증가 */
-  private void updateHit(Long postId) {
-    postRepository.updateHit(postId);
-  }
-
-  /* 전체 게시판 내 게시글 검색 */
-  public List<PostResponseDTO> searchPost(String keyword) {
-    return postRepository.findByTitleContainingOrContentContaining(keyword, keyword).stream()
+  /** 전체 게시판 내 게시글 검색 */
+  public List<PostResponseDTO> searchPost(String keyword, Pageable pageable) {
+    return postRepository
+        .findByTitleContainingOrContentContainingOrderByCreatedAtDesc(keyword, keyword, pageable)
+        .stream()
         .map(PostResponseDTO::new)
         .collect(Collectors.toList());
   }
