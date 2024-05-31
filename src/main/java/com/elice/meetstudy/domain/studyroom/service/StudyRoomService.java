@@ -4,9 +4,11 @@ import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.UserStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
 import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
+import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.domain.studyroom.mapper.StudyRoomMapper;
 import com.elice.meetstudy.domain.studyroom.repository.StudyRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -43,10 +45,11 @@ public class StudyRoomService {
      * @return 주어진 ID에 해당하는 StudyRoomDTO 객체를 포함한 Optional 객체,
      *         스터디룸이 존재하지 않으면 빈 Optional 객체
      */
-    public Optional<StudyRoomDTO> getStudyRoomById(Long id) {
+    public StudyRoomDTO getStudyRoomById(Long id) {
         return studyRoomRepository
                 .findById(id)
-                .map(studyRoomMapper::toStudyRoomDTO);
+                .map(studyRoomMapper::toStudyRoomDTO)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID :" + id + "]"));
     }
 
     /**
@@ -70,14 +73,15 @@ public class StudyRoomService {
      * @return 주어진 ID에 해당하는 업데이트된 StudyRoomDTO 객체를 포함한 Optional 객체,
      *         스터디룸이 존재하지 않으면 빈 Optional 객체
      */
-    public Optional<StudyRoomDTO> updateStudyRoom(Long id, StudyRoomDTO studyRoomDTO) {
+    public StudyRoomDTO updateStudyRoom(Long id, StudyRoomDTO studyRoomDTO) {
         return studyRoomRepository.findById(id)
                 .map(existingStudyRoom -> {
                     existingStudyRoom.setTitle(studyRoomDTO.getTitle());
                     existingStudyRoom.setDescription(studyRoomDTO.getDescription());
                     existingStudyRoom.setMaxCapacity(studyRoomDTO.getMaxCapacity());
                     return studyRoomMapper.toStudyRoomDTO(studyRoomRepository.save(existingStudyRoom));
-                });
+                })
+                .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID :" + id + "]"));
     }
 
     /**
