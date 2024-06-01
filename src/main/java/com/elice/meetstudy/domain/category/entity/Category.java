@@ -5,12 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-
-/**
- *  category Entity
- */
-
 @Entity
 @Getter
 @Setter
