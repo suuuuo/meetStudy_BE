@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ *  category Entity
+ */
+
 @Entity
 @Getter
 @Setter
@@ -21,6 +25,9 @@ public class Category {
 
   @Column(nullable = false)
   private String description;
+
+  //  @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
+//  private List<Post> posts = new ArrayList<>();
 
   public Category(String name, String description) {
     this.name = name;
