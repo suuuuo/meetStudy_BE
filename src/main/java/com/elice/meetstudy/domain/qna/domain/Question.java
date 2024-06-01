@@ -2,6 +2,7 @@ package com.elice.meetstudy.domain.qna.domain;
 
 import com.elice.meetstudy.domain.audit.BaseEntity;
 import com.elice.meetstudy.domain.user.domain.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,6 +44,10 @@ public class Question extends BaseEntity {
     @Column(nullable = false,columnDefinition = "ENUM('PENDING','COMPLETED') DEFAULT 'PENDING'")
     private AnswerStatus answerStatus;
 
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "answer_id")
+    private Answer answer;
+
     @NotNull
     String title;
 
@@ -65,5 +71,14 @@ public class Question extends BaseEntity {
         this.isSecret = isSecret;
         this.password = password;
         this.answerStatus = AnswerStatus.PENDING;
+    }
+
+    public void update(String title, String content, QuestionCategory questionCategory,
+        boolean isSecret, String password){
+        this.title = title;
+        this.content = content;
+        this.questionCategory = questionCategory;
+        this.isSecret = isSecret;
+        this.password = password;
     }
 }
