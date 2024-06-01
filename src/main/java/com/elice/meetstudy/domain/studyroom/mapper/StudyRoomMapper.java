@@ -13,15 +13,11 @@ public interface StudyRoomMapper {
     StudyRoomMapper INSTANCE = Mappers.getMapper(StudyRoomMapper.class);
 
 
-    @Mapping(source = "userStudyRooms", target = "userStudyRooms")
     StudyRoomDTO toStudyRoomDTO(StudyRoom studyRoom);
 
-    @Mapping(source = "userStudyRooms", target = "userStudyRooms")
     StudyRoom toStudyRoom(StudyRoomDTO studyRoomDTO);
 
-    @Mapping(source = "studyRoom", target = "studyRoom")
     UserStudyRoomDTO toUserStudyRoomDTO(UserStudyRoom userStudyRoom);
 
-    @Mapping(source = "studyRoom", target = "studyRoom")
     UserStudyRoom toUserStudyRoom(UserStudyRoomDTO userStudyRoomDTO);
 }

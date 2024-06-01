@@ -21,14 +21,4 @@ public class StudyRoomDTO {
     private Long maxCapacity;
     //private Long categoryId;
     private List<UserStudyRoomDTO> userStudyRooms = new ArrayList<>();
-
-    public static class StudyRoomDTOBuilder {
-        public StudyRoomDTOBuilder() {
-            this.userStudyRooms = new ArrayList<>();
-        }
-    }
-
-    public void addUserStudyRoom(UserStudyRoomDTO userStudyRoomDTO) {
-        this.userStudyRooms.add(userStudyRoomDTO);
-    }
 }
