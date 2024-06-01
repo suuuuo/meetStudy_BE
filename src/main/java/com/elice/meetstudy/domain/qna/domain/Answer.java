@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,16 @@ public class Answer extends BaseEntity {
 
     @NotNull
     String content;
+
+    @Builder
+    public Answer(Question question, String content){
+        this.question = question;
+        this.content = content;
+    }
+
+    public void update(String content){
+        this.content = content;
+    }
 
 
 }
