@@ -9,6 +9,10 @@ import com.elice.meetstudy.domain.calendar.holiday.service.HolidayService;
 import com.elice.meetstudy.domain.calendar.mapper.CalendarDetailMapper;
 import com.elice.meetstudy.domain.calendar.repository.CalendarDetailRepository;
 import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
+import com.elice.meetstudy.domain.user.domain.User;
+import com.elice.meetstudy.domain.user.domain.UserPrinciple;
+import com.elice.meetstudy.domain.user.repository.UserRepository;
+import com.elice.meetstudy.util.TokenUtility;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +20,8 @@ import java.util.Optional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,17 +33,20 @@ public class CalendarDetailService {
   private final CalendarService calendarService;
   private final HolidayService holidayService;
   private final CalendarDetailMapper calendarDetailMapper;
+  private final UserRepository userRepository;
 
   public CalendarDetailService(
       CalendarDetailRepository calendarDetailRepository, CalendarRepository calendarRepository,
       CalendarService calendarService,
       HolidayService holidayService,
-      CalendarDetailMapper calendarDetailMapper) {
+      CalendarDetailMapper calendarDetailMapper,
+      UserRepository userRepository) {
     this.calendarDetailRepository = calendarDetailRepository;
       this.calendarRepository = calendarRepository;
       this.calendarService = calendarService;
     this.holidayService = holidayService;
     this.calendarDetailMapper = calendarDetailMapper;
+      this.userRepository = userRepository;
   }
 
   /**
@@ -73,13 +82,15 @@ public class CalendarDetailService {
    *
    * @param year
    * @param month
-   * @param userId
    * @param studyRoomId
    * @return
    */
   @Transactional
   public ResponseEntity<List<ResponseCalendarDetail>> getAllCalendarDetail(
-      String year, String month, Long userId, Long studyRoomId) {
+      String year, String month, Long studyRoomId) {
+    //접근한 유저 정보 가져오는 로직
+    long userId = getUserId();
+
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
     saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
     List<Calendar_detail> calendarDetailList =
@@ -116,13 +127,15 @@ public class CalendarDetailService {
    * 일정 추가
    *
    * @param requestCalendarDetail
-   * @param userId
    * @param studyRoomId
    * @return
    */
   @Transactional
   public ResponseEntity<ResponseCalendarDetail> saveCalendarDetail(
-      RequestCalendarDetail requestCalendarDetail, Long userId, Long studyRoomId) { // request로 받으면
+      RequestCalendarDetail requestCalendarDetail, Long studyRoomId) { // request로 받으면
+    //접근한 유저 정보 가져오는 로직
+    long userId = getUserId();
+
     Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
     calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
@@ -163,4 +176,12 @@ public class CalendarDetailService {
     calendarDetailRepository.deleteById(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
       }
+
+  @Transactional
+  public long getUserId(){
+    //접근한 유저 정보 가져오는 로직
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
+    return Long.parseLong(userPrinciple.getLoginId());
+  }
 }

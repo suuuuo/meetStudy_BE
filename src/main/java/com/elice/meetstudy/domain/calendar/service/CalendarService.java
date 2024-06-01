@@ -6,6 +6,7 @@ import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
 import com.elice.meetstudy.domain.studyroom.repository.StudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
+import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -13,6 +14,8 @@ import java.time.YearMonth;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,10 +74,12 @@ public class CalendarService {
   /**
    * 개인 캘린더 삭제
    *
-   * @param userId
    */
   @Transactional
-  public ResponseEntity<?> deleteCalendar(Long userId) {
+  public ResponseEntity<?> deleteCalendar() {
+    //접근한 유저 정보 가져오는 로직
+    long userId = getUserId();
+
     Optional<Calendar> calendar = calendarRepository.findByUserIdAndStudyRoomIsNull(userId);
     calendarRepository.deleteById(calendar.get().getId());
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -104,5 +109,13 @@ public class CalendarService {
     YearMonth yearMonth = YearMonth.of(Integer.parseInt(year), Integer.parseInt(month));
     int day = yearMonth.lengthOfMonth();
     return String.valueOf(day);
+  }
+
+  @Transactional
+  public long getUserId(){
+    //접근한 유저 정보 가져오는 로직
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
+    return Long.parseLong(userPrinciple.getLoginId());
   }
 }

@@ -6,7 +6,9 @@ import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.calendar.mapper.CalendarDetailMapper;
 import com.elice.meetstudy.domain.calendar.service.CalendarDetailService;
 import com.elice.meetstudy.domain.calendar.service.CalendarService;
+import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import jakarta.validation.Valid;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,14 +37,12 @@ public class CalendarController {
 
     private final CalendarService calendarService;
     private final CalendarDetailService calendarDetailService;
-    private final CalendarDetailMapper calendarDetailMapper;
 
     @Autowired
     public CalendarController(CalendarService calendarService,
         CalendarDetailService calendarDetailService, CalendarDetailMapper calendarDetailMapper) {
         this.calendarService = calendarService;
         this.calendarDetailService = calendarDetailService;
-        this.calendarDetailMapper = calendarDetailMapper;
     }
 
     /**
@@ -50,9 +55,7 @@ public class CalendarController {
     @GetMapping("/calendar")
     public ResponseEntity<?> getCalendarDetails(
         @RequestHeader("year") String year, @RequestHeader("month") String month) {
-        //임시
-        long userId = 1L;
-        return calendarDetailService.getAllCalendarDetail(year, month, userId, 0L);
+        return calendarDetailService.getAllCalendarDetail(year, month,0L);
     }
 
     /**
@@ -67,9 +70,7 @@ public class CalendarController {
     public ResponseEntity<?> getCalendarDetails(
         @RequestHeader("year") String year, @RequestHeader("month") String month,
         @PathVariable long study_room_id) {
-        // 임시
-        long userId = 1L;
-        return calendarDetailService.getAllCalendarDetail(year, month, userId, study_room_id);
+        return calendarDetailService.getAllCalendarDetail(year, month, study_room_id);
     }
 
     /**
@@ -92,9 +93,7 @@ public class CalendarController {
     @PostMapping("/calendar")
     public ResponseEntity<?> postCalendarDetail(
         @RequestBody @Valid RequestCalendarDetail requestCalendarDetail) {
-        //임시
-        Long userId = 1L;
-        return calendarDetailService.saveCalendarDetail(requestCalendarDetail, userId, 0L);
+        return calendarDetailService.saveCalendarDetail(requestCalendarDetail, 0L);
     }
 
     /**
@@ -108,9 +107,7 @@ public class CalendarController {
     public ResponseEntity<?> postCalendarDetail(
         @RequestBody @Valid RequestCalendarDetail requestCalendarDetail,
         @PathVariable long study_room_id) {
-        //임시
-        Long userId = 1L;
-        return calendarDetailService.saveCalendarDetail(requestCalendarDetail, userId, study_room_id);
+        return calendarDetailService.saveCalendarDetail(requestCalendarDetail, study_room_id);
     }
 
 
@@ -146,9 +143,7 @@ public class CalendarController {
      */
     @DeleteMapping("/calendar")
     public ResponseEntity<?> deleteUserCalendar(){
-        //임시 id
-        long userId = 1L;
-        return calendarService.deleteCalendar(userId);
+        return calendarService.deleteCalendar();
     }
 
     /**
@@ -159,8 +154,6 @@ public class CalendarController {
      */
     @DeleteMapping("/calendar/{study_room_id}")
     public ResponseEntity<?> deleteStudyCalendar(@PathVariable long study_room_id){
-        //임시 id
-        long userId = 1L;
         return calendarService.deleteStudyCalendar(study_room_id);
     }
 }
