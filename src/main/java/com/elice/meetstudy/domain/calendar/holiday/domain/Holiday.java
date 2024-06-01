@@ -1,6 +1,5 @@
 package com.elice.meetstudy.domain.calendar.holiday.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,11 +18,9 @@ public class Holiday {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    @Column
     @NotNull
     private String date;
 
-    @Column
     @NotNull
     private String name;
 

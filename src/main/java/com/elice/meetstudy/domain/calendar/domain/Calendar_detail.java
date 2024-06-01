@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.calendar.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,7 +27,7 @@ public class Calendar_detail {
     private Long id;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "calendar_id")
     private Calendar calendar;
 
@@ -55,6 +56,7 @@ public class Calendar_detail {
     @ColumnDefault("false")
     private boolean isHoliday;
 
+
     @Builder
     public Calendar_detail(String title, String content, String startDay, String endDay,
         String startTime, String endTime, boolean isHoliday) {
@@ -67,7 +69,13 @@ public class Calendar_detail {
         this.isHoliday = isHoliday;
     }
 
-    public void setCalendar(Calendar calendar) {
-        this.calendar = calendar;
+  public void update( String title, String content, String startDay,
+      String endDay, String startTime, String endTime) {
+    this.title = title;
+    this.content = content;
+    this.startDay = startDay;
+    this.endDay = endDay;
+    this.startTime = startTime;
+    this.endTime = endTime;
     }
 }

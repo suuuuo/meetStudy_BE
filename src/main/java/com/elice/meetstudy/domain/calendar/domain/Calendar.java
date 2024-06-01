@@ -1,7 +1,6 @@
 package com.elice.meetstudy.domain.calendar.domain;
 
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
-import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -14,12 +13,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Calendar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
