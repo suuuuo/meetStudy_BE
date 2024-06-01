@@ -21,11 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class QuestionController {
 
   private final QuestionService questionService;
-  private final QuestionMapper questionMapper;
 
   public QuestionController(QuestionService questionService, QuestionMapper questionMapper) {
     this.questionService = questionService;
-    this.questionMapper = questionMapper;
   }
 
   /** 질문 전체 조회 (키워드) */
@@ -42,8 +40,9 @@ public class QuestionController {
    * 질문 개별 조회
    */
   @GetMapping("question/{question_id}")
-  public ResponseEntity<?> getQuestion(@PathVariable long question_id){
-    return questionService.getQuestion(question_id);
+  public ResponseEntity<?> getQuestion(@PathVariable long question_id,
+      @RequestParam(required = false) String password){
+    return questionService.getQuestion(question_id, password);
   }
 
   /**
