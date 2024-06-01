@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.user.domain;
 
+import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,6 +46,9 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Interest> interests = new ArrayList<>();
 
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  private List<UserStudyRoom> userStudyRooms = new ArrayList<>();
+
   public void updateDeletedAt() {
     this.deletedAt = LocalDateTime.now();
   }
@@ -61,6 +65,11 @@ public class User {
   public void addInterest(Interest interest) {
     interests.add(interest);
     interest.setUser(this);
+  }
+
+  public void addUserStudyRoom(UserStudyRoom userStudyRoom) {
+    userStudyRooms.add(userStudyRoom);
+    userStudyRoom.setUser(this);
   }
 
 //    public void update(UserUpdateDto userUpdateDto){
