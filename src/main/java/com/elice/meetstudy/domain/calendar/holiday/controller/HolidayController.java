@@ -1,26 +1,18 @@
 package com.elice.meetstudy.domain.calendar.holiday.controller;
 
-import com.elice.meetstudy.domain.calendar.holiday.domain.Holiday;
 import com.elice.meetstudy.domain.calendar.holiday.service.HolidayService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 import java.time.LocalDate;
-import org.json.JSONObject;
-import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -37,7 +29,7 @@ public class HolidayController {
         LocalDate now = LocalDate.now();
         int year = now.getYear();
 
-        for (int i = year; i <= year + 1; i++) { //내년까지 가져옴
+        for (int i = year-5; i <= year + 2; i++) { //5년 전부터 2년 후까지 가져옴
             for (int j = 1; j <= 12; j++) {
 
                 String month = Integer.toString(j);
@@ -57,7 +49,6 @@ public class HolidayController {
         urlBuilder.append("&" + URLEncoder.encode("_type", "UTF-8") + "=json");
 
         URL url = new URL(urlBuilder.toString());
-        System.out.println(url);
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");

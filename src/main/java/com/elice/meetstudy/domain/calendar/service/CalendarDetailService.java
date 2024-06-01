@@ -2,6 +2,7 @@ package com.elice.meetstudy.domain.calendar.service;
 
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
 import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
+import com.elice.meetstudy.domain.calendar.dto.DeleteRequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.RequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.calendar.holiday.domain.Holiday;
@@ -27,7 +28,7 @@ public class CalendarDetailService {
     private CalendarService calendarService;
     @Autowired
     private HolidayService holidayService;
-
+    @Autowired
     private final CalendarDetailMapper calendarDetailMapper;
 
     public CalendarDetailService(CalendarDetailMapper calendarDetailMapper) {
@@ -41,7 +42,7 @@ public class CalendarDetailService {
         Optional<Calendar> calendar = calendarRepository.findById(calendarId);
 
         for (Holiday holiday : holidayList) {
-            if (calendarDetailRepository.existsByStartDay(holiday.getDate())) {
+            if (calendarDetailRepository.existsByStartDayAndCalendarId(holiday.getDate(), calendarId)) {
                 continue;
             } else { //현재 캘린더에 공휴일 정보가 없으면 등록함
                 Calendar_detail c = Calendar_detail.builder()
@@ -61,23 +62,31 @@ public class CalendarDetailService {
 
     //일정 리스트 출력 - 작성 완료, 테스트 전
     @Transactional
-    public List<ResponseCalendarDetail> getAllCalendarDetail(String year, String month, Long userId, Long studyRoomId){
+    public List<ResponseCalendarDetail> getAllCalendarDetail(String year, String month, Long userId,
+        Long studyRoomId) {
         Calendar calendar = calendarService.findCalendar(userId, studyRoomId); //캘린더 찾아서
         saveHolidays(year, month, calendar.getId()); //공휴일 일정 등록
-        List<Calendar_detail> calendarDetailList = calendarDetailRepository.findAllByCalendar(calendar); //해당 캘린더의 일정들 리스트로 출력
+        List<Calendar_detail> calendarDetailList = calendarDetailRepository.findAllByCalendar(
+            calendar); //해당 캘린더의 일정들 리스트로 출력
 
         List<ResponseCalendarDetail> responseCalendarDetails = new ArrayList<>();
         for (Calendar_detail calendarDetail : calendarDetailList) {
-            responseCalendarDetails.add(calendarDetailMapper.toResponseCalendarDetail(calendarDetail));
+            responseCalendarDetails.add(
+                calendarDetailMapper.toResponseCalendarDetail(calendarDetail));
         }
         return responseCalendarDetails;
     }
 
+    @Transactional
+    public ResponseCalendarDetail getCalendarDetail(long id){
+        Optional<Calendar_detail> calendarDetail = calendarDetailRepository.findById(id);
+        return calendarDetailMapper.toResponseCalendarDetail(calendarDetail.get());
+    }
+
     //request 받아서 일정 추가 - 작성 완료, 테스트 전
     @Transactional
-    public ResponseCalendarDetail saveCalendarDetail(RequestCalendarDetail requestCalendarDetail,
+    public ResponseCalendarDetail saveCalendarDetail(Calendar_detail calendarDetail,
         Long userId, Long studyRoomId) { //request로 받으면
-        Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
         Calendar calendar = calendarService.findCalendar(userId, studyRoomId); //캘린더 찾아서
         calendarDetail.setCalendar(calendar); //캘린더 추가해주고
         calendarDetailRepository.save(calendarDetail); //저장
@@ -85,10 +94,28 @@ public class CalendarDetailService {
     }
 
     //일정 수정 - put
+    @Transactional
+    public ResponseCalendarDetail putCalendarDetail(Calendar_detail c) {
+        Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(
+            c.getId());
+        if(originCalendarDetail.isPresent()){
+            Calendar_detail calendarDetail = originCalendarDetail.get();
+            if(c.getTitle() != null) calendarDetail.setTitle(c.getTitle());
+            if(c.getContent() != null) calendarDetail.setContent(c.getContent());
+            if(c.getStartDay() != null) calendarDetail.setStartDay(c.getStartDay());
+            if(c.getEndDay() != null) calendarDetail.setEndDay(c.getEndDay());
+            if(c.getStartTime() != null) calendarDetail.setStartTime(c.getStartTime());
+            if(c.getEndTime() != null) calendarDetail.setEndDay(c.getEndTime());
+            return calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
+        }
+        return null;
+    }
 
     //일정 삭제 - delete
-
-    //회원 삭제 - 개인 / 공용 캘린더 삭제 delete
-    //스터디룸 삭제 - 공용 캘린더 삭제 delete
-
+    @Transactional
+    public void deleteCalendarDetail(long id) {
+        Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(id);
+        if(originCalendarDetail.isPresent())
+            calendarDetailRepository.deleteById(id);
+    }
 }

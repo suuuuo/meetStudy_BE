@@ -16,5 +16,5 @@ public class MyPageService {
 
     // 스크랩 한 게시글 조회
 
-    // + 프로필 설정
+    // + 프로필 설정, 내가 작성한 게시글
 }

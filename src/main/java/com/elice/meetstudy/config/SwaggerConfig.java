@@ -19,7 +19,7 @@ public class SwaggerConfig {
   @Bean
   public GroupedOpenApi chatOpenApi() {
     // "/v1/**" 경로에 매칭되는 API를 그룹화하여 문서화한다.
-    String[] paths = {"/v1/**"};
+    String[] paths = {"/v1/**", "/api/vi/user/**"};
 
     return GroupedOpenApi.builder()
         .group("MeetStudy API v1")  // 그룹 이름 설정
