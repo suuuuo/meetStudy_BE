@@ -19,4 +19,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
       Pageable pageable, QuestionCategory questionCategory);
 
   Page<Question> findAllByOrderByIdDesc(Pageable pageable);
+
+  Question findByAnswerId(long answerId);
 }

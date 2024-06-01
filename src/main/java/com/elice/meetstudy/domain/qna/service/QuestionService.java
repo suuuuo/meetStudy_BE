@@ -1,7 +1,5 @@
 package com.elice.meetstudy.domain.qna.service;
 
-import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
-import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.qna.domain.Question;
 import com.elice.meetstudy.domain.qna.domain.QuestionCategory;
 import com.elice.meetstudy.domain.qna.dto.RequestQuestionDto;
@@ -71,6 +69,10 @@ public class QuestionService {
   }
 
   /** 질문 개별 조회 */
+  @Transactional
+  public ResponseEntity<?> getQuestion(long questionId){
+    return new ResponseEntity<>(questionRepository.findById(questionId), HttpStatus.OK);
+  }
 
   /** 질문 생성 */
   @Transactional
@@ -87,15 +89,16 @@ public class QuestionService {
     Optional<Question> question = questionRepository.findById(questionId);
     if (question.isPresent()) {
       Question question1 = question.get();
-      question1.setTitle(re.title());
-      question1.setContent(re.content());
-      question1.setQuestionCategory(re.questionCategory());
-      question1.setSecret(re.isSecret());
-      question1.setPassword(re.password());
+     question1.update(re.title(), re.content(), re.questionCategory(), re.isSecret(), re.password());
       return new ResponseEntity<>(questionMapper.toResponseQuestionDto(question1), HttpStatus.OK);
     }
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   /** 질문 삭제 */
+  @Transactional
+  public ResponseEntity<?> deleteQuestion(long questionId){
+    questionRepository.deleteById(questionId);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
 }

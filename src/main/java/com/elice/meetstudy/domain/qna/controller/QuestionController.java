@@ -1,20 +1,17 @@
 package com.elice.meetstudy.domain.qna.controller;
 
-import com.elice.meetstudy.domain.qna.domain.Question;
-import com.elice.meetstudy.domain.qna.domain.QuestionCategory;
 import com.elice.meetstudy.domain.qna.dto.RequestQuestionDto;
 import com.elice.meetstudy.domain.qna.dto.ResponseQuestionDto;
 import com.elice.meetstudy.domain.qna.mapper.QuestionMapper;
 import com.elice.meetstudy.domain.qna.service.QuestionService;
 import java.util.List;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +39,14 @@ public class QuestionController {
   }
 
   /**
+   * 질문 개별 조회
+   */
+  @GetMapping("question/{question_id}")
+  public ResponseEntity<?> getQuestion(@PathVariable long question_id){
+    return questionService.getQuestion(question_id);
+  }
+
+  /**
    * @param requestQuestionDto
    * @return responseQuestionDto 질문 생성
    */
@@ -50,9 +55,23 @@ public class QuestionController {
     return questionService.postQuestion(requestQuestionDto);
   }
 
+  /**
+   * 질문 수정
+   * @param requestQuestionDto
+   * @param question_id
+   * @return
+   */
   @PutMapping("/question/{question_id}")
   public ResponseEntity<?> updateQuestion(@RequestBody RequestQuestionDto requestQuestionDto,
       @PathVariable long question_id){
     return questionService.updateQuestion(requestQuestionDto, question_id);
+  }
+
+  /**
+   * 질문 삭제
+   */
+  @DeleteMapping("/question/{question_id}")
+  public ResponseEntity<?> deleteQuestion(@PathVariable long question_id){
+    return questionService.deleteQuestion(question_id);
   }
 }
