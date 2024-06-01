@@ -6,6 +6,7 @@ import com.elice.meetstudy.domain.qna.dto.RequestQuestionDto;
 import com.elice.meetstudy.domain.qna.dto.ResponseQuestionDto;
 import com.elice.meetstudy.domain.qna.mapper.QuestionMapper;
 import com.elice.meetstudy.domain.qna.repository.QuestionRepository;
+import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +41,7 @@ public class QuestionService {
     if (category != null && !category.isEmpty()) {
       return getAllQuestionsByCategory(
           QuestionCategory.valueOf(category.toUpperCase()), pageRequest, keyword);
-    } else{
+    } else {
       if (keyword != null && !keyword.isEmpty())
         questions = questionRepository.findAllByTitleContainingOrderByIdDesc(keyword, pageRequest);
       else questions = questionRepository.findAllByOrderByIdDesc(pageRequest);
@@ -50,7 +53,7 @@ public class QuestionService {
     }
   }
 
-  /** 질문 리스트 카테고리별 조회 */
+  /** 질문 리스트 카테고리별 조회  */
   @Transactional
   public ResponseEntity<List<ResponseQuestionDto>> getAllQuestionsByCategory(
       QuestionCategory questionCategory, PageRequest pageRequest, String keyword) {
@@ -65,13 +68,23 @@ public class QuestionService {
           questionRepository.findAllByQuestionCategoryOrderByIdDesc(pageRequest, questionCategory);
     for (Question question : questions) {
       responseQuestionDtoList.add(questionMapper.toResponseQuestionDto(question));
-    } return new ResponseEntity(responseQuestionDtoList, HttpStatus.OK);
+    }
+    return new ResponseEntity(responseQuestionDtoList, HttpStatus.OK);
   }
 
-  /** 질문 개별 조회 */
+  /** 질문 개별 조회 : 관리자는 다 볼 수 있게 추가 */
   @Transactional
-  public ResponseEntity<?> getQuestion(long questionId){
-    return new ResponseEntity<>(questionRepository.findById(questionId), HttpStatus.OK);
+  public ResponseEntity<?> getQuestion(long questionId, String password) {
+    Optional<Question> Question = questionRepository.findById(questionId);
+
+    if (Question.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    Question question = Question.get();
+
+    if (question.isSecret()) { // 비밀글인 경우 : 수정
+      if (password == null || !password.equals(question.getPassword()))
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+    return new ResponseEntity<>(question, HttpStatus.OK);
   }
 
   /** 질문 생성 */
@@ -82,23 +95,40 @@ public class QuestionService {
         questionMapper.toResponseQuestionDto(questionRepository.save(question)), HttpStatus.OK);
   }
 
-  /** 질문 수정 */
+  /** 질문 수정 : 조회 이후 */
   @Transactional
   public ResponseEntity<ResponseQuestionDto> updateQuestion(
       RequestQuestionDto re, long questionId) {
     Optional<Question> question = questionRepository.findById(questionId);
-    if (question.isPresent()) {
-      Question question1 = question.get();
-     question1.update(re.title(), re.content(), re.questionCategory(), re.isSecret(), re.password());
+    long userId = getUserId();
+    if (question.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    Question question1 = question.get();
+    if (question1.getUser().getId() == userId) {
+      question1.update(
+          re.title(), re.content(), re.questionCategory(), re.isSecret(), re.password());
       return new ResponseEntity<>(questionMapper.toResponseQuestionDto(question1), HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
   }
 
-  /** 질문 삭제 */
+  /** 질문 삭제 : 조회 이후 */
   @Transactional
-  public ResponseEntity<?> deleteQuestion(long questionId){
-    questionRepository.deleteById(questionId);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  public ResponseEntity<?> deleteQuestion(long questionId) {
+    Optional<Question> question = questionRepository.findById(questionId);
+    long userId = getUserId();
+
+    Question question1 = question.get();
+    if(question1.getUser().getId() == userId)
+      questionRepository.deleteById(questionId);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  @Transactional
+  public long getUserId() {
+    // 접근한 유저 정보 가져오는 로직
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+    return Long.parseLong(userPrinciple.getLoginId());
   }
 }
