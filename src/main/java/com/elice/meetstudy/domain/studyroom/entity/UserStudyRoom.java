@@ -20,13 +20,13 @@ public class UserStudyRoom {
     private Date joinDate;
     private String permission;
 
-    @ManyToOne
-    @JoinColumn(name = "studyRoom_id")
-    private Long studyRoomId;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Long userId;
+//    @ManyToOne
+//    @JoinColumn(name = "studyRoom_id")
+//    private Long studyRoomId;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private Long userId;
 
 
 }

@@ -23,8 +23,8 @@ public class StudyRoom {
     private Date createdDate;
     private Long maxCapacity;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Long categoryId;
+//    @ManyToOne
+//    @JoinColumn(name = "category_id")
+//    private Long categoryId;
 
 }
