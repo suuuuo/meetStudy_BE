@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-05-31T21:51:36+0900",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 20.0.1 (Oracle Corporation)"
+    date = "2024-06-02T23:40:59+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.9 (Oracle Corporation)"
 )
 @Component
 public class CalendarDetailMapperImpl implements CalendarDetailMapper {
@@ -20,6 +20,8 @@ public class CalendarDetailMapperImpl implements CalendarDetailMapper {
             return null;
         }
 
+        boolean isHoliday = false;
+        long id = 0L;
         String title = null;
         String content = null;
         String startDay = null;
@@ -27,6 +29,10 @@ public class CalendarDetailMapperImpl implements CalendarDetailMapper {
         String startTime = null;
         String endTime = null;
 
+        isHoliday = calendarDetail.isHoliday();
+        if ( calendarDetail.getId() != null ) {
+            id = calendarDetail.getId();
+        }
         title = calendarDetail.getTitle();
         content = calendarDetail.getContent();
         startDay = calendarDetail.getStartDay();
@@ -34,9 +40,7 @@ public class CalendarDetailMapperImpl implements CalendarDetailMapper {
         startTime = calendarDetail.getStartTime();
         endTime = calendarDetail.getEndTime();
 
-        boolean isHoliday = false;
-
-        ResponseCalendarDetail responseCalendarDetail = new ResponseCalendarDetail( title, content, startDay, endDay, startTime, endTime, isHoliday );
+        ResponseCalendarDetail responseCalendarDetail = new ResponseCalendarDetail( id, title, content, startDay, endDay, startTime, endTime, isHoliday );
 
         return responseCalendarDetail;
     }
