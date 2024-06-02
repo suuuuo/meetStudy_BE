@@ -3,9 +3,11 @@ package com.elice.meetstudy.domain.user.domain;
 import com.elice.meetstudy.domain.category.entity.Category;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Interest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,4 +24,5 @@ public class Interest {
     public Interest(User user, Category category) {}
 
     public void setUser(User user) {} // 없으면 실행 안됨 -> 추가
+
 }
