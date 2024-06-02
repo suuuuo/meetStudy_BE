@@ -1,6 +1,5 @@
 package com.elice.meetstudy.domain.calendar.controller;
 
-import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
 import com.elice.meetstudy.domain.calendar.dto.RequestCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.calendar.service.CalendarDetailService;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class CalendarController {
 
     @Autowired
@@ -29,19 +28,23 @@ public class CalendarController {
     @Autowired
     CalendarDetailService calendarDetailService;
 
-    //조회 : 테스트 전
-    @GetMapping("/calendar/{study_room_id}") //개인 캘린더 조회, userId 받아오는 건 추후에 추가예정
+    //개인 캘린더 조회 : 테스트 전
+    @GetMapping("/calendar" ) //개인 캘린더 조회, userId 받아오는 건 추후에 추가예정
     public ResponseEntity<?> getCalendarDetails(
-        @RequestParam(value = "study_room_id", required = false, defaultValue = "0") long study_room_id,
+
         @RequestHeader("year") String year, @RequestHeader("month") String month
         /*userId .. 헤더 액세스 jwt 토큰?*/) {
 
-        //user Id 구하는 로직
-        Long userId = 1L;
+        System.out.println(year);
+        System.out.println(month);
 
-        if (true /*유효한 유저 id라면*/ ) {
-            //userId, studyroomId로 캘린더 찾아서 year, month로 해당 월의 일정들 반환
-           List<ResponseCalendarDetail> calendarDetailList = calendarDetailService.getAllCalendarDetail(year, month, userId, study_room_id);
+        //user Id 구하는 로직
+        long userId = 1L;
+
+        if (userId == 1L /*유효한 유저 id라면*/ ) {
+            //userId로 캘린더 찾아서 year, month로 해당 월의 일정들 반환
+           List<ResponseCalendarDetail> calendarDetailList =
+               calendarDetailService.getAllCalendarDetail(year, month, userId, 0L);
             return ResponseEntity.ok(calendarDetailList);
         } else {
             //유효한 유저 아님 에러 = 회원이 아니라 캘린더 조회할 수 없음
@@ -51,7 +54,24 @@ public class CalendarController {
         }
     }
 
-    //일정 추가 - post : 테스트 전
+    //공용 캘린더 조회
+    @GetMapping("/calendar/{study_room_id}" )
+    public ResponseEntity<?> getCalendarDetails(
+        @RequestHeader("year") String year, @RequestHeader("month") String month,
+        @PathVariable long study_room_id /*userId .. 헤더 액세스 jwt 토큰?*/) {
+
+        //user Id 구하는 로직
+        long userId = 1L;
+
+        //userId, studyroomId로 캘린더 찾아서 year, month로 해당 월의 일정들 반환
+        List<ResponseCalendarDetail> calendarDetailList =
+            calendarDetailService.getAllCalendarDetail(year, month, userId, study_room_id);
+        return ResponseEntity.ok(calendarDetailList);
+    }
+
+
+
+    //개인 캘린더 일정 추가 - post : 테스트 전
     @PostMapping("/calendar/{study_room_id}")
     public ResponseEntity<?> postCalendarDetail(
         @RequestParam(value = "study_room_id", required = false, defaultValue = "0") long study_room_id,
