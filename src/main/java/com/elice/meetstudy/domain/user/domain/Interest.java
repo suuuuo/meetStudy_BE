@@ -1,14 +1,11 @@
 package com.elice.meetstudy.domain.user.domain;
 
+import com.elice.meetstudy.domain.category.entity.Category;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
 public class Interest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,16 +19,7 @@ public class Interest {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    public Interest(User user, Category category) {
-        this.user = user;
-        this.category = category;
-    }
+    public Interest(User user, Category category) {}
 
-//    public static Interest addInterest(User user, Category category) {
-//        Interest interest = new Interest();
-//        interest.setUser(user);
-//        interest.setCategory(category);
-//        // 필요한 필드들을 설정합니다.
-//        return interest;
-//    }
+    public void setUser(User user) {} // 없으면 실행 안됨 -> 추가
 }
