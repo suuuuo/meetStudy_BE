@@ -1,6 +1,5 @@
 package com.elice.meetstudy.domain.scrap.domain;
 
-import com.elice.meetstudy.domain.category.domain.Category;
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.*;
