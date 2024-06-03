@@ -6,6 +6,8 @@ import com.elice.meetstudy.domain.user.dto.UserLoginDto;
 import com.elice.meetstudy.domain.user.jwt.token.dto.TokenInfo;
 import com.elice.meetstudy.domain.user.jwt.web.json.ApiResponseJson;
 import com.elice.meetstudy.domain.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,11 +20,12 @@ import java.util.Map;
 @RequestMapping("/api/vi/user")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "유저", description = "유저 접속 관련 API 입니다.")
 public class UserController {
 
   private final UserService userService;
 
-  // 회원가입
+  @Operation(summary = "회원가입")
   @PostMapping("/join")
   public ApiResponseJson join(@RequestBody UserJoinDto userJoinDto){
 
@@ -33,23 +36,21 @@ public class UserController {
     ));
   }
 
-  // 회원가입 - 이메일 중복확인, 이메일 인증
+  @Operation(summary = "회원가입 - 이메일 중복확인, 이메일 인증")
   @GetMapping("/check-email")
   public ResponseEntity<Boolean> checkEmailDuplicate(@RequestParam String email) {
     boolean isDuplicate = userService.checkEmailDuplicate(email);
     return ResponseEntity.ok(isDuplicate);
   }
 
-  // 회원가입 - 닉네임 중복확인
+  @Operation(summary = "회원가입 - 닉네임 중복확인")
   @GetMapping("/check-nickname")
   public ResponseEntity<Boolean> checkNicknameDuplicate(@RequestParam String nickname) {
     boolean isDuplicate = userService.checkNicknameDuplicate(nickname);
     return ResponseEntity.ok(isDuplicate);
   }
 
-  // 관심분야 선택 (최대 3개)
-
-  // 로그인
+  @Operation(summary = "로그인")
   @PostMapping("/login")
   public ApiResponseJson login(@RequestBody UserLoginDto userLoginDto) {
     TokenInfo tokenInfo = userService.login(userLoginDto.getEmail(), userLoginDto.getPassword());
