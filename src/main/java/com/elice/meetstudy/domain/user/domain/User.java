@@ -1,6 +1,7 @@
 package com.elice.meetstudy.domain.user.domain;
 
 import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
+import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -67,15 +68,13 @@ public class User {
     interest.setUser(this);
   }
 
+  public void clearInterests() {
+    interests.clear();
+  }
+
   public void addUserStudyRoom(UserStudyRoom userStudyRoom) {
     userStudyRooms.add(userStudyRoom);
     userStudyRoom.setUser(this);
   }
 
-//    public void update(UserUpdateDto userUpdateDto){
-//        this.password = userUpdateDto.getPassword();
-//        this.username = userUpdateDto.getUsername();
-//        this.nickname = userUpdateDto.getNickname();
-//        this.interests = userUpdateDto.getInterests();
-//    }
 }

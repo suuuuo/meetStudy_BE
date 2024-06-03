@@ -182,6 +182,6 @@ public class CalendarDetailService {
     //접근한 유저 정보 가져오는 로직
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-    return Long.parseLong(userPrinciple.getLoginId());
+    return Long.parseLong(userPrinciple.getEmail());
   }
 }
