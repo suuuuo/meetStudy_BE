@@ -44,6 +44,9 @@ public class StudyRoomService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserStudyRoomService userStudyRoomService;
+
     /**
      * 모든 스터디룸을 조회하여 스터디룸 DTO 리스트로 반환합니다.
      *
@@ -69,6 +72,26 @@ public class StudyRoomService {
                 .findById(id)
                 .map(studyRoomMapper::toStudyRoomDTO)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID :" + id + "]"));
+    }
+
+    /**
+     * 주어진 이메일에 해당하는 유저가 참여한 스터디룸을 조회하여 StudyRoomDTO 객체로 반환합니다.
+     *
+     * @param email 조회할 스터디룸의 ID
+     * @return 주어진 ID에 해당하는 StudyRoomDTO 객체를 포함한 Optional 객체,
+     *         스터디룸이 존재하지 않으면 빈 Optional 객체
+     */
+    public List<StudyRoomDTO> getStudyRoomByEmail(String email) {
+        return userStudyRoomService
+                .getUserStudyRoomsByEmail(email).stream()
+                .map((usr) -> studyRoomMapper
+                        .toStudyRoomDTO(
+                                studyRoomRepository
+                                        .findById(usr.getStudyRoomId())
+                                        .orElse(null)
+                        )
+                )
+                .collect(Collectors.toList());
     }
 
     /**
@@ -154,13 +177,5 @@ public class StudyRoomService {
      */
     public void deleteStudyRoom(Long id) {
         studyRoomRepository.deleteById(id);
-    }
-
-    public UserStudyRoom convertToUserStudyRoomEntity(UserStudyRoomDTO userStudyRoomDTO) {
-        return studyRoomMapper.toUserStudyRoom(userStudyRoomDTO);
-    }
-
-    public UserStudyRoomDTO convertToUserStudyRoomDTO(UserStudyRoom userStudyRoom) {
-        return studyRoomMapper.toUserStudyRoomDTO(userStudyRoom);
     }
 }

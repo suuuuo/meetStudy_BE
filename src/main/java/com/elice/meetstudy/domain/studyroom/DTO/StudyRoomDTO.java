@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder(builderClassName = "StudyRoomDTOBuilder", toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudyRoomDTO {
@@ -20,5 +20,6 @@ public class StudyRoomDTO {
     private Date createdDate;
     private Long maxCapacity;
     //private Long categoryId;
+    @Builder.Default
     private List<UserStudyRoomDTO> userStudyRooms = new ArrayList<>();
 }

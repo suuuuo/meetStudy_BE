@@ -17,6 +17,7 @@ public interface StudyRoomMapper {
 
     StudyRoom toStudyRoom(StudyRoomDTO studyRoomDTO);
 
+    @Mapping(source="userStudyRoom.studyRoom.id", target= "studyRoomId")
     UserStudyRoomDTO toUserStudyRoomDTO(UserStudyRoom userStudyRoom);
 
     UserStudyRoom toUserStudyRoom(UserStudyRoomDTO userStudyRoomDTO);
