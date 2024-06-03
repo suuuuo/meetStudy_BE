@@ -1,6 +1,8 @@
 package com.elice.meetstudy.domain.user.service;
 
+import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.category.repository.CategoryRepository;
+import com.elice.meetstudy.domain.user.domain.Interest;
 import com.elice.meetstudy.domain.user.domain.Role;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.dto.UserJoinDto;
@@ -32,6 +34,7 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final TokenProvider tokenProvider;
 
+  // 회원가입
   public User join(UserJoinDto userJoinDto) {
     passwordCheck(userJoinDto.getPassword());
     usernameCheck(userJoinDto.getUsername());
@@ -54,12 +57,12 @@ public class UserService {
         .role(Role.USER)
         .build();
 
-//        userJoinDto.getInterests().forEach(categoryId -> {
-//            Category category = categoryRepository.findById(categoryId)
-//                    .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + categoryId));
-//            Interest interest = new Interest(user, category);
-//            user.addInterest(interest);
-//        });
+        userJoinDto.getInterests().forEach(categoryId -> {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + categoryId));
+            Interest interest = new Interest(user, category);
+            user.addInterest(interest);
+        });
 
     user.setCreatedAt(LocalDateTime.now());
 
@@ -114,7 +117,7 @@ public class UserService {
       try {
         checkPassword(password, user);
         return tokenProvider.createToken(user);
-      } catch (IllegalArgumentException e) {
+      } catch (IllegalArgumentException | BadCredentialsException e) {
         throw new IllegalArgumentException("계정이 존재하지 않거나 비밀번호가 잘못되었습니다");
       }
     } else {
@@ -123,7 +126,7 @@ public class UserService {
   }
 
   // 로그인 - 이메일 확인
-  private User findUserByEmail(String email){
+  public User findUserByEmail(String email){
 
     return userRepository.findByEmail(email).orElseThrow(() -> {
       return new IllegalArgumentException("계정이 존재하지 않습니다.");

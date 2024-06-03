@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-@Order(SecurityProperties.DEFAULT_FILTER_ORDER - 1)
+@Order(SecurityProperties.DEFAULT_FILTER_ORDER - 1) // 항상 securityfilter 앞에 위치 하도록
 public class ExceptionFilter extends OncePerRequestFilter {
 
     private static final String INTERNAL_SERVER_ERROR = "Unexpected Server Error";
