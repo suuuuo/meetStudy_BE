@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class CalendarController {
-    // 임의 생성한 회원으로 개인 캘린더 기능은 postman으로 확인 완료, 테스트 코드 작성 중
-    // 공용 캘린더는 작성만
 
     private final CalendarService calendarService;
     private final CalendarDetailService calendarDetailService;

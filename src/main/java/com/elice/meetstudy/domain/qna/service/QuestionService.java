@@ -7,6 +7,7 @@ import com.elice.meetstudy.domain.qna.dto.ResponseQuestionDto;
 import com.elice.meetstudy.domain.qna.mapper.QuestionMapper;
 import com.elice.meetstudy.domain.qna.repository.QuestionRepository;
 import com.elice.meetstudy.domain.user.domain.UserPrinciple;
+import com.elice.meetstudy.domain.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +25,13 @@ public class QuestionService {
 
   private final QuestionRepository questionRepository;
   private final QuestionMapper questionMapper;
+  private final UserRepository userRepository;
 
-  public QuestionService(QuestionRepository questionRepository, QuestionMapper questionMapper) {
+  public QuestionService(QuestionRepository questionRepository, QuestionMapper questionMapper,
+      UserRepository userRepository) {
     this.questionRepository = questionRepository;
     this.questionMapper = questionMapper;
+      this.userRepository = userRepository;
   }
 
   /** 질문 리스트 전체 조회 (키워드 설정 o ) */
@@ -129,6 +133,7 @@ public class QuestionService {
     // 접근한 유저 정보 가져오는 로직
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-    return Long.parseLong(userPrinciple.getLoginId());
+    String userEmail = userPrinciple.getEmail();
+    return userRepository.findUserIdByEmail(userEmail);
   }
 }
