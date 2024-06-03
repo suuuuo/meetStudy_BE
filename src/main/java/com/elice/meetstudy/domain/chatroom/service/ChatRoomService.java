@@ -8,8 +8,10 @@ import com.elice.meetstudy.domain.chatroom.repository.ChatRoomRepository;
 import com.elice.meetstudy.domain.chatroom.repository.MessageRepository;
 import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,8 @@ public class ChatRoomService {
   @Autowired
   private final UserRepository userRepository;
 
+//  private Set<WebSocketSession> sessions = new HashSet<>();
+
   //채팅방 생성하기
 //  public ChatRoom chatRoom(Long id){
 //    chatRoomRepository.save(ChatRoom.builder()
@@ -58,15 +62,14 @@ public class ChatRoomService {
 
   //채팅방 세션 저장
   public void sessionSave(Long chatRoomId, WebSocketSession session) {
-    findByChatRoomId(chatRoomId).get().getSessions().add(session);
   }
 
   //채팅방의 메세지 조회
-  public Page<MessageDto> messages (Long chatRoomId) {
-    Pageable pageable = PageRequest.of(0,50, Sort.by("createdAt").descending());
+//  public Page<MessageDto> messages (Long chatRoomId) {
+//    Pageable pageable = PageRequest.of(0,50, Sort.by("createdAt").descending());
 
-    Page<Message> messages = chatRoomRepository.findChatMessageByChatRoomId(
-        chatRoomId, pageable);
-    return messages.map(message -> new MessageDto(message));
-  }
+//    Page<Message> messages = chatRoomRepository.findChatRoomWithMessagesAndUsers(
+//        chatRoomId, pageable);
+//    return messages.map(message -> new MessageDto(message));
+//  }
 }

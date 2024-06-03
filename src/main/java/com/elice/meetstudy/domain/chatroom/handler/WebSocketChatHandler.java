@@ -11,26 +11,26 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-@Component
-@RequiredArgsConstructor
-public class WebSocketChatHandler extends TextWebSocketHandler {
+//@Component
+//@RequiredArgsConstructor
+//public class WebSocketChatHandler extends TextWebSocketHandler {
+//
+//  private final ObjectMapper mapper;
+//  @Autowired
+//  private final MessageService messageSerive;
+//  @Autowired
+//  private final ChatRoomService chatRoomService;
+//
+////  @Override
+//  protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+//    String payload = message.getPayload();
+//    MessageDto messageDto = mapper.readValue(payload,MessageDto.class);
+//    chatRoomService.sessionSave(messageDto.getChatRoomId(), session);
+//    messageSerive.sendMessageToAllSession(messageDto.getChatRoomId(),messageDto);
+//  }
 
-  private final ObjectMapper mapper;
-  @Autowired
-  private final MessageService messageSerive;
-  @Autowired
-  private final ChatRoomService chatRoomService;
+//  @Override
+//  public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
-  @Override
-  protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-    String payload = message.getPayload();
-    MessageDto messageDto = mapper.readValue(payload,MessageDto.class);
-    chatRoomService.sessionSave(messageDto.getChatRoomId(), session);
-    messageSerive.sendMessageToAllSession(messageDto.getChatRoomId(),messageDto);
-  }
-
-  @Override
-  public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-
-  }
-}
+//  }
+//}

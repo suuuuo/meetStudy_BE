@@ -36,9 +36,6 @@ public class ChatRoom {
   @Column(name="notice")
   private String notice;
 
-  private Set<WebSocketSession> sessions = new HashSet<>();
-
-
 
   @Builder
   public ChatRoom(StudyRoom studyRoom) {
