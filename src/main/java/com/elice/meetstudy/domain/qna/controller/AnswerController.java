@@ -33,9 +33,10 @@ public class AnswerController {
 
   @Operation(summary = "답변 등록",
       description = "답변 등록이 가능합니다. 답변이 등록되면 질문의 상태가 답변 완료로 수정됩니다.")
-  @PostMapping("/answer")
+  @PostMapping("/answer/{questionId}")
   public ResponseEntity<?> addAnswer(
-      @RequestParam long questionId, @RequestBody RequestAnswerDto requestAnswerDto) {
+      @RequestBody RequestAnswerDto requestAnswerDto, @PathVariable long questionId) {
+    System.out.println(requestAnswerDto.content());
     return answerService.addAnswer(requestAnswerDto, questionId);
   }
 

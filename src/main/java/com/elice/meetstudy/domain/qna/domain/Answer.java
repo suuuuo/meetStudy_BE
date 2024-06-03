@@ -28,17 +28,12 @@ public class Answer extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne
-    @JoinColumn(name = "question_id")
-    private Question question;
-
     @NotNull
     String content;
 
     @Builder
-    public Answer(Question question, String content){
-        this.question = question;
-        this.content = content;
+    public Answer(String content){
+      this.content = content;
     }
 
     public void update(String content){
