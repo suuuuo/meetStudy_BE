@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/post")
+@RequestMapping("/api/post")
 @RequiredArgsConstructor
 @Tag(name = "게시글", description = "게시글 관련 API 입니다.")
 @Slf4j
