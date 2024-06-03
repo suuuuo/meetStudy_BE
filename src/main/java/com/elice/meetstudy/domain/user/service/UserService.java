@@ -117,7 +117,7 @@ public class UserService {
       try {
         checkPassword(password, user);
         return tokenProvider.createToken(user);
-      } catch (IllegalArgumentException e) {
+      } catch (IllegalArgumentException | BadCredentialsException e) {
         throw new IllegalArgumentException("계정이 존재하지 않거나 비밀번호가 잘못되었습니다");
       }
     } else {
@@ -126,7 +126,7 @@ public class UserService {
   }
 
   // 로그인 - 이메일 확인
-  private User findUserByEmail(String email){
+  public User findUserByEmail(String email){
 
     return userRepository.findByEmail(email).orElseThrow(() -> {
       return new IllegalArgumentException("계정이 존재하지 않습니다.");

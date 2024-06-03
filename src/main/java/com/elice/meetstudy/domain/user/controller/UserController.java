@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/vi/user")
 @RequiredArgsConstructor
@@ -22,13 +24,13 @@ public class UserController {
 
   // 회원가입
   @PostMapping("/join")
-  public ResponseEntity<User> join(@RequestBody UserJoinDto userJoinDto) {
-    try {
-      User user = userService.join(userJoinDto);
-      return ResponseEntity.ok(user);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().body(null);
-    }
+  public ApiResponseJson join(@RequestBody UserJoinDto userJoinDto){
+
+    User user = userService.join(userJoinDto);
+    return new ApiResponseJson(HttpStatus.OK, Map.of(
+            "email", user.getEmail(),
+            "username", user.getUsername()
+    ));
   }
 
   // 회원가입 - 이메일 중복확인, 이메일 인증
@@ -51,6 +53,7 @@ public class UserController {
   @PostMapping("/login")
   public ApiResponseJson login(@RequestBody UserLoginDto userLoginDto) {
     TokenInfo tokenInfo = userService.login(userLoginDto.getEmail(), userLoginDto.getPassword());
+    log.info("Token issued: {}", tokenInfo);
     return new ApiResponseJson(HttpStatus.OK, tokenInfo);
   }
 
