@@ -26,6 +26,7 @@ public class SecurityConfig {
   private final String[] adminUrl = {"api/vi/admin/**"};
   private final String[] userUrl = {"api/vi/user/**"};
 
+
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
@@ -41,14 +42,10 @@ public class SecurityConfig {
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/vi/**")
-                    .permitAll()
-                    .requestMatchers(adminUrl)
-                    .hasRole("ADMIN")
-                    .requestMatchers(userUrl)
-                    .hasRole("USER")
-                    .anyRequest()
-                    .permitAll())
+                auth.requestMatchers("/api/vi/**").permitAll()
+                    .requestMatchers(adminUrl).hasRole("ADMIN")
+                    .requestMatchers(userUrl).hasRole("USER")
+                    .anyRequest().authenticated())
         .build();
   }
 
