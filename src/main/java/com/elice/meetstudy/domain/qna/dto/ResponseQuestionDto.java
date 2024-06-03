@@ -7,6 +7,9 @@ public record ResponseQuestionDto(
     long id,
     String title,
     String content,
+    String createdBy,
+    String createdAt,
+    String updatedAt,
     AnswerStatus answerStatus,
     QuestionCategory questionCategory,
     boolean isSecret
