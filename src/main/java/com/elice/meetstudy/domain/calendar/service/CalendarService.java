@@ -12,6 +12,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,21 +20,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class CalendarService {
 
   private final CalendarRepository calendarRepository;
   private final UserRepository userRepository;
   private final StudyRoomRepository studyRoomRepository;
-
-  public CalendarService(
-          CalendarRepository calendarRepository,
-          UserRepository userRepository,
-          StudyRoomRepository studyRoomRepository) {
-    this.calendarRepository = calendarRepository;
-    this.userRepository = userRepository;
-    this.studyRoomRepository = studyRoomRepository;
-  }
 
   /**
    * 캘린더 조회(생성 )
@@ -76,13 +69,12 @@ public class CalendarService {
    *
    */
   @Transactional
-  public ResponseEntity<?> deleteCalendar() {
+  public void deleteCalendar() {
     //접근한 유저 정보 가져오는 로직
     long userId = getUserId();
 
     Optional<Calendar> calendar = calendarRepository.findByUserIdAndStudyRoomIsNull(userId);
     calendarRepository.deleteById(calendar.get().getId());
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   /**
@@ -91,24 +83,9 @@ public class CalendarService {
    * @param studyRoomId
    */
   @Transactional
-  public ResponseEntity<?> deleteStudyCalendar(Long studyRoomId) {
+  public void deleteStudyCalendar(Long studyRoomId) {
     Optional<Calendar> calendar = calendarRepository.findByStudyRoomId(studyRoomId);
     calendarRepository.deleteById(calendar.get().getId());
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
-
-  @Transactional
-  public String findFirstDay(String year, String month) {
-    LocalDate firstDayOfMonth = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), 1);
-    DayOfWeek dayOfWeek = firstDayOfMonth.getDayOfWeek();
-    return dayOfWeek.toString();
-  }
-
-  @Transactional
-  public String findLastDay(String year, String month) {
-    YearMonth yearMonth = YearMonth.of(Integer.parseInt(year), Integer.parseInt(month));
-    int day = yearMonth.lengthOfMonth();
-    return String.valueOf(day);
   }
 
   @Transactional
@@ -116,9 +93,7 @@ public class CalendarService {
     //접근한 유저 정보 가져오는 로직
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-    String userEmail = userPrinciple.getEmail();
-    return  userRepository.findUserIdByEmail(userEmail);
-
+    return Long.parseLong(userPrinciple.getEmail());
   }
 }
 
