@@ -10,10 +10,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom,Long> {
-
-  @Query("select c from Chatroom c "
-      + "left join fetch c.message m "
-      + "left join fetch m.user u "
-      + "where c.id = :id")
-  Page<Message> findChatMessageByChatRoomId(Long id,Pageable pageable);
+//
+//  @Query("select c from Chatroom c "
+//      + "left join fetch c.message m "
+//      + "left join fetch m.user u "
+//      + "where c.id = :id")
+//  Page<Message> findChatRoomWithMessagesAndUsers(Long id,Pageable pageable);
 }

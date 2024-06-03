@@ -35,7 +35,7 @@ public class MessageService {
   public void sendMessageToAllSession(Long id, MessageDto messageDto) {
 
     //chatroom 각각의 세션
-    Set<WebSocketSession> sessions = chatRoomRepository.findById(id).get().getSessions();
+//    Set<WebSocketSession> sessions = chatRoomRepository.findById(id).get().getSessions();
 
     //메세지 저장
     messageRepository.save(
@@ -48,13 +48,13 @@ public class MessageService {
         );
 
     //메세지 전송
-    for (WebSocketSession session : sessions) {
-      try {
-        session.sendMessage(new TextMessage(mapper.writeValueAsString(messageDto)));
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
+//    for (WebSocketSession session : sessions) {
+//      try {
+//        session.sendMessage(new TextMessage(mapper.writeValueAsString(messageDto)));
+//      } catch (IOException e) {
+//        throw new RuntimeException(e);
+//      }
+//    }
   }
 
 
