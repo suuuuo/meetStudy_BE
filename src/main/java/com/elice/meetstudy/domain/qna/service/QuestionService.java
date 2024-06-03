@@ -26,111 +26,111 @@ import org.webjars.NotFoundException;
 @Service
 public class QuestionService {
 
-  private final QuestionRepository questionRepository;
-  private final QuestionMapper questionMapper;
-  private final UserRepository userRepository;
+    private final QuestionRepository questionRepository;
+    private final QuestionMapper questionMapper;
+    private final UserRepository userRepository;
 
 
-  /** 질문 리스트 전체 조회 (키워드 설정 o ) */
-  @Transactional
-  public List<ResponseQuestionDto> getAllQuestionsByKeywords(
-      String keyword, int page, int size, String category) {
-    PageRequest pageRequest = PageRequest.of(page, size);
-    List<ResponseQuestionDto> responseQuestionDtoList = new ArrayList<>();
-    Page<Question> questions;
+    /** 질문 리스트 전체 조회 (키워드 설정 o ) */
+    @Transactional
+    public List<ResponseQuestionDto> getAllQuestionsByKeywords(
+            String keyword, int page, int size, String category) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        List<ResponseQuestionDto> responseQuestionDtoList = new ArrayList<>();
+        Page<Question> questions;
 
-    if (category != null && !category.isEmpty()) {
-      return getAllQuestionsByCategory(
-          QuestionCategory.valueOf(category.toUpperCase()), pageRequest, keyword);
-    } else {
-      if (keyword != null && !keyword.isEmpty())
-        questions = questionRepository.findAllByTitleContainingOrderByIdDesc(keyword, pageRequest);
-      else questions = questionRepository.findAllByOrderByIdDesc(pageRequest);
+        if (category != null && !category.isEmpty()) {
+            return getAllQuestionsByCategory(
+                    QuestionCategory.valueOf(category.toUpperCase()), pageRequest, keyword);
+        } else {
+            if (keyword != null && !keyword.isEmpty())
+                questions = questionRepository.findAllByTitleContainingOrderByIdDesc(keyword, pageRequest);
+            else questions = questionRepository.findAllByOrderByIdDesc(pageRequest);
 
-      for (Question question : questions) {
-        responseQuestionDtoList.add(questionMapper.toResponseQuestionDto(question));
-      }
-      return responseQuestionDtoList;
+            for (Question question : questions) {
+                responseQuestionDtoList.add(questionMapper.toResponseQuestionDto(question));
+            }
+            return responseQuestionDtoList;
+        }
     }
-  }
 
-  /** 질문 리스트 카테고리별 조회  */
-  @Transactional
-  public List<ResponseQuestionDto> getAllQuestionsByCategory(
-      QuestionCategory questionCategory, PageRequest pageRequest, String keyword) {
-    Page<Question> questions;
-    List<ResponseQuestionDto> responseQuestionDtoList = new ArrayList<>();
-    if (keyword != null && !keyword.isEmpty()) {
-      questions =
-          questionRepository.findAllByTitleContainingAndQuestionCategoryOrderByIdDesc(
-              keyword, questionCategory, pageRequest);
-    } else
-      questions =
-          questionRepository.findAllByQuestionCategoryOrderByIdDesc(pageRequest, questionCategory);
-    for (Question question : questions) {
-      responseQuestionDtoList.add(questionMapper.toResponseQuestionDto(question));
+    /** 질문 리스트 카테고리별 조회  */
+    @Transactional
+    public List<ResponseQuestionDto> getAllQuestionsByCategory(
+            QuestionCategory questionCategory, PageRequest pageRequest, String keyword) {
+        Page<Question> questions;
+        List<ResponseQuestionDto> responseQuestionDtoList = new ArrayList<>();
+        if (keyword != null && !keyword.isEmpty()) {
+            questions =
+                    questionRepository.findAllByTitleContainingAndQuestionCategoryOrderByIdDesc(
+                            keyword, questionCategory, pageRequest);
+        } else
+            questions =
+                    questionRepository.findAllByQuestionCategoryOrderByIdDesc(pageRequest, questionCategory);
+        for (Question question : questions) {
+            responseQuestionDtoList.add(questionMapper.toResponseQuestionDto(question));
+        }
+        return responseQuestionDtoList;
     }
-    return responseQuestionDtoList;
-  }
 
-  /** 질문 개별 조회 : 관리자는 다 볼 수 있게 추가 */
-  @Transactional
-  public ResponseQuestionDto getQuestion(long questionId, String password)
-      throws AccessDeniedException {
-    Optional<Question> Question = questionRepository.findById(questionId);
+    /** 질문 개별 조회 : 관리자는 다 볼 수 있게 추가 */
+    @Transactional
+    public ResponseQuestionDto getQuestion(long questionId, String password)
+            throws AccessDeniedException {
+        Optional<Question> Question = questionRepository.findById(questionId);
 
-    if (Question.isEmpty()) throw new EntityNotFoundException();
-    Question question = Question.get();
+        if (Question.isEmpty()) throw new EntityNotFoundException();
+        Question question = Question.get();
 
-    if (question.isSecret()) { // 비밀글인 경우 : 수정
-      if (password == null || !password.equals(question.getPassword()))
+        if (question.isSecret()) { // 비밀글인 경우 : 수정
+            if (password == null || !password.equals(question.getPassword()))
+                throw new AccessDeniedException(null);
+        }
+        return questionMapper.toResponseQuestionDto(question);
+    }
+
+    /** 질문 생성 */
+    @Transactional
+    public ResponseQuestionDto postQuestion(RequestQuestionDto requestQuestionDto) {
+        Question question = questionMapper.toQuestionEntity(requestQuestionDto);
+        question.setUser(userRepository.findById(getUserId()).get());
+        return
+                questionMapper.toResponseQuestionDto(questionRepository.save(question));
+    }
+
+    /** 질문 수정 : 조회 이후 */
+    @Transactional
+    public ResponseQuestionDto updateQuestion(
+            RequestQuestionDto re, long questionId) throws AccessDeniedException {
+        Optional<Question> question = questionRepository.findById(questionId);
+        long userId = getUserId();
+        if (question.isEmpty()) throw new NotFoundException(null);
+
+        Question question1 = question.get();
+        if (question1.getUser().getId() == userId) {
+            question1.update(
+                    re.title(), re.content(), re.questionCategory(), re.isSecret(), re.password());
+            return questionMapper.toResponseQuestionDto(question1);
+        }
         throw new AccessDeniedException(null);
     }
-    return questionMapper.toResponseQuestionDto(question);
-  }
 
-  /** 질문 생성 */
-  @Transactional
-  public ResponseQuestionDto postQuestion(RequestQuestionDto requestQuestionDto) {
-    Question question = questionMapper.toQuestionEntity(requestQuestionDto);
-    question.setUser(userRepository.findById(getUserId()).get());
-    return
-        questionMapper.toResponseQuestionDto(questionRepository.save(question));
-  }
+    /** 질문 삭제 : 조회 이후 */
+    @Transactional
+    public void deleteQuestion(long questionId) {
+        Optional<Question> question = questionRepository.findById(questionId);
+        long userId = getUserId();
 
-  /** 질문 수정 : 조회 이후 */
-  @Transactional
-  public ResponseQuestionDto updateQuestion(
-      RequestQuestionDto re, long questionId) throws AccessDeniedException {
-    Optional<Question> question = questionRepository.findById(questionId);
-    long userId = getUserId();
-    if (question.isEmpty()) throw new NotFoundException(null);
-
-    Question question1 = question.get();
-    if (question1.getUser().getId() == userId) {
-      question1.update(
-          re.title(), re.content(), re.questionCategory(), re.isSecret(), re.password());
-      return questionMapper.toResponseQuestionDto(question1);
+        Question question1 = question.get();
+        if(question1.getUser().getId() == userId)
+            questionRepository.deleteById(questionId);
     }
-   throw new AccessDeniedException(null);
-  }
 
-  /** 질문 삭제 : 조회 이후 */
-  @Transactional
-  public void deleteQuestion(long questionId) {
-    Optional<Question> question = questionRepository.findById(questionId);
-    long userId = getUserId();
-
-    Question question1 = question.get();
-    if(question1.getUser().getId() == userId)
-      questionRepository.deleteById(questionId);
-  }
-
-  @Transactional
-  public long getUserId() {
-    // 접근한 유저 정보 가져오는 로직
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-    return Long.parseLong(userPrinciple.getEmail());
-  }
+    @Transactional
+    public long getUserId() {
+        // 접근한 유저 정보 가져오는 로직
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
+        return Long.parseLong(userPrinciple.getEmail());
+    }
 }
