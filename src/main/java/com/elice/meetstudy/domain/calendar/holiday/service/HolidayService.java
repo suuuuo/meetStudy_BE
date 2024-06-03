@@ -16,6 +16,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class HolidayService {
         this.holidayRepository = holidayRepository;
     }
 
-    String serviceKey = "u68Vcu5y2ZXWBQ%2Fvmi%2BjltzqsE1hJSxVg5Vdm3XL8V9DdzUTdK4OZdjMBaXguu2XD7cK1fMuAYitTOhuTgrycA%3D%3D";
+    @Value("${secret.key}") String serviceKey;
 
     // 연도, 달로 공휴일 리스트 뽑아서 전달 (캘린더에서 공휴일 일정 자동 등록하기 위함)
     @Transactional
