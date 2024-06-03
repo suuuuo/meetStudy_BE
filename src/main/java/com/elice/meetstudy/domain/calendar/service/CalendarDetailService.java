@@ -25,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
 
 @RequiredArgsConstructor
 @Service
@@ -61,7 +62,7 @@ public class CalendarDetailService {
           calendarDetailRepository.save(c);
         }
       }
-    } else throw new EntityNotFoundException("해당 캘린더가 존재하지 않습니다");
+    } else throw new EntityNotFoundException();
   }
 
   /**
@@ -73,13 +74,18 @@ public class CalendarDetailService {
    * @return
    */
   @Transactional
-  public ResponseEntity<List<ResponseCalendarDetail>> getAllCalendarDetail(
+  public List<ResponseCalendarDetail> getAllCalendarDetail(
       String year, String month, Long studyRoomId) {
     //접근한 유저 정보 가져오는 로직
     long userId = getUserId();
 
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
-    saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
+    try {
+      saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
+    }catch (EntityNotFoundException e){
+      throw new EntityNotFoundException();
+    }
+
     List<Calendar_detail> calendarDetailList =
         calendarDetailRepository.findAllByCalendar(calendar); // 해당 캘린더의 한 달 일정들을 리스트로 출력
 
@@ -87,7 +93,7 @@ public class CalendarDetailService {
     for (Calendar_detail calendarDetail : calendarDetailList) {
       responseCalendarDetails.add(calendarDetailMapper.toResponseCalendarDetail(calendarDetail));
     }
-    return new ResponseEntity<>(responseCalendarDetails, HttpStatus.OK);
+    return responseCalendarDetails;
 
   }
 
@@ -98,12 +104,11 @@ public class CalendarDetailService {
    * @return
    */
   @Transactional
-  public ResponseEntity<ResponseCalendarDetail> getCalendarDetail(long id) {
+  public ResponseCalendarDetail getCalendarDetail(long id) {
     Optional<Calendar_detail> calendarDetail = calendarDetailRepository.findById(id);
     if (calendarDetail.isPresent()) {
-      return new ResponseEntity<>(
-          calendarDetailMapper.toResponseCalendarDetail(calendarDetail.get()), HttpStatus.OK);
-    } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      return calendarDetailMapper.toResponseCalendarDetail(calendarDetail.get());
+    } else throw new NotFoundException("");
   }
 
   /**
@@ -114,17 +119,15 @@ public class CalendarDetailService {
    * @return
    */
   @Transactional
-  public ResponseEntity<ResponseCalendarDetail> saveCalendarDetail(
+  public ResponseCalendarDetail saveCalendarDetail(
       RequestCalendarDetail requestCalendarDetail, Long studyRoomId) { // request로 받으면
     //접근한 유저 정보 가져오는 로직
     long userId = getUserId();
-
     Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
     calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
     calendarDetailRepository.save(calendarDetail); // 저장
-    return new ResponseEntity<>(
-        calendarDetailMapper.toResponseCalendarDetail(calendarDetail), HttpStatus.OK); // 반환
+    return calendarDetailMapper.toResponseCalendarDetail(calendarDetail); // 반환
   }
 
   /**
@@ -135,7 +138,7 @@ public class CalendarDetailService {
    * @return
    */
   @Transactional
-  public ResponseEntity<ResponseCalendarDetail> putCalendarDetail(RequestCalendarDetail re,
+  public ResponseCalendarDetail putCalendarDetail(RequestCalendarDetail re,
       long calendarDetailId) {
     Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(calendarDetailId);
 
@@ -143,9 +146,8 @@ public class CalendarDetailService {
       Calendar_detail calendarDetail = originCalendarDetail.get();
       calendarDetail.update( re.title(), re.content(), re.startDay(), re.endDay(),
           re.startTime(), re.endTime());
-      return new ResponseEntity<>(
-          calendarDetailMapper.toResponseCalendarDetail(calendarDetail), HttpStatus.OK);
-    } else throw new IllegalArgumentException("존재하는 일정이 아닙니다.");
+      return calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
+    } else throw new NotFoundException("");
   }
 
   /**
@@ -155,9 +157,8 @@ public class CalendarDetailService {
    * @return
    */
   @Transactional
-  public ResponseEntity<?> deleteCalendarDetail(long id) {
+  public void deleteCalendarDetail(long id) {
     calendarDetailRepository.deleteById(id);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
       }
 
   @Transactional
