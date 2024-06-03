@@ -2,5 +2,7 @@ package com.elice.meetstudy.domain.qna.dto;
 
 
 public record ResponseAnswerDto(
-    String content)
+    long id,
+    String content,
+    String createdBy)
 {}
