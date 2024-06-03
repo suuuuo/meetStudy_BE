@@ -17,6 +17,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class CalendarDetailService {
 
@@ -33,21 +35,6 @@ public class CalendarDetailService {
   private final CalendarService calendarService;
   private final HolidayService holidayService;
   private final CalendarDetailMapper calendarDetailMapper;
-  private final UserRepository userRepository;
-
-  public CalendarDetailService(
-      CalendarDetailRepository calendarDetailRepository, CalendarRepository calendarRepository,
-      CalendarService calendarService,
-      HolidayService holidayService,
-      CalendarDetailMapper calendarDetailMapper,
-      UserRepository userRepository) {
-    this.calendarDetailRepository = calendarDetailRepository;
-      this.calendarRepository = calendarRepository;
-      this.calendarService = calendarService;
-    this.holidayService = holidayService;
-    this.calendarDetailMapper = calendarDetailMapper;
-      this.userRepository = userRepository;
-  }
 
   /**
    * 캘린더 공휴일 자동 등록 -> 조회 시 공휴일 표시

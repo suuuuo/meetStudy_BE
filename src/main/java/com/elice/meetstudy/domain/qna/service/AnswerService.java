@@ -8,26 +8,20 @@ import com.elice.meetstudy.domain.qna.mapper.AnswerMapper;
 import com.elice.meetstudy.domain.qna.repository.AnswerRepository;
 import com.elice.meetstudy.domain.qna.repository.QuestionRepository;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class AnswerService {
 
   private final AnswerRepository answerRepository;
   private final AnswerMapper answerMapper;
   private final QuestionRepository questionRepository;
-
-  public AnswerService(
-      AnswerRepository answerRepository,
-      AnswerMapper answerMapper,
-      QuestionRepository questionRepository) {
-    this.answerRepository = answerRepository;
-    this.answerMapper = answerMapper;
-    this.questionRepository = questionRepository;
-  }
 
   /** 답변 관리는 관리자만 할 수 있도록 설정 */
 

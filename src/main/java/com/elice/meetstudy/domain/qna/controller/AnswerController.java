@@ -4,6 +4,8 @@ import com.elice.meetstudy.domain.qna.dto.RequestAnswerDto;
 import com.elice.meetstudy.domain.qna.service.AnswerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,15 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "답변", description = "문의에 대한 답변 관련 API 입니다.")
 public class AnswerController {
-  private final AnswerService answerService;
 
-  public AnswerController(AnswerService answerService) {
-    this.answerService = answerService;
-  }
+  private final AnswerService answerService;
 
   @Operation(summary = "답변 조회", description = "답변 조회가 가능합니다.")
   @GetMapping("/answer")

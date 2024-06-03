@@ -6,6 +6,8 @@ import com.elice.meetstudy.domain.calendar.service.CalendarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "캘린더", description = "캘린더 관련 API 입니다.")
@@ -25,13 +28,6 @@ public class CalendarController {
 
     private final CalendarService calendarService;
     private final CalendarDetailService calendarDetailService;
-
-    @Autowired
-    public CalendarController(
-            CalendarService calendarService, CalendarDetailService calendarDetailService) {
-        this.calendarService = calendarService;
-        this.calendarDetailService = calendarDetailService;
-    }
 
     /**
      * 개인 캘린더 전체 조회(공휴일 포함)

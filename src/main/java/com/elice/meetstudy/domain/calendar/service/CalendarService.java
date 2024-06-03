@@ -12,6 +12,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,21 +20,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class CalendarService {
 
   private final CalendarRepository calendarRepository;
   private final UserRepository userRepository;
   private final StudyRoomRepository studyRoomRepository;
-
-  public CalendarService(
-          CalendarRepository calendarRepository,
-          UserRepository userRepository,
-          StudyRoomRepository studyRoomRepository) {
-    this.calendarRepository = calendarRepository;
-    this.userRepository = userRepository;
-    this.studyRoomRepository = studyRoomRepository;
-  }
 
   /**
    * 캘린더 조회(생성 )
