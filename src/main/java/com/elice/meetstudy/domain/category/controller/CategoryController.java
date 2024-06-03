@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/admin/categories")
+@RequestMapping("/api/admin/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -31,13 +31,13 @@ public class CategoryController {
     }
 
     // 카테고리 생성
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody CategoryDto categoryDto) {
         return ResponseEntity.ok(categoryService.createCategory(categoryDto.getName(), categoryDto.getDescription()));
     }
 
     // 카테고리 수정
-    @PutMapping("/{id}/edit")
+    @PutMapping("/{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable Long id,
                                                    @RequestBody CategoryDto categoryDto) {
         return ResponseEntity.ok(categoryService.updateCategory(id, categoryDto.getName(), categoryDto.getDescription()));
