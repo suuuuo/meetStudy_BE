@@ -2,6 +2,7 @@ package com.elice.meetstudy.domain.studyroom.controller;
 
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
+import com.elice.meetstudy.domain.studyroom.service.UserStudyRoomService;
 import com.elice.meetstudy.domain.user.dto.UserLoginDto;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class StudyRoomController {
     @Autowired
     private StudyRoomService studyRoomService;
 
+    @Autowired
+    private UserStudyRoomService userStudyRoomService;
+
     @GetMapping
     public List<StudyRoomDTO> getAllStudyRooms() {
         return studyRoomService.getAllStudyRooms();
@@ -34,7 +38,6 @@ public class StudyRoomController {
     public List<StudyRoomDTO> getStudyRoomByUserEmail(@RequestBody Map<Object, String> email) {
         return studyRoomService.getStudyRoomByEmail(email.get("email"));
     }
-
 
     @PostMapping("/add")
     public ResponseEntity<StudyRoomDTO> createStudyRoom(@RequestBody StudyRoomDTO studyRoomDTO) {
