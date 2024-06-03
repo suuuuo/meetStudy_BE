@@ -29,10 +29,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   // 게시글 수정
 
   // 게시글 삭제
-  // List<Post> findByUserIdAndId(Long userId, Long id);
 
   // 게시글 조회
   List<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+  @Query("SELECT p FROM Post p WHERE p.id = :id AND p.user.id = :userId")
+  Post findByIdAndUserId(@Param("id") Long postId, @Param("userId") Long userId);
 
   // 조회수 증가
   @Modifying // 데이터를 수정하는 쿼리는 자동생성 X -> 어노테이션으로 명시적으로 나타내기
@@ -44,5 +46,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
       "SELECT p FROM Post p WHERE (p.title LIKE %:keyword% OR p.content LIKE %:keyword%) AND p.category.id = :categoryId")
   List<Post> findByKeyword(@Param("keyword") String keyword, @Param("categoryId") Long categoryId);
 
-  List<Post> findByTitleContainingOrContentContainingOrderByCreatedAtDesc(String titleKeyword, String contentKeyword, Pageable pageable);
+  List<Post> findByTitleContainingOrContentContainingOrderByCreatedAtDesc(
+      String titleKeyword, String contentKeyword, Pageable pageable);
 }

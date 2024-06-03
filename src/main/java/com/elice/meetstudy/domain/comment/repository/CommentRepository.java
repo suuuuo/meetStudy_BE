@@ -2,8 +2,10 @@ package com.elice.meetstudy.domain.comment.repository;
 
 import com.elice.meetstudy.domain.comment.domain.Comment;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,9 +18,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
   // 댓글 수정
 
   // 댓글 삭제
+  @Modifying
+  @Query("DELETE FROM Comment c WHERE c.id = :commentId AND c.user.id = :userId")
+  void deleteByIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
   // 게시글에 달린 댓글 조회
-  List<Comment> findAllByPostId(Long postId, Pageable pageable);
+  Page<Comment> findAllByPostId(Long postId, Pageable pageable);
 
   // 전체 댓글 내 키워드 검색
   @Query("SELECT c FROM Comment c WHERE c.post.id = :postId AND c.content LIKE %:keyword%")

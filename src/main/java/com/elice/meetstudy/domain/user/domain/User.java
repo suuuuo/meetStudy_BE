@@ -8,10 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 
-/**
- * user Entity
- */
-
+/** user Entity */
 @Entity
 @Getter
 @Setter
@@ -34,7 +31,10 @@ public class User {
   @Column(length = 10)
   private String nickname;
 
-  @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  @Column(
+      name = "created_at",
+      nullable = false,
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private LocalDateTime createdAt;
 
   @Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
@@ -55,12 +55,13 @@ public class User {
   }
 
   @Builder
-  public User(String email, String password, String username, String nickname, Role role){
+  public User(String email, String password, String username, String nickname, Role role, Long id) {
     this.email = email;
     this.password = password;
     this.username = username;
     this.nickname = nickname;
     this.role = role;
+    this.id = id;
   }
 
   public void addInterest(Interest interest) {
@@ -76,5 +77,4 @@ public class User {
     userStudyRooms.add(userStudyRoom);
     userStudyRoom.setUser(this);
   }
-
 }
