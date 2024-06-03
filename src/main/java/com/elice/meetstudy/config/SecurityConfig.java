@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -54,15 +55,28 @@ public class SecurityConfig {
     return new BCryptPasswordEncoder();
   }
 
-  /** Security 의존성 사용 : 자동으로 추가되는 기본 로그인 화면을 제거 하기 위해 우선적으로 작성함. */
+  //  /** Security 의존성 사용 : 자동으로 추가되는 기본 로그인 화면을 제거 하기 위해 우선적으로 작성함. */
+  //  @Bean
+  //  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  //    http.csrf(csrf -> csrf.disable()) // 테스트를 위해 잠시 비활성화 //
+  //        .authorizeRequests()
+  //        .requestMatchers("/**")
+  //        .permitAll()
+  //        .anyRequest()
+  //        .authenticated();
+  //    return http.build();
+  //  }
+
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf(csrf -> csrf.disable()) // 테스트를 위해 잠시 비활성화 //
-        .authorizeRequests()
-        .requestMatchers("/**")
-        .permitAll()
-        .anyRequest()
-        .authenticated();
-    return http.build();
+  public CorsConfiguration corsConfiguration() {
+    CorsConfiguration config = new CorsConfiguration();
+    config.addAllowedOrigin("http://34.47.79.59:8080");
+    config.addAllowedMethod("*");
+    config.addExposedHeader("Set-Cookie");
+    config.addAllowedHeader("*");
+    config.setAllowCredentials(true);
+    config.addExposedHeader("access");
+    config.setMaxAge(3600L);
+    return config;
   }
 }
