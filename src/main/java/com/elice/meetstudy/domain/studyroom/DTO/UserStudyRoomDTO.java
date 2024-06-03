@@ -1,5 +1,7 @@
 package com.elice.meetstudy.domain.studyroom.DTO;
 
+import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
+import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
 import com.elice.meetstudy.domain.user.dto.UserLoginDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,5 +20,6 @@ public class UserStudyRoomDTO {
     private Date joinDate;
     private String permission;
 
+    private Long studyRoomId;
     private UserLoginDto user;
 }

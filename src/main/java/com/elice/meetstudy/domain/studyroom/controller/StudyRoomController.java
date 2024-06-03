@@ -2,11 +2,14 @@ package com.elice.meetstudy.domain.studyroom.controller;
 
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
+import com.elice.meetstudy.domain.user.dto.UserLoginDto;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -26,6 +29,12 @@ public class StudyRoomController {
         StudyRoomDTO studyRoomDTO = studyRoomService.getStudyRoomById(id);
         return ResponseEntity.ok(studyRoomDTO);
     }
+
+    @GetMapping("/user")
+    public List<StudyRoomDTO> getStudyRoomByUserEmail(@RequestBody Map<Object, String> email) {
+        return studyRoomService.getStudyRoomByEmail(email.get("email"));
+    }
+
 
     @PostMapping("/add")
     public ResponseEntity<StudyRoomDTO> createStudyRoom(@RequestBody StudyRoomDTO studyRoomDTO) {
