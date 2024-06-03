@@ -3,9 +3,10 @@ package com.elice.meetstudy.domain.chatroom.dto;
 import com.elice.meetstudy.domain.chatroom.domain.Message;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@Builder
+@RequiredArgsConstructor
 public class MessageDto {
 
   public MessageDto(Long chatRoomId) {
@@ -16,7 +17,7 @@ public class MessageDto {
   private String nickName;
   private String content;
   private String createdAt;
-
+  @Builder
   public MessageDto(Message message){
       this.chatRoomId = message.getChatRoom().getId();
       this.nickName = message.getUser().getNickname();
