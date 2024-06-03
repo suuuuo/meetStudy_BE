@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -25,16 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/post")
+@RequiredArgsConstructor
 @Tag(name = "게시글", description = "게시글 관련 API 입니다.")
 @Slf4j
 public class PostController {
 
   private final PostService postService;
-
-  @Autowired
-  public PostController(PostService postService) {
-    this.postService = postService;
-  }
 
   @Operation(summary = "게시글 작성")
   @PostMapping

@@ -22,4 +22,5 @@ public class PostWriteDTO {
     this.title = title;
     this.content = content;
   }
+
 }

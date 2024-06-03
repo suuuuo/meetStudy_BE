@@ -40,10 +40,13 @@ public class Comment {
   }
 
   @Builder
-  public Comment(Post post, User user, String content) {
+  public Comment(Post post, User user, String content, Long userId) {
     this.post = post;
     this.user = user;
     this.content = content;
+    if (userId != null) {
+      this.user = User.builder().id(userId).build();
+    }
   }
 
   public CommentEditDTO.CommentEditDTOBuilder toEdit() {

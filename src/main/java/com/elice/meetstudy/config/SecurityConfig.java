@@ -17,9 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -34,6 +31,7 @@ public class SecurityConfig {
 
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
+        .cors(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement(
@@ -97,20 +95,20 @@ public class SecurityConfig {
     return Arrays.stream(excludePath).anyMatch(path::startsWith);
   }
 
-  @Bean
-  public CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration config = new CorsConfiguration();
-    config.addAllowedOrigin("http://34.47.79.59:8080");
-    config.addAllowedMethod("*");
-    config.addExposedHeader("Set-Cookie");
-    config.addAllowedHeader("*");
-    config.setAllowCredentials(true);
-    config.addExposedHeader("access");
-    config.setMaxAge(3600L);
-
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config);
-
-    return source;
-  }
+  //  @Bean
+  //  public CorsConfigurationSource corsConfigurationSource() {
+  //    CorsConfiguration config = new CorsConfiguration();
+  //    config.addAllowedOrigin("http://34.47.79.59:8080");
+  //    config.addAllowedMethod("*");
+  //    config.addExposedHeader("Set-Cookie");
+  //    config.addAllowedHeader("*");
+  //    config.setAllowCredentials(true);
+  //    config.addExposedHeader("access");
+  //    config.setMaxAge(3600L);
+  //
+  //    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+  //    source.registerCorsConfiguration("/**", config);
+  //
+  //    return source;
+  //  }
 }

@@ -7,13 +7,14 @@ import com.elice.meetstudy.domain.post.dto.PostResponseDTO;
 import com.elice.meetstudy.domain.post.dto.PostWriteDTO;
 import com.elice.meetstudy.domain.post.repository.PostRepository;
 import com.elice.meetstudy.domain.user.domain.User;
+import com.elice.meetstudy.domain.user.service.UserService;
 import com.elice.meetstudy.util.EntityFinder;
 import com.elice.meetstudy.util.TokenUtility;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,19 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @Transactional
+@RequiredArgsConstructor
 public class PostService {
 
   private final PostRepository postRepository;
+  private final UserService userService;
   private final EntityFinder entityFinder;
   private final TokenUtility tokenUtility;
-
-  @Autowired
-  public PostService(
-      PostRepository postRepository, EntityFinder entityFinder, TokenUtility tokenUtility) {
-    this.postRepository = postRepository;
-    this.entityFinder = entityFinder;
-    this.tokenUtility = tokenUtility;
-  }
 
   /** 게시글 작성 */
   public PostResponseDTO write(PostWriteDTO postCreate, String jwtToken) {
@@ -43,6 +38,28 @@ public class PostService {
 
     // 예외 발생시
     Category category = entityFinder.findCategoryById(postCreate.getCategoryId());
+
+    // Post 엔티티 생성
+    Post newPost =
+        Post.builder()
+            .user(user)
+            .category(category)
+            .title(postCreate.getTitle())
+            .content(postCreate.getContent())
+            .build();
+
+    return new PostResponseDTO(postRepository.save(newPost));
+  }
+
+  /** 특정 게시판에서 게시글 작성 */
+  public PostResponseDTO writeByCategory(
+      PostWriteDTO postCreate, Long categoryId, String jwtToken) {
+
+    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+    User user = entityFinder.findUserById(userId);
+
+    //    // 예외 발생시
+    Category category = entityFinder.findCategoryById(categoryId);
 
     // Post 엔티티 생성
     Post newPost =
@@ -127,8 +144,10 @@ public class PostService {
 
     return PostResponseDTO.builder()
         .id(post.getId())
-        .categoryId(post.getCategory().getId())
-        .userId(post.getUser().getId())
+        // .categoryId(post.getCategory().getId())
+        .category(post.getCategory().getName())
+        // .userId(post.getUser().getId())
+        .nickname(post.getUser().getNickname())
         .title(post.getTitle())
         .content(post.getContent())
         .hit(post.getHit())

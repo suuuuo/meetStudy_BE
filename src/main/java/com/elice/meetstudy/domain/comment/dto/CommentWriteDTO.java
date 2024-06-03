@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class CommentWriteDTO {
 
-  @NotNull private Long postId;
+  //  @NotNull private Long postId;
 
   @NotBlank(message = "내용을 입력해주세요.")
   private String content;
