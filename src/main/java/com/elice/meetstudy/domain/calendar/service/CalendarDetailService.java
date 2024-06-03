@@ -87,11 +87,7 @@ public class CalendarDetailService {
     for (Calendar_detail calendarDetail : calendarDetailList) {
       responseCalendarDetails.add(calendarDetailMapper.toResponseCalendarDetail(calendarDetail));
     }
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("first-day", calendarService.findFirstDay(year, month));
-    headers.add("last-day", calendarService.findLastDay(year, month));
-    return new ResponseEntity<>(responseCalendarDetails, headers, HttpStatus.OK);
+    return new ResponseEntity<>(responseCalendarDetails, HttpStatus.OK);
 
   }
 

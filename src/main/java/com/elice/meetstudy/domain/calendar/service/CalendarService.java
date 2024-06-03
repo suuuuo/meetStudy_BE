@@ -91,20 +91,6 @@ public class CalendarService {
   }
 
   @Transactional
-  public String findFirstDay(String year, String month) {
-    LocalDate firstDayOfMonth = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), 1);
-    DayOfWeek dayOfWeek = firstDayOfMonth.getDayOfWeek();
-    return dayOfWeek.toString();
-  }
-
-  @Transactional
-  public String findLastDay(String year, String month) {
-    YearMonth yearMonth = YearMonth.of(Integer.parseInt(year), Integer.parseInt(month));
-    int day = yearMonth.lengthOfMonth();
-    return String.valueOf(day);
-  }
-
-  @Transactional
   public long getUserId(){
     //접근한 유저 정보 가져오는 로직
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
