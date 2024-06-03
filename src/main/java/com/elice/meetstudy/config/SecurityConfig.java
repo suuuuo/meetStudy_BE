@@ -29,8 +29,8 @@ public class SecurityConfig {
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
   private final JwtFilter jwtFilter;
-  private final String[] adminUrl = {"api/vi/admin/**"};
-  private final String[] userUrl = {"api/vi/user/**"};
+  private final String[] adminUrl = {"api/admin/**"};
+  private final String[] userUrl = {"api/user/**"};
 
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
@@ -46,7 +46,7 @@ public class SecurityConfig {
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/vi/**")
+                auth.requestMatchers("/api/**")
                     .permitAll()
                     .requestMatchers(
                         "/swagger-ui/**",
@@ -54,9 +54,9 @@ public class SecurityConfig {
                         "/swagger-resources/**",
                         "/swagger-ui.html")
                     .permitAll()
-                    .requestMatchers("/api/vi/admin/**")
+                    .requestMatchers(adminUrl)
                     .hasRole("ADMIN")
-                    .requestMatchers("/api/vi/user/**")
+                    .requestMatchers(userUrl)
                     .hasRole("USER")
                     .anyRequest()
                     .authenticated())

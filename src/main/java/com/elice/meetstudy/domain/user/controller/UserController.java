@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/vi/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "유저", description = "유저 접속 관련 API 입니다.")
