@@ -33,7 +33,7 @@ public class ChatRoom {
   @OneToMany(mappedBy = "chatRoom")
   private List<Message> messages = new ArrayList<>();
 
-  @Column(name="notice", nullable = true)
+  @Column(name="notice")
   private String notice;
 
   private Set<WebSocketSession> sessions = new HashSet<>();
