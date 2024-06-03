@@ -95,6 +95,7 @@ public class QuestionService {
   @Transactional
   public ResponseEntity<ResponseQuestionDto> postQuestion(RequestQuestionDto requestQuestionDto) {
     Question question = questionMapper.toQuestionEntity(requestQuestionDto);
+    question.setUser(userRepository.findById(getUserId()).get());
     return new ResponseEntity<>(
         questionMapper.toResponseQuestionDto(questionRepository.save(question)), HttpStatus.OK);
   }
@@ -132,8 +133,7 @@ public class QuestionService {
   public long getUserId() {
     // 접근한 유저 정보 가져오는 로직
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-    String userEmail = userPrinciple.getEmail();
-    return userRepository.findUserIdByEmail(userEmail);
+    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
+    return Long.parseLong(userPrinciple.getEmail());
   }
 }
