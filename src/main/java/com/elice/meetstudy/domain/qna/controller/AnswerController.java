@@ -5,6 +5,7 @@ import com.elice.meetstudy.domain.qna.dto.ResponseAnswerDto;
 import com.elice.meetstudy.domain.qna.service.AnswerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.nio.file.AccessDeniedException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class AnswerController {
       description = "답변 등록이 가능합니다. 답변이 등록되면 질문의 상태가 답변 완료로 수정됩니다.")
   @PostMapping("/{questionId}")
   public ResponseEntity<ResponseAnswerDto> addAnswer(
-      @RequestBody RequestAnswerDto requestAnswerDto, @PathVariable long questionId)
+      @RequestBody @Valid RequestAnswerDto requestAnswerDto, @PathVariable long questionId)
       throws AccessDeniedException {
     return new ResponseEntity<>(answerService.addAnswer(requestAnswerDto, questionId), HttpStatus.OK);
   }
@@ -47,7 +48,7 @@ public class AnswerController {
   @Operation(summary = "답변 수정", description = "답변 수정이 가능합니다.")
   @PutMapping("/{answerId}")
   public ResponseEntity<ResponseAnswerDto> updateAnswer(
-      @PathVariable long answerId, @RequestBody RequestAnswerDto requestAnswerDto)
+      @PathVariable long answerId, @RequestBody @Valid RequestAnswerDto requestAnswerDto)
       throws AccessDeniedException {
     return new ResponseEntity<>(answerService.updateAnswer(requestAnswerDto, answerId), HttpStatus.OK);
   }
