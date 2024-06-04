@@ -1,6 +1,7 @@
 package com.elice.meetstudy.domain.post.dto;
 
 import com.elice.meetstudy.domain.post.domain.Post;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,8 @@ public class PostResponseDTO {
   private final String title;
   private final String content;
   private final Long hit;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy.MM.dd HH:mm")
   private final LocalDateTime createdAt;
 
   public PostResponseDTO(Post post) {
