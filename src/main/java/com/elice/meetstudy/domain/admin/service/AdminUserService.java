@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
+
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -18,7 +20,7 @@ public class AdminUserService {
 
     // 모든 회원 조회
     public Page<User> findAllUsers(Pageable pageable) {
-        return userRepository.findByRole(List.of("USER"), pageable);
+        return userRepository.findByRoleIn(Collections.singletonList("USER"), pageable);
     }
 
     // id로 회원 조회
