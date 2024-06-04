@@ -9,23 +9,16 @@ import com.elice.meetstudy.domain.calendar.holiday.service.HolidayService;
 import com.elice.meetstudy.domain.calendar.mapper.CalendarDetailMapper;
 import com.elice.meetstudy.domain.calendar.repository.CalendarDetailRepository;
 import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
-import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.domain.UserPrinciple;
-import com.elice.meetstudy.domain.user.repository.UserRepository;
-import com.elice.meetstudy.util.TokenUtility;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.webjars.NotFoundException;
 
 @RequiredArgsConstructor
 @Service
@@ -86,8 +79,11 @@ public class CalendarDetailService {
       throw new EntityNotFoundException();
     }
 
+    String Month = String.format("%02d", Integer.parseInt(month));
+    String date = year + Month;
+
     List<Calendar_detail> calendarDetailList =
-        calendarDetailRepository.findAllByCalendar(calendar); // 해당 캘린더의 한 달 일정들을 리스트로 출력
+        calendarDetailRepository.findByStartDayContainingAndCalendar(date, calendar); // 해당 캘린더의 한 달 일정들을 리스트로 출력
 
     List<ResponseCalendarDetail> responseCalendarDetails = new ArrayList<>();
     for (Calendar_detail calendarDetail : calendarDetailList) {
@@ -108,7 +104,7 @@ public class CalendarDetailService {
     Optional<Calendar_detail> calendarDetail = calendarDetailRepository.findById(id);
     if (calendarDetail.isPresent()) {
       return calendarDetailMapper.toResponseCalendarDetail(calendarDetail.get());
-    } else throw new NotFoundException("");
+    } else throw new EntityNotFoundException();
   }
 
   /**
@@ -147,7 +143,7 @@ public class CalendarDetailService {
       calendarDetail.update( re.title(), re.content(), re.startDay(), re.endDay(),
           re.startTime(), re.endTime());
       return calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
-    } else throw new NotFoundException("");
+    } else throw new EntityNotFoundException();
   }
 
   /**

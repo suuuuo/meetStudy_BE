@@ -13,11 +13,13 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -30,6 +32,10 @@ public class Answer extends BaseEntity {
 
     @NotNull
     String content;
+
+    @OneToOne
+    @JoinColumn(name = "question_id")
+    private Question question;
 
     @Builder
     public Answer(String content){

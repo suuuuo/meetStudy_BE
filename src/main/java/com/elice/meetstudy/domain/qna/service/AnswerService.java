@@ -33,7 +33,6 @@ public class AnswerService {
   private final QuestionRepository questionRepository;
   private final UserRepository userRepository;
 
-  /** 답변 관리는 관리자만 할 수 있도록 설정 */
 
   /** 답변 조회 */
   @Transactional
@@ -56,12 +55,13 @@ public class AnswerService {
       Optional<Question> question = questionRepository.findById(questionId);
       if (question.isPresent()) {
         Answer answer = new Answer(requestAnswerDto.content());
+        answer.setQuestion(question.get());
         question.get().setAnswerStatus(AnswerStatus.COMPLETED); // 질문의 답변 상태 변경
         question.get().setAnswer(answer);
         return answerMapper.toResponseAnswerDto(answerRepository.save(answer));
       }
-      throw new NotFoundException(null);
-    }throw new AccessDeniedException(null);
+      throw new EntityNotFoundException();
+    }throw new AccessDeniedException("관리자만 접근 가능합니다.");
   }
 
   /** 답변 수정 */
@@ -77,7 +77,7 @@ public class AnswerService {
         return answerMapper.toResponseAnswerDto(answer1);
       }
       throw new NotFoundException(null);
-    } throw new AccessDeniedException(null);
+    } throw new AccessDeniedException("관리자만 접근 가능합니다.");
   }
 
   /** 답변 삭제 */
@@ -89,7 +89,8 @@ public class AnswerService {
       question.setAnswerStatus(AnswerStatus.PENDING); //답변 상태 수정
       question.setAnswer(null);
       answerRepository.deleteById(answerId);
-    } throw new AccessDeniedException(null);
+      return;
+    } throw new AccessDeniedException("관리자만 접근 가능합니다.");
   }
 
   @Transactional
