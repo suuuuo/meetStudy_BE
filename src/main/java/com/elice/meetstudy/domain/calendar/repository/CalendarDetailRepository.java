@@ -13,6 +13,6 @@ public interface CalendarDetailRepository extends JpaRepository<Calendar_detail,
 
     void deleteAllByCalendar(Calendar calendar);
 
-    List<Calendar_detail> findAllByCalendar(Calendar calendar);
+    List<Calendar_detail> findByStartDayContainingAndCalendar(String startDay, Calendar calendar);
 
 }
