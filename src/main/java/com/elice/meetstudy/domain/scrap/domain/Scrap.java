@@ -4,9 +4,12 @@ import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table(name = "scrap")
 public class Scrap {
 
