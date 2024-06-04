@@ -27,40 +27,41 @@ import java.util.List;
 @Tag(name = "마이페이지", description = "마이페이지 관련 API 입니다.")
 public class MyPageController {
 
-    private final MyPageService myPageService;
+  private final MyPageService myPageService;
 
-    @Operation(summary = "회원 정보 조회")
-    @GetMapping
-    public User getUserInfo(@RequestHeader("Authorization") String token){
-        return myPageService.getUserByUserId(token);
-    }
+  @Operation(summary = "회원 정보 조회")
+  @GetMapping
+  public User getUserInfo(@RequestHeader("Authorization") String token) {
+    return myPageService.getUserByUserId(token);
+  }
 
-    @Operation(summary = "회원 정보 수정")
-    @PutMapping("/edit")
-    public User updateUser(@RequestHeader("Authorization") String token, @RequestBody UserUpdateDto userUpdateDto){
-        User updatedUser = myPageService.updateUser(token, userUpdateDto);
+  //    @Operation(summary = "회원 정보 수정")
+  //    @PutMapping("/edit")
+  //    public User updateUser(@RequestHeader("Authorization") String token, @RequestBody
+  // UserUpdateDto userUpdateDto){
+  //        User updatedUser = myPageService.updateUser(token, userUpdateDto);
+  //
+  //        return updatedUser;
+  //    }
 
-        return updatedUser;
-    }
+  @Operation(summary = "회원 삭제 (탈퇴)")
+  @DeleteMapping("/delete")
+  public void userDelete(@RequestHeader("Authorization") String token) {
+    myPageService.delete(token);
+  }
 
-    @Operation(summary = "회원 삭제 (탈퇴)")
-    @DeleteMapping("/delete")
-    public void userDelete(@RequestHeader("Authorization") String token){
-        myPageService.delete(token);
-    }
+  //    @Operation(summary = "참여한 스터디룸 조회")
+  //    @GetMapping("/studyroomlist")
+  //    public ResponseEntity<List<UserStudyRoom>>
+  // getStudyRoomsByUserId(@RequestHeader("Authorization") String token) {
+  //        List<UserStudyRoom> studyRooms = myPageService.getStudyRoomsByUserId(token);
+  //        return new ResponseEntity<>(studyRooms, HttpStatus.OK);
+  //    }
 
-//    @Operation(summary = "참여한 스터디룸 조회")
-//    @GetMapping("/studyroomlist")
-//    public ResponseEntity<List<UserStudyRoom>> getStudyRoomsByUserId(@RequestHeader("Authorization") String token) {
-//        List<UserStudyRoom> studyRooms = myPageService.getStudyRoomsByUserId(token);
-//        return new ResponseEntity<>(studyRooms, HttpStatus.OK);
-//    }
-
-    @Operation(summary = "스크랩 한 게시글 조회")
-    @GetMapping("/scraplist")
-    public ResponseEntity<List<Post>> getScrappedPosts(@RequestHeader("Authorization") String token) {
-        List<Post> scrappedPosts = myPageService.getScrappedPostsByUserId(token);
-        return new ResponseEntity<>(scrappedPosts, HttpStatus.OK);
-    }
-
+  @Operation(summary = "스크랩 한 게시글 조회")
+  @GetMapping("/scraplist")
+  public ResponseEntity<List<Post>> getScrappedPosts(@RequestHeader("Authorization") String token) {
+    List<Post> scrappedPosts = myPageService.getScrappedPostsByUserId(token);
+    return new ResponseEntity<>(scrappedPosts, HttpStatus.OK);
+  }
 }

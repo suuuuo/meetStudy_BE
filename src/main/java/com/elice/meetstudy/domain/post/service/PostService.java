@@ -9,13 +9,15 @@ import com.elice.meetstudy.domain.post.repository.PostRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.service.UserService;
 import com.elice.meetstudy.util.EntityFinder;
-import com.elice.meetstudy.util.TokenUtility;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,12 +30,14 @@ public class PostService {
   private final PostRepository postRepository;
   private final UserService userService;
   private final EntityFinder entityFinder;
-  private final TokenUtility tokenUtility;
 
   /** 게시글 작성 */
-  public PostResponseDTO write(PostWriteDTO postCreate, String jwtToken) {
-    // jwt -> userId get -> userId 를 찾는건데,userId 를 바로 집어넣으려면 어떻게하나요? (고민)
-    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+  public PostResponseDTO write(PostWriteDTO postCreate) {
+
+    Long userId = 1L;
+
+    //    User user = entityFinder.getUser();
+
     User user = entityFinder.findUserById(userId);
 
     // 예외 발생시
@@ -52,10 +56,11 @@ public class PostService {
   }
 
   /** 특정 게시판에서 게시글 작성 */
-  public PostResponseDTO writeByCategory(
-      PostWriteDTO postCreate, Long categoryId, String jwtToken) {
+  public PostResponseDTO writeByCategory(PostWriteDTO postCreate, Long categoryId) {
 
-    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+    Long userId = 1L;
+
+    //    User user = entityFinder.getUser();
     User user = entityFinder.findUserById(userId);
 
     //    // 예외 발생시
@@ -74,13 +79,12 @@ public class PostService {
   }
 
   /** 게시글 수정 */
-  public PostResponseDTO edit(Long postId, PostWriteDTO editRequest, String jwtToken) {
-    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+  public PostResponseDTO edit(Long postId, PostWriteDTO editRequest) {
+    Long userId = 1L;
+
+    //    User user = entityFinder.getUser();
     Post post = entityFinder.findPost(postId);
 
-    if (!userId.equals(post.getUser().getId())) {
-      throw new SecurityException("해당 게시글을 수정할 권한이 없습니다.");
-    }
 
     Category category = entityFinder.findCategoryById(editRequest.getCategoryId());
 
@@ -104,10 +108,10 @@ public class PostService {
   }
 
   /** 게시글 삭제 - (이미 삭제된 게시글이어도 204) */
-  public void delete(Long postId, String jwtToken) {
-    // 토큰 -> userId 추출
-    Long userId = tokenUtility.getUserIdFromToken(jwtToken);
+  public void delete(Long postId) {
+    Long userId = 1L;
 
+    //    User user = entityFinder.getUser();
     // 게시글 조회
     Optional<Post> optionalPost = entityFinder.findPostById(postId);
 
@@ -126,10 +130,27 @@ public class PostService {
     }
   }
 
+  /** 게시판 별 게시글 조회 - (공학게시판/교육게시판 등) */
+  public List<PostResponseDTO> getPostBycategory(Long categoryId, int page, int size) {
+    Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
+    return postRepository.findByCategoryId(categoryId, defaultPageable).stream()
+        .map(PostResponseDTO::new)
+        .collect(Collectors.toList());
+  }
+
+  /** 내가 작성한 글 조회 - (최근 작성된 순으로) */
+  public List<PostResponseDTO> getPostByUser(Long userId, int page, int size) {
+    Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
+    return postRepository.findByUserId(userId, defaultPageable).stream()
+        .map(PostResponseDTO::new)
+        .collect(Collectors.toList());
+  }
+
   /** 전체 게시글 조회 - (최근 작성된 순으로) */
-  public List<PostResponseDTO> getPostAll(Pageable pageable) {
+  public List<PostResponseDTO> getPostAll(int page, int size) {
+    Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
     return postRepository
-        .findAllByOrderByCreatedAtDesc(pageable)
+        .findAllByOrderByCreatedAtDesc(defaultPageable)
         .stream() /* Page<Post> 객체를 스트림으로 변환 */
         .map(PostResponseDTO::new) /* 스트림 내 Post 객체 -> ResponsePostGet 객체로 변환. */
         .collect(Collectors.toList()); /* ResponsePostGet을 리스트로 반환 */
@@ -156,9 +177,20 @@ public class PostService {
   }
 
   /** 전체 게시판 내 게시글 검색 */
-  public List<PostResponseDTO> searchPost(String keyword, Pageable pageable) {
+  public List<PostResponseDTO> searchPostInBoard(
+      Long categoryId, String keyword, int page, int size) {
+    Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
+    return postRepository.findByKeyword(categoryId, keyword, defaultPageable).stream()
+        .map(PostResponseDTO::new)
+        .collect(Collectors.toList());
+  }
+
+  /** 전체 게시판 내 게시글 검색 */
+  public List<PostResponseDTO> searchPost(String keyword, int page, int size) {
+    Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
     return postRepository
-        .findByTitleContainingOrContentContainingOrderByCreatedAtDesc(keyword, keyword, pageable)
+        .findByTitleContainingOrContentContainingOrderByCreatedAtDesc(
+            keyword, keyword, defaultPageable)
         .stream()
         .map(PostResponseDTO::new)
         .collect(Collectors.toList());
