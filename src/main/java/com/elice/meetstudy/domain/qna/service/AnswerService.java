@@ -51,7 +51,7 @@ public class AnswerService {
   public ResponseAnswerDto addAnswer(RequestAnswerDto requestAnswerDto, long questionId)
       throws AccessDeniedException {
     Optional<User> user = userRepository.findById(getUserId());
-    if(user.get().getRole() == Role.USER){
+    if(user.get().getRole() == Role.ADMIN){
       Optional<Question> question = questionRepository.findById(questionId);
       if (question.isPresent()) {
         Answer answer = new Answer(requestAnswerDto.content());
@@ -69,7 +69,7 @@ public class AnswerService {
   public ResponseAnswerDto updateAnswer(RequestAnswerDto requestAnswerDto, long answerId)
       throws AccessDeniedException {
     Optional<User> user = userRepository.findById(getUserId());
-    if(user.get().getRole() == Role.USER){
+    if(user.get().getRole() == Role.ADMIN){
       Optional<Answer> answer = answerRepository.findById(answerId);
       if (answer.isPresent()) {
         Answer answer1 = answer.get();
@@ -84,7 +84,7 @@ public class AnswerService {
   @Transactional
   public void deleteAnswer(long answerId) throws AccessDeniedException {
     Optional<User> user = userRepository.findById(getUserId());
-    if(user.get().getRole() == Role.USER){
+    if(user.get().getRole() == Role.ADMIN){
       Question question = questionRepository.findByAnswerId(answerId);
       question.setAnswerStatus(AnswerStatus.PENDING); //답변 상태 수정
       question.setAnswer(null);
