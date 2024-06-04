@@ -28,8 +28,8 @@ public class AdminUserService {
     }
 
     // 회원 삭제
-    public void deleteUser(Long userId) {
-        User foundUser = userRepository.findById(userId)
+    public void deleteUser(Long id) {
+        User foundUser = userRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
 
         userRepository.delete(foundUser);
