@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import lombok.Builder;
+import lombok.Getter;
 
 @Entity
 @Getter
@@ -22,16 +24,28 @@ public class Scrap {
   private User user;
 
   @ManyToOne
-  @JoinColumn(name = "category_id", nullable = false)
+  @JoinColumn(name = "category_id", nullable = true) // 게시판 또는 게시글을 스크랩 할 수 있음. = null 허용
   private Category category;
 
   @ManyToOne
-  @JoinColumn(name = "post_id", nullable = false)
+  @JoinColumn(name = "post_id", nullable = true) // 게시판 또는 게시글을 스크랩 할 수 있음. = null 허용
   private Post post;
 
-  @Column(
-      name = "created_at",
-      nullable = false,
-      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
+
+  @PrePersist
+  protected void onCreate() {
+    createdAt = LocalDateTime.now();
+  }
+
+  @Builder
+  public Scrap(User user, Category category, Long userId, Post post) {
+    this.user = user;
+    this.category = category;
+    this.post = post;
+    if (userId != null) {
+      this.user = User.builder().id(userId).build();
+    }
+  }
 }
