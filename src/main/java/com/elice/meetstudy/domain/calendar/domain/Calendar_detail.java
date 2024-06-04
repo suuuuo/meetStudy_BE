@@ -7,7 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,10 +48,12 @@ public class Calendar_detail {
     private String endDay;
 
     @NotNull
+    @ColumnDefault("00:00:00")
     @JoinColumn(name = "start_time")
     private String startTime;
 
     @NotNull
+    @ColumnDefault("23:59:59")
     @JoinColumn(name = "end_time")
     private String endTime;
 
@@ -56,6 +61,20 @@ public class Calendar_detail {
     @ColumnDefault("false")
     private boolean isHoliday;
 
+    @PrePersist
+    protected void setToday() {
+        if (this.startDay == null) {
+            LocalDate now = LocalDate.now();
+            String date = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            this.startDay = date;
+        }
+
+        if (this.endDay == null) {
+            LocalDate now = LocalDate.now();
+            String date1 = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            this.endDay = date1;
+        }
+    }
 
     @Builder
     public Calendar_detail(String title, String content, String startDay, String endDay,
