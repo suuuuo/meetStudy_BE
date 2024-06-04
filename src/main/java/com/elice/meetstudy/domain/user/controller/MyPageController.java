@@ -35,13 +35,13 @@ public class MyPageController {
         return myPageService.getUserByUserId(token);
     }
 
-//    @Operation(summary = "회원 정보 수정")
-//    @PutMapping("/edit")
-//    public User updateUser(@RequestHeader("Authorization") String token, @RequestBody UserUpdateDto userUpdateDto){
-//        User updatedUser = myPageService.updateUser(token, userUpdateDto);
-//
-//        return updatedUser;
-//    }
+    @Operation(summary = "회원 정보 수정")
+    @PutMapping("/edit")
+    public User updateUser(@RequestHeader("Authorization") String token, @RequestBody UserUpdateDto userUpdateDto){
+        User updatedUser = myPageService.updateUser(token, userUpdateDto);
+
+        return updatedUser;
+    }
 
     @Operation(summary = "회원 삭제 (탈퇴)")
     @DeleteMapping("/delete")
@@ -49,12 +49,12 @@ public class MyPageController {
         myPageService.delete(token);
     }
 
-    @Operation(summary = "참여한 스터디룸 조회")
-    @GetMapping("/studyroomlist")
-    public ResponseEntity<List<UserStudyRoom>> getStudyRoomsByUserId(@RequestHeader("Authorization") String token) {
-        List<UserStudyRoom> studyRooms = myPageService.getStudyRoomsByUserId(token);
-        return new ResponseEntity<>(studyRooms, HttpStatus.OK);
-    }
+//    @Operation(summary = "참여한 스터디룸 조회")
+//    @GetMapping("/studyroomlist")
+//    public ResponseEntity<List<UserStudyRoom>> getStudyRoomsByUserId(@RequestHeader("Authorization") String token) {
+//        List<UserStudyRoom> studyRooms = myPageService.getStudyRoomsByUserId(token);
+//        return new ResponseEntity<>(studyRooms, HttpStatus.OK);
+//    }
 
     @Operation(summary = "스크랩 한 게시글 조회")
     @GetMapping("/scraplist")
