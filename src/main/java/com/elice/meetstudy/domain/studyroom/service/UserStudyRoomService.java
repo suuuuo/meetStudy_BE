@@ -82,7 +82,7 @@ public class UserStudyRoomService {
                 .filter((usr) -> Objects.equals(usr.getUser().getId(), user.getId()))
                 .findAny()
                 .ifPresent(e -> {
-                    throw new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID: " + studyRoomId + "]");
+                    throw new EntityNotFoundException("이미 해당 유저가 존재합니다. [RoomID: " + studyRoomId + ", Email: email]");
                 });
 
         UserStudyRoom userStudyRoom = new UserStudyRoom();

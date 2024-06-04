@@ -1,20 +1,29 @@
 package com.elice.meetstudy.domain.studyroom.controller;
 
+import com.elice.meetstudy.domain.studyroom.DTO.EmailBodyDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
 import com.elice.meetstudy.domain.studyroom.service.UserStudyRoomService;
 import com.elice.meetstudy.domain.user.dto.UserLoginDto;
 import com.fasterxml.jackson.databind.node.TextNode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/studyrooms")
+@Tag(name = "스터디룸", description = "스터디룸 관련 API 입니다.")
 public class StudyRoomController {
 
     @Autowired
@@ -23,36 +32,72 @@ public class StudyRoomController {
     @Autowired
     private UserStudyRoomService userStudyRoomService;
 
+
+    @Operation(summary = "모든 스터디룸 조회", description = "모든 스터디룸을 조회합니다.")
+    @StudyRoomAnnotation.Success(description = "성공적으로 조회됨")
     @GetMapping
     public List<StudyRoomDTO> getAllStudyRooms() {
         return studyRoomService.getAllStudyRooms();
     }
 
+
+    @Operation(summary = "스터디룸 조회", description = "ID를 사용하여 특정 스터디룸을 조회합니다.")
+    @StudyRoomAnnotation.Success(description = "성공적으로 조회됨")
+    @StudyRoomAnnotation.Failure
     @GetMapping("/{id}")
-    public ResponseEntity<StudyRoomDTO> getStudyRoomById(@PathVariable Long id) {
+    public ResponseEntity<StudyRoomDTO> getStudyRoomById(
+            @Parameter(description = "조회할 스터디룸의 ID", required = true)
+            @PathVariable Long id
+    ) {
         StudyRoomDTO studyRoomDTO = studyRoomService.getStudyRoomById(id);
         return ResponseEntity.ok(studyRoomDTO);
     }
 
+    @Operation(summary = "참가 스터디룸 조회", description = "유저의 이메일을 사용하여, 해당 유저가 참가중인 스터디룸들을 조회합니다.")
+    @StudyRoomAnnotation.Success(description = "성공적으로 조회됨")
+    @StudyRoomAnnotation.Failure
     @GetMapping("/user")
-    public List<StudyRoomDTO> getStudyRoomByUserEmail(@RequestBody Map<Object, String> email) {
-        return studyRoomService.getStudyRoomByEmail(email.get("email"));
+    public List<StudyRoomDTO> getStudyRoomByUserEmail(
+            @Parameter(description = "참여한 스터디룸을 조회할 유저의 이메일", required = true)
+            @RequestBody EmailBodyDTO emailBodyDTO
+    ) {
+        return studyRoomService.getStudyRoomByEmail(emailBodyDTO.getEmail());
     }
 
+    @Operation(summary = "스터디룸 생성", description = "새로운 스터디룸을 생성합니다.")
+    @StudyRoomAnnotation.Success(description = "성공적으로 생성됨")
     @PostMapping("/add")
-    public ResponseEntity<StudyRoomDTO> createStudyRoom(@RequestBody StudyRoomDTO studyRoomDTO) {
+    public ResponseEntity<StudyRoomDTO> createStudyRoom(
+            @Parameter(description = "생성할 스터디룸 정보 JSON", required = true)
+            @RequestBody StudyRoomDTO studyRoomDTO
+    ) {
         StudyRoomDTO createdStudyRoom = studyRoomService.createStudyRoom(studyRoomDTO);
-        return ResponseEntity.ok(createdStudyRoom);
+        URI location = URI.create(String.format("/api/studyrooms/%s", createdStudyRoom.getId()));
+        return ResponseEntity.created(location).body(createdStudyRoom);
     }
 
+    @Operation(summary = "스터디룸 업데이트", description = "ID를 사용하여 스터디룸을 업데이트합니다.")
     @PutMapping("/{id}")
-    public ResponseEntity<StudyRoomDTO> updateStudyRoom(@PathVariable Long id, @RequestBody StudyRoomDTO studyRoomDTO) {
+    @StudyRoomAnnotation.Success(description = "성공적으로 수정됨")
+    @StudyRoomAnnotation.Failure
+    public ResponseEntity<StudyRoomDTO> updateStudyRoom(
+            @Parameter(description = "수정할 스터디룸의 ID", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "수정할 스터디룸 정보 JSON", required = true)
+            @RequestBody StudyRoomDTO studyRoomDTO
+    ) {
         StudyRoomDTO updatedStudyRoom = studyRoomService.updateStudyRoom(id, studyRoomDTO);
         return ResponseEntity.ok(updatedStudyRoom);
     }
 
+    @Operation(summary = "스터디룸 삭제", description = "ID를 사용하여 스터디룸을 삭제합니다.")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStudyRoom(@PathVariable Long id) {
+    @ApiResponse(responseCode = "204", description = "성공적으로 삭제됨")
+    @StudyRoomAnnotation.Failure
+    public ResponseEntity<Void> deleteStudyRoom(
+            @Parameter(description = "삭제할 스터디룸의 ID", required = true)
+            @PathVariable Long id
+    ) {
         studyRoomService.deleteStudyRoom(id);
         return ResponseEntity.noContent().build();
     }
