@@ -15,7 +15,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -126,6 +129,22 @@ public class PostService {
     }
   }
 
+  /** 게시판 별 게시글 조회 - (공학게시판/교육게시판 등) */
+  public List<PostResponseDTO> getPostBycategory(Long categoryId, int page, int size) {
+    Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
+    return postRepository.findByCategoryId(categoryId, defaultPageable).stream()
+        .map(PostResponseDTO::new)
+        .collect(Collectors.toList());
+  }
+
+  /** 내가 작성한 글 조회 - (최근 작성된 순으로) */
+  public List<PostResponseDTO> getPostByUser(Long userId, int page, int size) {
+    Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
+    return postRepository.findByUserId(userId, defaultPageable).stream()
+        .map(PostResponseDTO::new)
+        .collect(Collectors.toList());
+  }
+
   /** 전체 게시글 조회 - (최근 작성된 순으로) */
   public List<PostResponseDTO> getPostAll(Pageable pageable) {
     return postRepository
@@ -153,6 +172,15 @@ public class PostService {
         .hit(post.getHit())
         .createdAt(post.getCreatedAt())
         .build();
+  }
+
+  /** 전체 게시판 내 게시글 검색 */
+  public List<PostResponseDTO> searchPostInBoard(
+      Long categoryId, String keyword, int page, int size) {
+    Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
+    return postRepository.findByKeyword(categoryId, keyword, defaultPageable).stream()
+        .map(PostResponseDTO::new)
+        .collect(Collectors.toList());
   }
 
   /** 전체 게시판 내 게시글 검색 */

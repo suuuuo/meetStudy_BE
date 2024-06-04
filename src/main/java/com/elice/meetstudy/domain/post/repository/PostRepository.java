@@ -1,6 +1,5 @@
 package com.elice.meetstudy.domain.post.repository;
 
-import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.post.domain.Post;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -21,14 +20,17 @@ public interface PostRepository extends JpaRepository<Post, Long> {
           + "LIKE %:keyword% OR p.content LIKE %:keyword%")
   List<Post> findByKeyword(@Param("keyword") String keyword);
 
-  // 카테고리별 게시글 조회 (선택한 게시판)
-  List<Post> findByCategory(Category category);
+  // 게시판 별 게시글 조회 - (공학게시판/교육게시판 등)
+  List<Post> findByCategoryId(Long categoryId, Pageable pageable);
 
   // 게시글 작성
 
   // 게시글 수정
 
   // 게시글 삭제
+
+  // 내가 작성한 글 조회
+  List<Post> findByUserId(Long userId, Pageable pageable);
 
   // 게시글 조회
   List<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
@@ -41,11 +43,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   @Query("UPDATE Post p SET p.hit = p.hit + 1 WHERE p.id = :id")
   void updateHit(Long id);
 
-  // 특정 게시판 내 게시글 검색
+  // 특정 게시판 내 게시글 키워드 검색
   @Query(
       "SELECT p FROM Post p WHERE (p.title LIKE %:keyword% OR p.content LIKE %:keyword%) AND p.category.id = :categoryId")
-  List<Post> findByKeyword(@Param("keyword") String keyword, @Param("categoryId") Long categoryId);
+  List<Post> findByKeyword(
+      @Param("categoryId") Long categoryId, @Param("keyword") String keyword, Pageable pageable);
 
+  // 전체 게시판 내 게시글 키워드 검색
   List<Post> findByTitleContainingOrContentContainingOrderByCreatedAtDesc(
       String titleKeyword, String contentKeyword, Pageable pageable);
 }

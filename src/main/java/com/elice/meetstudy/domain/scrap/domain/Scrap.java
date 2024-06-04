@@ -23,13 +23,15 @@ public class Scrap {
 
   @ManyToOne
   @JoinColumn(name = "category_id", nullable = false)
-  private Category board;
+  private Category category;
 
   @ManyToOne
   @JoinColumn(name = "post_id", nullable = false)
   private Post post;
 
-  @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  @Column(
+      name = "created_at",
+      nullable = false,
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private LocalDateTime createdAt;
-
 }

@@ -57,6 +57,24 @@ public class PostController {
     return ResponseEntity.noContent().build();
   }
 
+  @Operation(summary = "게시판 별 게시글 조회 - (공학게시판/교육게시판 등)")
+  @GetMapping("/category/{categoryId}")
+  public ResponseEntity<List<PostResponseDTO>> getPostByCategory(
+      @PathVariable Long categoryId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "15") int size) {
+    return ResponseEntity.ok(postService.getPostBycategory(categoryId, page, size));
+  }
+
+  @Operation(summary = "내가 작성한 글 조회 - (최근 작성된 순으로)")
+  @GetMapping("/user/{userId}")
+  public ResponseEntity<List<PostResponseDTO>> getPostByUser(
+      @PathVariable Long userId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "15") int size) {
+    return ResponseEntity.ok(postService.getPostByUser(userId, page, size));
+  }
+
   @Operation(summary = "전체 게시글 조회 - (최근 작성된 순으로)")
   @GetMapping
   public ResponseEntity<List<PostResponseDTO>> getPostAll(@PageableDefault Pageable pageable) {
@@ -69,7 +87,17 @@ public class PostController {
     return ResponseEntity.ok(postService.getPost(postId));
   }
 
-  @Operation(summary = "전체 게시판 내 게시글 검색 - (최근 작성된 순으로)")
+  @Operation(summary = "특정 게시판 내 게시글 키워드 검색 - (최근 작성된 순으로)")
+  @GetMapping("/category/{categoryId}/search")
+  public ResponseEntity<List<PostResponseDTO>> searchPostInBoard(
+      @PathVariable Long categoryId,
+      @RequestParam String keyword,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "15") int size) {
+    return ResponseEntity.ok(postService.searchPostInBoard(categoryId, keyword, page, size));
+  }
+
+  @Operation(summary = "전체 게시판 내 게시글 키워드 검색 - (최근 작성된 순으로)")
   @GetMapping("/search")
   public ResponseEntity<List<PostResponseDTO>> searchPost(
       @RequestParam String keyword, @PageableDefault Pageable pageable) {
