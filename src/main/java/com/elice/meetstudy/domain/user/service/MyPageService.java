@@ -137,5 +137,5 @@ public class MyPageService {
                 .collect(Collectors.toList());
     }
 
-    // + 프로필 설정 (보유 자격증 등록), 내가 작성한 게시글, 스터디 성취율
+    // + 프로필 설정 (보유 자격증 등록)
 }
