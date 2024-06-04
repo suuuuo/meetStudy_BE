@@ -51,10 +51,11 @@ public class AnswerService {
   public ResponseAnswerDto addAnswer(RequestAnswerDto requestAnswerDto, long questionId)
       throws AccessDeniedException {
     Optional<User> user = userRepository.findById(getUserId());
-    if(user.get().getRole() == Role.ADMIN){
+    if(user.get().getRole() == Role.USER){
       Optional<Question> question = questionRepository.findById(questionId);
       if (question.isPresent()) {
         Answer answer = new Answer(requestAnswerDto.content());
+        answer.setQuestion(question.get());
         question.get().setAnswerStatus(AnswerStatus.COMPLETED); // 질문의 답변 상태 변경
         question.get().setAnswer(answer);
         return answerMapper.toResponseAnswerDto(answerRepository.save(answer));
@@ -68,7 +69,7 @@ public class AnswerService {
   public ResponseAnswerDto updateAnswer(RequestAnswerDto requestAnswerDto, long answerId)
       throws AccessDeniedException {
     Optional<User> user = userRepository.findById(getUserId());
-    if(user.get().getRole() == Role.ADMIN){
+    if(user.get().getRole() == Role.USER){
       Optional<Answer> answer = answerRepository.findById(answerId);
       if (answer.isPresent()) {
         Answer answer1 = answer.get();
@@ -83,11 +84,12 @@ public class AnswerService {
   @Transactional
   public void deleteAnswer(long answerId) throws AccessDeniedException {
     Optional<User> user = userRepository.findById(getUserId());
-    if(user.get().getRole() == Role.ADMIN){
+    if(user.get().getRole() == Role.USER){
       Question question = questionRepository.findByAnswerId(answerId);
       question.setAnswerStatus(AnswerStatus.PENDING); //답변 상태 수정
       question.setAnswer(null);
       answerRepository.deleteById(answerId);
+      return;
     } throw new AccessDeniedException("관리자만 접근 가능합니다.");
   }
 
