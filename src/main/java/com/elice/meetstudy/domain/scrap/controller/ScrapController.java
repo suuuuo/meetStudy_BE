@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/scrap")
 @RequiredArgsConstructor
-@Tag(name = "스크랩", description = "(게시글과 게시판을 스크랩) 스크랩 관련 API 입니다.")
+@Tag(name = "가. 스크랩", description = "(게시글과 게시판을 스크랩) 스크랩 관련 API 입니다.")
 public class ScrapController {
 
   private final ScrapService scrapService;
