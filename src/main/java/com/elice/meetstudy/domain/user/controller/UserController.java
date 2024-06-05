@@ -8,6 +8,7 @@ import com.elice.meetstudy.domain.user.jwt.web.json.ApiResponseJson;
 import com.elice.meetstudy.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class UserController {
 
   @Operation(summary = "회원가입")
   @PostMapping("/join")
-  public ApiResponseJson join(@RequestBody UserJoinDto userJoinDto){
+  public ApiResponseJson join(@RequestBody @Valid UserJoinDto userJoinDto){
 
     User user = userService.join(userJoinDto);
     return new ApiResponseJson(HttpStatus.OK, Map.of(
@@ -52,7 +53,7 @@ public class UserController {
 
   @Operation(summary = "로그인")
   @PostMapping("/login")
-  public ApiResponseJson login(@RequestBody UserLoginDto userLoginDto) {
+  public ApiResponseJson login(@RequestBody @Valid UserLoginDto userLoginDto) {
     TokenInfo tokenInfo = userService.login(userLoginDto.getEmail(), userLoginDto.getPassword());
     log.info("Token issued: {}", tokenInfo);
     return new ApiResponseJson(HttpStatus.OK, tokenInfo);
