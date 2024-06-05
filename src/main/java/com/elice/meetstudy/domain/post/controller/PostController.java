@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/post")
 @RequiredArgsConstructor
-@Tag(name = "가. 게시글", description = "게시글 관련 API 입니다.")
+@Tag(name = "게시글", description = "게시글 관련 API 입니다.")
 @Slf4j
 public class PostController {
 
