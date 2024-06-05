@@ -10,8 +10,12 @@ import com.elice.meetstudy.domain.user.jwt.token.TokenProvider;
 import com.elice.meetstudy.domain.user.jwt.token.dto.TokenInfo;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -50,23 +54,25 @@ public class UserService {
     }
 
     User user = User.builder()
-        .email(userJoinDto.getEmail())
-        .password(passwordEncoder.encode(userJoinDto.getPassword()))
-        .username(userJoinDto.getUsername())
-        .nickname(userJoinDto.getNickname())
-        .role(Role.USER)
-        .build();
-
-        userJoinDto.getInterests().forEach(categoryId -> {
-            Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + categoryId));
-            Interest interest = new Interest(user, category);
-            user.addInterest(interest);
-        });
+            .email(userJoinDto.getEmail())
+            .password(passwordEncoder.encode(userJoinDto.getPassword()))
+            .username(userJoinDto.getUsername())
+            .nickname(userJoinDto.getNickname())
+            .role(Role.USER)
+            .build();
 
     user.setCreatedAt(LocalDateTime.now());
 
-    return userRepository.save(user);
+    List<Long> interestIds = userJoinDto.getInterests();
+    for (Long categoryId : interestIds) {
+      Category category = categoryRepository.findById(categoryId)
+              .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + categoryId));
+      Interest interest = Interest.createInterest(user, category); // 관심사를 생성하고 사용자에게 추가
+      user.addInterest(interest);
+    }
+
+    // Save the user with interests
+    return userRepository.save(user); // 관심사가 추가된 사용자를 한 번에 저장
   }
 
 
