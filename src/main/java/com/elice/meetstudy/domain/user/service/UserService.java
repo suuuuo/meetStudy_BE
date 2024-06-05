@@ -49,10 +49,9 @@ public class UserService {
             .password(passwordEncoder.encode(userJoinDto.getPassword()))
             .username(userJoinDto.getUsername())
             .nickname(userJoinDto.getNickname())
+            .createdAt(LocalDateTime.now())
             .role(Role.USER)
             .build();
-
-    user.setCreatedAt(LocalDateTime.now());
 
     List<Long> interestIds = userJoinDto.getInterests();
     for (Long categoryId : interestIds) {

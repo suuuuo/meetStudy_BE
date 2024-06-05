@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
+import org.springframework.cglib.core.Local;
 
 /** user Entity */
 @Entity
@@ -55,11 +56,12 @@ public class User {
   }
 
   @Builder
-  public User(String email, String password, String username, String nickname, Role role, Long id) {
+  public User(String email, String password, String username, String nickname, LocalDateTime createdAt, Role role, Long id) {
     this.email = email;
     this.password = password;
     this.username = username;
     this.nickname = nickname;
+    this.createdAt = createdAt;
     this.role = role;
     this.id = id;
   }
