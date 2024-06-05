@@ -10,19 +10,19 @@ import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.dto.UserJoinDto;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class UserStudyRoomService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserStudyRoomService.class);
     @Autowired
     private UserStudyRoomRepository userStudyRoomRepository;
 
@@ -112,7 +112,25 @@ public class UserStudyRoomService {
                 .findAny()
                 .orElseThrow(() -> new EntityNotFoundException("유저가 이미 해당 스터디룸에 존재하지 않습니다. [RoomID: " + id + ", Email: " + userEmail + "]"));
 
-        userStudyRoomRepository.deleteById(userStudyRoom.getId());
+
+        studyRoom.getUserStudyRooms().remove(userStudyRoom);
+
+        // OWNER가 나갔다면 남은 유저중 가장 먼저 가입한 유저가 Owner 계승
+        //                남은 유저가 없다면 Studyroom 삭제
+        if (userStudyRoom.getPermission().equals("OWNER")) {
+            studyRoom.getUserStudyRooms().stream()
+                    .min(Comparator.comparing(UserStudyRoom::getJoinDate))
+                    .ifPresentOrElse(
+                            usr -> {
+                                usr.setPermission("OWNER");
+                                studyRoomRepository.save(studyRoom);
+                            },
+                            () -> {
+                                studyRoomRepository.deleteById(id);
+                            });
+        } else {
+            studyRoomRepository.save(studyRoom);
+        }
     }
 
     public UserStudyRoomDTO createUserStudyRoom(UserStudyRoomDTO userStudyRoomDTO) {
