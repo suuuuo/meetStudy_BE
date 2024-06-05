@@ -27,38 +27,35 @@ public class SecurityConfig {
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
   private final JwtFilter jwtFilter;
   private final String[] adminUrl = {"api/admin/**"};
-  private final String[] userUrl = {"api/user/**"};
+  private final String[] userUrl = {"api/mypage/**", "api/post/**"};
 
+  @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
-        .cors(AbstractHttpConfigurer::disable)
-        .csrf(AbstractHttpConfigurer::disable)
-        .formLogin(AbstractHttpConfigurer::disable)
-        .sessionManagement(
-            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .exceptionHandling(
-            handle ->
-                handle
+            .cors(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(handle -> handle
                     .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                     .accessDeniedHandler(jwtAccessDeniedHandler))
-        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-        .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers("/api/**")
-                    .permitAll()
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/api/user/**").permitAll() // 회원가입, 로그인
                     .requestMatchers(
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/swagger-resources/**",
-                        "/swagger-ui.html")
+                            "/swagger-ui/**",
+                            "/v3/api-docs/**",
+                            "/swagger-resources/**",
+                            "/swagger-ui.html")
                     .permitAll()
-                    .requestMatchers(adminUrl)
-                    .hasRole("ADMIN")
-                    .requestMatchers(userUrl)
-                    .hasRole("USER")
-                    .anyRequest()
-                    .authenticated())
-        .build();
+                    .requestMatchers(adminUrl).hasAuthority("ADMIN")
+                    .requestMatchers(userUrl).hasAuthority("USER")
+                    .anyRequest().authenticated())
+            .logout(logout -> logout
+                    .logoutUrl("/api/user/logout") // 로그아웃 요청 URL
+                    .logoutSuccessUrl("/login") // 로그아웃 성공 시 리디렉션 URL
+                    .invalidateHttpSession(true) // 세션 무효화
+                    .deleteCookies("JSESSIONID")) // 쿠키 삭제
+            .build();
   }
 
   @Bean

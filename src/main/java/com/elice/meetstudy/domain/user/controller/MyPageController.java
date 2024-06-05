@@ -21,7 +21,7 @@ import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/user/mypage")
+@RequestMapping("api/mypage")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "마이페이지", description = "마이페이지 관련 API 입니다.")
@@ -31,23 +31,20 @@ public class MyPageController {
 
   @Operation(summary = "회원 정보 조회")
   @GetMapping
-  public User getUserInfo(@RequestHeader("Authorization") String token) {
-    return myPageService.getUserByUserId(token);
+  public User getUserInfo() {
+    return myPageService.getUserByUserId();
   }
 
-  //    @Operation(summary = "회원 정보 수정")
-  //    @PutMapping("/edit")
-  //    public User updateUser(@RequestHeader("Authorization") String token, @RequestBody
-  // UserUpdateDto userUpdateDto){
-  //        User updatedUser = myPageService.updateUser(token, userUpdateDto);
-  //
-  //        return updatedUser;
-  //    }
+  @Operation(summary = "회원 정보 수정")
+  @PutMapping("/edit")
+  public User updateUser(@RequestBody UserUpdateDto userUpdateDto){
+    return myPageService.updateUser(userUpdateDto);
+  }
 
   @Operation(summary = "회원 삭제 (탈퇴)")
   @DeleteMapping("/delete")
-  public void userDelete(@RequestHeader("Authorization") String token) {
-    myPageService.delete(token);
+  public void userDelete() {
+    myPageService.delete();
   }
 
   //    @Operation(summary = "참여한 스터디룸 조회")
@@ -60,8 +57,8 @@ public class MyPageController {
 
   @Operation(summary = "스크랩 한 게시글 조회")
   @GetMapping("/scraplist")
-  public ResponseEntity<List<Post>> getScrappedPosts(@RequestHeader("Authorization") String token) {
-    List<Post> scrappedPosts = myPageService.getScrappedPostsByUserId(token);
+  public ResponseEntity<List<Post>> getScrappedPosts() {
+    List<Post> scrappedPosts = myPageService.getScrappedPostsByUserId();
     return new ResponseEntity<>(scrappedPosts, HttpStatus.OK);
   }
 }
