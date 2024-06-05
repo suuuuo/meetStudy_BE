@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.user.domain;
 
+import com.elice.meetstudy.domain.chatroom.domain.Message;
 import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
 import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
 import jakarta.persistence.*;
@@ -49,6 +50,10 @@ public class User {
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   private List<UserStudyRoom> userStudyRooms = new ArrayList<>();
+
+  @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+  private List<Message> messages = new ArrayList<>();
+
 
   public void updateDeletedAt() {
     this.deletedAt = LocalDateTime.now();
