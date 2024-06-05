@@ -6,6 +6,7 @@ import com.elice.meetstudy.domain.comment.dto.CommentResponseDTO;
 import com.elice.meetstudy.domain.comment.dto.CommentWriteDTO;
 import com.elice.meetstudy.domain.comment.repository.CommentRepository;
 import com.elice.meetstudy.domain.post.domain.Post;
+import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.util.EntityFinder;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,60 +31,58 @@ public class CommentService {
 
   /** 댓글 작성 */
   public CommentResponseDTO write(Long postId, CommentWriteDTO commentCreate) {
-    Long userId = 1L;
-
-    //    User user = entityFinder.getUser();
-    Post post = entityFinder.findPostByIdAndUserId(postId, userId);
+    Post post = entityFinder.findPost(postId);
 
     Comment newComment =
-        Comment.builder().post(post).userId(userId).content(commentCreate.getContent()).build();
+        Comment.builder()
+            .post(post)
+            .user(entityFinder.getUser())
+            .content(commentCreate.getContent())
+            .build();
 
-    // 댓글 DB에 저장
     return new CommentResponseDTO(commentRepository.save(newComment));
   }
 
   /** 댓글 수정 */
   public CommentResponseDTO edit(Long commentId, CommentWriteDTO editRequest) {
     Comment comment = entityFinder.findComment(commentId);
-    // Long userId = entityFinder.getUserId();
 
-    Long userId = 1L;
-    if (!userId.equals(comment.getUser().getId())) {
-      throw new SecurityException("해당 댓글을 수정할 권한이 없습니다.");
+    if (entityFinder.getUser().getId() != comment.getUser().getId()) {
+      throw new EntityNotFoundException("해당 댓글을 수정할 권한이 없습니다.");
+    } else {
+      CommentEditDTO editComment =
+          comment
+              .toEdit()
+              .content(
+                  editRequest.getContent() != null
+                      ? editRequest.getContent()
+                      : comment.getContent())
+              .build();
+
+      // Comment 엔티티 수정
+      comment.edit(editComment);
+      return new CommentResponseDTO(commentRepository.save(comment));
     }
-
-    // editRequest, comment로 분기처리하고 객체 생성
-    CommentEditDTO editComment =
-        comment
-            .toEdit()
-            .content(
-                editRequest.getContent() != null ? editRequest.getContent() : comment.getContent())
-            .build();
-
-    // Comment 엔티티 수정
-    comment.edit(editComment);
-
-    // 저장
-    return new CommentResponseDTO(commentRepository.save(comment));
   }
 
-  /** 댓글 삭제 - (이미 삭제된 게시글이어도 204) */
+  /** 댓글 삭제 - (이미 삭제된 댓글이어도 204) */
   public void delete(Long commentId) {
-    // Long userId = entityFinder.getUserId();
-    Long userId = 1L;
-    commentRepository.deleteByIdAndUserId(commentId, userId);
+    if (entityFinder.getUser().getId() != entityFinder.findComment(commentId).getId()) {
+      throw new EntityNotFoundException("해당 댓글을 삭제할 권한이 없습니다");
+    }
+    commentRepository.deleteByIdAndUserId(commentId, entityFinder.getUser().getId());
   }
 
-  /** 게시글에 달린 댓글 조회 정렬 기준은 ?.? */
+  /** 게시글에 달린 댓글 조회 */
   public List<CommentResponseDTO> getByPost(Long postId, int page, int size) {
     Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
-    // 주어진 postId에 해당하는 페이지에 있는 댓글 가져오기
+
     Page<Comment> commentsPage = commentRepository.findAllByPostId(postId, defaultPageable);
 
     // 댓글 페이지를 CommentResponseDTO의 리스트로 변환
     List<CommentResponseDTO> commentResponse =
         commentsPage.getContent().stream()
-            .map(CommentResponseDTO::new) // CommentResponseDTO에 Comment 객체를 받는 생성자가 있다고 가정합니다.
+            .map(CommentResponseDTO::new)
             .collect(Collectors.toList());
 
     return commentResponse;
@@ -93,14 +92,11 @@ public class CommentService {
   public List<CommentResponseDTO> getByPostAndKeyword(
       Long postId, String keyword, int page, int size) {
     Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
-    // 게시글 조회
-    entityFinder.findPostById(postId);
+    entityFinder.findPost(postId);
 
-    // 댓글 조회
     List<Comment> commentList =
         commentRepository.findAllByPostIdAndKeyword(postId, keyword, defaultPageable);
 
-    // 댓글을 응답객체로 변환
     return commentList.stream().map(CommentResponseDTO::new).collect(Collectors.toList());
   }
 
