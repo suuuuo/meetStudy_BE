@@ -5,19 +5,15 @@ import com.elice.meetstudy.domain.category.repository.CategoryRepository;
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.scrap.domain.Scrap;
 import com.elice.meetstudy.domain.scrap.repository.ScrapRepository;
-import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.Interest;
 import com.elice.meetstudy.domain.user.domain.User;
-import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
-import com.elice.meetstudy.domain.user.jwt.token.TokenProvider;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
+import com.elice.meetstudy.util.EntityFinder;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,23 +27,25 @@ public class MyPageService {
     private final CategoryRepository categoryRepository;
     private final ScrapRepository scrapRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EntityFinder entityFinder;
 
 
-    @Transactional
-    public long getUserId(){
-        //접근한 유저 정보 가져오는 로직
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-        return Long.parseLong(userPrinciple.getUserId());
-    }
+//    @Transactional
+//    public long getUserId(){
+//        //접근한 유저 정보 가져오는 로직
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
+//        return Long.parseLong(userPrinciple.getUserId());
+//    }
 
     // 회원 정보 조회
     @Transactional
     public User getUserByUserId(){
 
 //        Long userId = getUserId();
-        Long userId = 18L;
+//        Long userId = 18L;
 
+        Long userId = entityFinder.getUser().getId();
         return userRepository.findUserByUserId(userId);
     }
 
@@ -55,7 +53,9 @@ public class MyPageService {
     // 회원 정보 수정
     public User updateUser(UserUpdateDto userUpdateDto) {
 //        Long userId = getUserId();
-        Long userId = 18L;
+//        Long userId = 18L;
+
+        Long userId = entityFinder.getUser().getId();
 
         User updateUser = userRepository.findUserByUserId(userId);
 
@@ -94,7 +94,9 @@ public class MyPageService {
     public void delete() {
 
 //        Long userId = getUserId();
-        Long userId = 12L;
+//        Long userId = 12L;
+
+        Long userId = entityFinder.getUser().getId();
 
         User deleteUser = userRepository.findUserByUserId(userId);
 
@@ -112,7 +114,8 @@ public class MyPageService {
     // 스크랩 한 게시글 조회
     @Transactional
     public List<Post> getScrappedPostsByUserId() {
-        Long userId = getUserId();
+        Long userId = entityFinder.getUser().getId();
+//        Long userId = getUserId();
         List<Scrap> scraps = scrapRepository.findScrapsByUserId(userId);
         return scraps.stream()
             .map(Scrap::getPost)

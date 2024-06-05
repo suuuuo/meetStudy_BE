@@ -11,13 +11,11 @@ import com.elice.meetstudy.domain.qna.repository.QuestionRepository;
 import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.domain.user.domain.Role;
 import com.elice.meetstudy.domain.user.domain.User;
-import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
+import com.elice.meetstudy.util.EntityFinder;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
@@ -30,6 +28,7 @@ public class AnswerService {
   private final AnswerMapper answerMapper;
   private final QuestionRepository questionRepository;
   private final UserRepository userRepository;
+  private final EntityFinder entityFinder;
 
 
   /** 답변 조회 */
@@ -51,7 +50,9 @@ public class AnswerService {
   @Transactional
   public ResponseAnswerDto addAnswer(RequestAnswerDto requestAnswerDto, long questionId)
       throws AccessDeniedException {
-    Optional<User> user = userRepository.findById(getUserId());
+    //    Optional<User> user = userRepository.findById(getUserId());
+    Optional<User> user = userRepository.findById(entityFinder.getUser().getId());
+
     if(user.get().getRole() == Role.ADMIN){
       Optional<Question> question = questionRepository.findById(questionId);
       if (question.isPresent()) {
@@ -69,7 +70,9 @@ public class AnswerService {
   @Transactional
   public ResponseAnswerDto updateAnswer(RequestAnswerDto requestAnswerDto, long answerId)
       throws AccessDeniedException {
-    Optional<User> user = userRepository.findById(getUserId());
+//    Optional<User> user = userRepository.findById(getUserId());
+    Optional<User> user = userRepository.findById(entityFinder.getUser().getId());
+
     if(user.get().getRole() == Role.ADMIN){
       Optional<Answer> answer = answerRepository.findById(answerId);
       if (answer.isPresent()) {
@@ -83,7 +86,9 @@ public class AnswerService {
   /** 답변 삭제 */
   @Transactional
   public void deleteAnswer(long answerId) throws AccessDeniedException {
-    Optional<User> user = userRepository.findById(getUserId());
+//    Optional<User> user = userRepository.findById(getUserId());
+    Optional<User> user = userRepository.findById(entityFinder.getUser().getId());
+
     if(user.get().getRole() == Role.ADMIN){
       Question question = questionRepository.findByAnswerId(answerId);
       question.setAnswerStatus(AnswerStatus.PENDING); //답변 상태 수정
@@ -93,11 +98,11 @@ public class AnswerService {
     } throw new AccessDeniedException("관리자만 접근 가능합니다.");
   }
 
-  @Transactional
-  public long getUserId() {
-    // 접근한 유저 정보 가져오는 로직
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-    return Long.parseLong(userPrinciple.getUserId());
-  }
+//  @Transactional
+//  public long getUserId() {
+//    // 접근한 유저 정보 가져오는 로직
+//    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
+//    return Long.parseLong(userPrinciple.getUserId());
+//  }
 }

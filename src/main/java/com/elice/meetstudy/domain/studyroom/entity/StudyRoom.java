@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.studyroom.entity;
 
+import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.chatroom.domain.ChatRoom;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,28 +17,27 @@ import java.util.List;
 @AllArgsConstructor
 public class StudyRoom {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  private String title;
+  private String description;
+  private Date createdDate;
+  private Long maxCapacity;
 
-    private String title;
-    private String description;
-    private Date createdDate;
-    private Long maxCapacity;
+  @ManyToOne
+  @JoinColumn(name = "category_id")
+  private Category category;
 
-//    @ManyToOne
-//    @JoinColumn(name = "category_id")
-//    private Long categoryId;
+  @OneToMany(mappedBy = "studyRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<UserStudyRoom> userStudyRooms = new ArrayList<>();
 
-    @OneToMany(mappedBy = "studyRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserStudyRoom> userStudyRooms = new ArrayList<>();
+  public void addUserStudyRoom(UserStudyRoom userStudyRoom) {
+    userStudyRooms.add(userStudyRoom);
+    userStudyRoom.setStudyRoom(this);
+  }
 
-    public void addUserStudyRoom(UserStudyRoom userStudyRoom) {
-        userStudyRooms.add(userStudyRoom);
-        userStudyRoom.setStudyRoom(this);
-    }
-
-    @OneToMany(mappedBy = "studyRoom")
-    private List<ChatRoom> chatRooms = new ArrayList<>();
+  @OneToMany(mappedBy = "studyRoom")
+  private List<ChatRoom> chatRooms = new ArrayList<>();
 }

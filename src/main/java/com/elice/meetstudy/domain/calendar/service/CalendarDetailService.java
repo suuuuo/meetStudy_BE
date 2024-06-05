@@ -14,14 +14,12 @@ import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
 import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
-import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
+import com.elice.meetstudy.util.EntityFinder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +34,7 @@ public class CalendarDetailService {
   private final CalendarDetailMapper calendarDetailMapper;
   private final UserRepository userRepository;
   private final UserStudyRoomRepository userStudyRoomRepository;
+  private final EntityFinder entityFinder;
 
   /**
    * 캘린더 공휴일 자동 등록 -> 조회 시 공휴일 표시
@@ -78,8 +77,8 @@ public class CalendarDetailService {
   public List<ResponseCalendarDetail> getAllCalendarDetail(
       String year, String month, Long studyRoomId) {
     //접근한 유저 정보 가져오는 로직
-    long userId = getUserId();
-
+    //long userId = getUserId();
+    Long userId = entityFinder.getUser().getId();;
     List<Calendar_detail> calendarDetailList =
         getCalendarDetailsFromCalendar(userId, studyRoomId, year, month);
     List<ResponseCalendarDetail> responseCalendarDetails = new ArrayList<>();
@@ -95,7 +94,9 @@ public class CalendarDetailService {
       String year, String month) {
     List<ResponseAllCalendarDetail> responseCalendarDetails = new ArrayList<>();
     //접근한 유저 정보 가져오는 로직
-    long userId = getUserId();
+    //long userId = getUserId();
+    Long userId = entityFinder.getUser().getId();;
+
     Optional<User> user = userRepository.findById(userId);
     List<UserStudyRoom> byUser = userStudyRoomRepository.findByUser(user.get());
 
@@ -131,7 +132,9 @@ public class CalendarDetailService {
   public ResponseCalendarDetail saveCalendarDetail(
       RequestCalendarDetail requestCalendarDetail, Long studyRoomId) { // request로 받으면
     //접근한 유저 정보 가져오는 로직
-    long userId = getUserId();
+//    long userId = getUserId();
+
+    Long userId = entityFinder.getUser().getId();;
     Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
     calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
@@ -170,13 +173,13 @@ public class CalendarDetailService {
     calendarDetailRepository.deleteById(id);
       }
 
-  @Transactional
-  public long getUserId(){
-    //접근한 유저 정보 가져오는 로직
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-    return Long.parseLong(userPrinciple.getUserId());
-  }
+//  @Transactional
+//  public long getUserId(){
+//    //접근한 유저 정보 가져오는 로직
+//    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
+//    return Long.parseLong(userPrinciple.getUserId());
+//  }
 
   //캘린더 찾아서 해당 캘린더 한 달 리스트를 반환
   public List<Calendar_detail> getCalendarDetailsFromCalendar(long userId, long studyRoomId,
