@@ -6,7 +6,6 @@ import com.elice.meetstudy.domain.user.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -24,27 +23,10 @@ public class SecurityConfig {
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
   private final JwtFilter jwtFilter;
-  private final String[] adminUrl = {"/api/admin/**"};
-  private final String[] userUrl = {
-    "/api/mypage/**",
-    "/api/comment/**",
-    "/api/post/**",
-    "/api/question/**",
-    "/api/chatroom/**",
-    "/api/studyroom/**",
-    "/api/calendar/**",
-    "/api/calendarDetail/**",
-    "/api/calendarAll"
-  };
+  private final String[] adminUrl = {"api/admin/**"};
+  private final String[] userUrl = {"api/**"};
   private final String[] publicUrl = {
-    "/",
-    "/api/user/**",
-    "/api/comment/public/**",
-    "/api/post/public/**",
-    "/api/categories/**",
-    "/api/answer/public/**",
-    "/api/question/public/**",
-    "/api/admin/categories/public/**"
+    "/", "api/user/**", "api/comment/public/**", "/api/post/public/**"
   };
   private final String[] swaggerUrl = {
     "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/api-docs/**"
@@ -53,8 +35,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
-        //        .cors(AbstractHttpConfigurer::disable)
-        .cors(Customizer.withDefaults())
+        .cors(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement(
@@ -77,13 +58,6 @@ public class SecurityConfig {
                     .hasAuthority("USER")
                     .anyRequest()
                     .authenticated())
-        .logout(
-            logout ->
-                logout
-                    .logoutUrl("/api/user/logout") // 로그아웃 요청 URL
-                    .logoutSuccessUrl("/login") // 로그아웃 성공 시 리디렉션 URL
-                    .invalidateHttpSession(true) // 세션 무효화
-                    .deleteCookies("JSESSIONID")) // 쿠키 삭제
         .build();
   }
 
