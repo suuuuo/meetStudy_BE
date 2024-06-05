@@ -21,7 +21,7 @@ import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/user/mypage")
+@RequestMapping("api/mypage")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "마이페이지", description = "마이페이지 관련 API 입니다.")
