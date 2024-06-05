@@ -1,9 +1,14 @@
 package com.elice.meetstudy.domain.category.entity;
 
+import com.elice.meetstudy.domain.post.domain.Post;
+import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  category Entity
@@ -26,8 +31,11 @@ public class Category {
   @Column(nullable = false)
   private String description;
 
-  //  @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
-//  private List<Post> posts = new ArrayList<>();
+  @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
+  private List<Post> posts = new ArrayList<>();
+
+  @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
+  private List<StudyRoom> studyRooms = new ArrayList<>();
 
   public Category(String name, String description) {
     this.name = name;
