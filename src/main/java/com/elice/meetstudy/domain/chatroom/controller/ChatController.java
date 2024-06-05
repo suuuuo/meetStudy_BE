@@ -43,20 +43,4 @@ public class ChatController {
     return outputMessageModel;
   }
 
-  //채팅방 생성
-//  @PostMapping("/api/v1/{id}/chatroom/")
-//  public ResponseEntity<ChatRoomDto> chatRoomDtoResponseEntity(@PathVariable Long id){
-//    studyRoomService.studyRoomService.getStudyRoomById(id).get();
-//  }
-
-  //채팅방 삭제
-
-  //채팅방 메세지 조회
-//  @GetMapping("/api/v1/chatroom/{id}")
-//  public ResponseEntity<Page<MessageDto>> chatMessage(@PathVariable Long id){
-//    Page<MessageDto> messages = chatRoomService.messages(id);
-//    return ResponseEntity.ok(messages);
-//  }
-
-
 }

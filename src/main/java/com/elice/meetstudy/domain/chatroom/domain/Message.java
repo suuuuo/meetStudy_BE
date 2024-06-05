@@ -12,6 +12,8 @@ import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Getter
@@ -19,6 +21,7 @@ import lombok.Getter;
 public class Message {
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "message_id")
   private Long id;
 
   @ManyToOne
@@ -34,6 +37,7 @@ public class Message {
 
   @Column(name = "create_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private LocalDateTime createAt;
+
 
 
 }

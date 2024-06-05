@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.chatroom.domain;
 
+import com.elice.meetstudy.domain.chatroom.dto.ChatRoomDto;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,14 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Getter
+@RequiredArgsConstructor
 public class ChatRoom {
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "chat_room_id")
   private Long id;
+
+  @Column(name="title")
+  private String title;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "study_room_id")
@@ -35,11 +41,15 @@ public class ChatRoom {
 
 
   @Builder
-  public ChatRoom(StudyRoom studyRoom) {
+  public ChatRoom(StudyRoom studyRoom,String title,String notice) {
+    this.title = title;
+    this.notice = notice;
     this.studyRoom = studyRoom;
   }
 
   public void updateNotice(String notice){
     this.notice =notice;
   }
+
+
 }
