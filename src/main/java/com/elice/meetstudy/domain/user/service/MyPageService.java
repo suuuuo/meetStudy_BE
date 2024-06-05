@@ -8,6 +8,7 @@ import com.elice.meetstudy.domain.scrap.repository.ScrapRepository;
 import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.Interest;
 import com.elice.meetstudy.domain.user.domain.User;
+import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
 import com.elice.meetstudy.domain.user.jwt.token.TokenProvider;
 import com.elice.meetstudy.domain.user.jwt.token.TokenType;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,36 +39,30 @@ public class MyPageService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    // 사용자 ID 추출 메서드
-    @Transactional
-    public Long getUserIdFromToken(String token) {
-        if (token != null) {
-            TokenValidationResult tokenValidationResult = tokenProvider.validateToken(token);
-            Claims claims = tokenValidationResult.getClaims();
 
-            if (tokenValidationResult.getTokenType() == TokenType.ACCESS) { // 타입이 access일 때
-                if (claims != null) { // 토큰 만료되지 않음
-                    return Long.parseLong(claims.getSubject());
-                }
-            }
-        }
-        throw new UsernameNotFoundException("Unable to extract user ID from token");
+    @Transactional
+    public long getUserId(){
+        //접근한 유저 정보 가져오는 로직
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
+        return Long.parseLong(userPrinciple.getUserId());
     }
 
     // 회원 정보 조회
     @Transactional
-    public User getUserByUserId(String token){
+    public User getUserByUserId(){
 
-        Long userId = getUserIdFromToken(token);
+//        Long userId = getUserId();
+        Long userId = 18L;
 
         return userRepository.findUserByUserId(userId);
     }
 
-
     @Transactional
     // 회원 정보 수정
-    public User updateUser(String token, UserUpdateDto userUpdateDto) {
-        Long userId = getUserIdFromToken(token);
+    public User updateUser(UserUpdateDto userUpdateDto) {
+//        Long userId = getUserId();
+        Long userId = 18L;
 
         User updateUser = userRepository.findUserByUserId(userId);
 
@@ -104,9 +101,10 @@ public class MyPageService {
 
     // 회원 삭제 (탈퇴)
     @Transactional
-    public void delete(String token) {
+    public void delete() {
 
-        Long userId = getUserIdFromToken(token);
+//        Long userId = getUserId();
+        Long userId = 12L;
 
         User deleteUser = userRepository.findUserByUserId(userId);
 
@@ -123,8 +121,8 @@ public class MyPageService {
 
     // 스크랩 한 게시글 조회
     @Transactional
-    public List<Post> getScrappedPostsByUserId(String token) {
-        Long userId = getUserIdFromToken(token);
+    public List<Post> getScrappedPostsByUserId() {
+        Long userId = getUserId();
         List<Scrap> scraps = scrapRepository.findScrapsByUserId(userId);
         return scraps.stream()
             .map(Scrap::getPost)
