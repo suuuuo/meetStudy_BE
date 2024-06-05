@@ -2,6 +2,7 @@ package com.elice.meetstudy.domain.chatroom.domain;
 
 import com.elice.meetstudy.domain.chatroom.dto.ChatRoomDto;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,7 +34,7 @@ public class ChatRoom {
   @JoinColumn(name = "study_room_id")
   private StudyRoom studyRoom;
 
-  @OneToMany(mappedBy = "chatRoom")
+  @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Message> messages = new ArrayList<>();
 
   @Column(name="notice")

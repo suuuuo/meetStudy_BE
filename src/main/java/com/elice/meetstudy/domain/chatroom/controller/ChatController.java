@@ -3,6 +3,7 @@ package com.elice.meetstudy.domain.chatroom.controller;
 import com.elice.meetstudy.domain.chatroom.dto.MessageModel;
 import com.elice.meetstudy.domain.chatroom.dto.OutputMessageModel;
 import com.elice.meetstudy.domain.chatroom.service.ChatRoomService;
+import com.elice.meetstudy.domain.chatroom.service.MessageService;
 import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,7 +23,8 @@ public class ChatController {
   private ChatRoomService chatRoomService;
   @Autowired
   private StudyRoomService studyRoomService;
-
+  @Autowired
+  private MessageService messageService;
 
   /**
     * let chatMessage = {
@@ -34,13 +36,11 @@ public class ChatController {
    **/
   @MessageMapping("/message/send/{chatRoomId}") //app/message/send/{chatRoomId}
   @SendTo("/{chatRoomId}")
-  public OutputMessageModel sendMessage(@Payload MessageModel messageModel, @DestinationVariable Long chatRoomId){
-    final String time = new SimpleDateFormat("HH:mm").format(new Date());
-    OutputMessageModel outputMessageModel = new OutputMessageModel(chatRoomId,
-        messageModel.getNickName(), messageModel.getContent(),
-        time);
+  public OutputMessageModel sendMessage(@Payload MessageModel messageModel, @DestinationVariable Long chatRoomId) {
 
-    return outputMessageModel;
+    return messageService.sendMessage(messageModel, chatRoomId);
+
   }
+
 
 }

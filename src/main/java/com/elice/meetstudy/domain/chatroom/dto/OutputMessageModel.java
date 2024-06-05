@@ -11,6 +11,7 @@ public class OutputMessageModel {
   private String content;
   private String createdAt;
 
+  @Builder
   public OutputMessageModel(Long chatRoomId, String nickName, String content, String createdAt) {
     this.chatRoomId = chatRoomId;
     this.nickName = nickName;

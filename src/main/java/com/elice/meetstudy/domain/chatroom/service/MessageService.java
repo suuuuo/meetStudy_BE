@@ -5,8 +5,10 @@ import com.elice.meetstudy.domain.chatroom.dto.MessageModel;
 import com.elice.meetstudy.domain.chatroom.dto.OutputMessageModel;
 import com.elice.meetstudy.domain.chatroom.repository.ChatRoomRepository;
 import com.elice.meetstudy.domain.chatroom.repository.MessageRepository;
+import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
+import com.elice.meetstudy.util.EntityFinder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -34,34 +36,37 @@ public class MessageService {
   private final MessageRepository messageRepository;
 
   @Autowired
-  private final UserRepository userRepository;
+  private final EntityFinder entityFinder;
 
 
   //메세지를 데이터베이스에 저장 후 보내기
   public OutputMessageModel sendMessage(MessageModel messageModel, Long chatRoomId){
 
-//    User byNickname = userRepository.findUserByNickname(messageModel.getNickName());
+    User user = entityFinder.getUser();
+
     Message message = Message.builder()
-          .chatRoom(chatRoomRepository.findById(chatRoomId).get())
+          .chatRoom(chatRoomRepository.findById(chatRoomId).orElseThrow(()->new EntityNotFoundException("채팅방이 존재하지 않습니다.")))
           .createAt(LocalDateTime.now())
-//          .sender(byNickname)
+          .sender(user)
           .content(messageModel.getContent())
           .build();
       messageRepository.save(message);
-      return new OutputMessageModel(chatRoomId,
-          messageModel.getNickName(), messageModel.getContent(),
-          message.getCreateAt().toString());
-}
-    //메세지 저장
-    //메세지 전송
 
-//  //채팅방의 메세지 조회
-//  public Page<MessageModel> messages (Long chatRoomId) {
-//    Pageable pageable = PageRequest.of(0,50, Sort.by("createdAt").descending());
-//
-//    Page<Message> messages = messageRepository.findChatRoomWithMessagesAndUsers(
-//        chatRoomId, pageable);
-//    return messages.map(message -> new MessageModel(message));
-//  }
+      return OutputMessageModel.builder()
+          .chatRoomId(chatRoomId)
+          .createdAt(message.getCreateAt().toString())
+          .nickName(user.getNickname())
+          .content(message.getContent())
+          .build();
+}
+
+  //채팅방의 메세지 조회
+  public Page<MessageModel> messages (Long chatRoomId) {
+    Pageable pageable = PageRequest.of(0,50, Sort.by("createdAt").descending());
+
+    Page<Message> messages = messageRepository.findMessagesWithChatRoomAndUsers(
+        chatRoomId, pageable);
+    return messages.map(message -> new MessageModel(message));
+  }
 
 }
