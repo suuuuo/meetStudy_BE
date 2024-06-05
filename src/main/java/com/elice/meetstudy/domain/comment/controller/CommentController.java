@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/comment")
 @RequiredArgsConstructor
-@Tag(name = "G. 댓글", description = "댓글 관련 API 입니다.")
+@Tag(name = "A. 댓글", description = "댓글 관련 API 입니다.")
 public class CommentController {
 
   private final CommentService commentService;
@@ -49,7 +49,7 @@ public class CommentController {
   }
 
   @Operation(summary = "게시글에 달린 댓글 조회")
-  @GetMapping("/public/{postId}")
+  @GetMapping("/{postId}")
   public ResponseEntity<List<CommentResponseDTO>> getCommentByPost(
       @PathVariable Long postId,
       @RequestParam(defaultValue = "0") int page,
@@ -58,7 +58,7 @@ public class CommentController {
   }
 
   @Operation(summary = "게시글에 달린 댓글을 키워드로 조회")
-  @GetMapping("/public/{postId}/search")
+  @GetMapping("/{postId}/search")
   public ResponseEntity<List<CommentResponseDTO>> getCommentByKeyword(
       @PathVariable Long postId,
       @RequestParam String keyword,

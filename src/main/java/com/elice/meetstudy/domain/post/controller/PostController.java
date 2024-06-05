@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/post")
 @RequiredArgsConstructor
-@Tag(name = "게시글", description = "게시글 관련 API 입니다.")
+@Tag(name = "A. 게시글", description = "게시글 관련 API 입니다.")
 @Slf4j
 public class PostController {
 
@@ -39,7 +39,7 @@ public class PostController {
   @PostMapping("/category/direct/{categoryId}")
   public ResponseEntity<PostResponseDTO> createPostByCategory(
       @RequestBody @Valid PostWriteDTO postCreate, @PathVariable Long categoryId) {
-    return ResponseEntity.ok().body(postService.writeByCategory(postCreate, categoryId));
+    return ResponseEntity.ok().body(postService.writeByCategory(categoryId, postCreate));
   }
 
   @Operation(summary = "게시글 수정")
@@ -66,12 +66,10 @@ public class PostController {
   }
 
   @Operation(summary = "내가 작성한 글 조회 - (최근 작성된 순으로)")
-  @GetMapping("/user/{userId}")
+  @GetMapping("/user")
   public ResponseEntity<List<PostResponseDTO>> getPostByUser(
-      @PathVariable Long userId,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "15") int size) {
-    return ResponseEntity.ok(postService.getPostByUser(userId, page, size));
+      @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    return ResponseEntity.ok(postService.getPostByUser(page, size));
   }
 
   @Operation(summary = "전체 게시글 조회 - (최근 작성된 순으로)")
