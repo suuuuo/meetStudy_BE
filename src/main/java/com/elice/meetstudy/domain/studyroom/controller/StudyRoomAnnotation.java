@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 import static java.lang.annotation.ElementType.METHOD;
 
@@ -45,11 +42,25 @@ public @interface StudyRoomAnnotation {
     @Target(METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @Inherited
-    @ApiResponse(content = @Content(mediaType = "text/html"))
+    @Repeatable(Failures.class)
+    @ApiResponse(content = @Content(mediaType = "application/json",
+                    examples = @ExampleObject(value = """
+                    {
+                        "error" : 404,
+                        "description" : "해당 id의 StudyRoom을 찾을 수 없습니다."
+                    }
+                    """)))
     @interface Failure {
         String responseCode() default "404";
         String description() default "해당 스터디 룸을 찾을 수 없음";
 
+    }
+
+    @Target(METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Inherited
+    @interface Failures {
+        Failure[] value();
     }
 }
 

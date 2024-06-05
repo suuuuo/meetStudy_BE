@@ -4,6 +4,7 @@ import com.elice.meetstudy.domain.studyroom.DTO.UserStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.service.UserStudyRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,5 +36,18 @@ public class UserStudyRoomController {
             @PathVariable String email) {
         UserStudyRoomDTO createdStudyRoom = userStudyRoomService.joinStudyRoom(id, email);
         return ResponseEntity.ok(createdStudyRoom);
+    }
+
+
+    @DeleteMapping("/quit/{id}")
+    @Operation(summary = "스터디룸 탈퇴", description = "해당 API를 사용하는 유저가 스터디룸에서 탈퇴합니다.")
+    @ApiResponse(responseCode = "204", description = "성공적으로 탈퇴함")
+    @StudyRoomAnnotation.Failure
+    @StudyRoomAnnotation.Failure(description = "유저가 이미 해당 스터디룸에 존재하지 않음")
+    public ResponseEntity<Void> quitStudyRoom(
+            @Parameter(description = "탈퇴할 스터디룸의 ID", required = true)
+            @PathVariable Long id) {
+        userStudyRoomService.quitStudyRoom(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -8,10 +8,13 @@ import com.elice.meetstudy.domain.studyroom.mapper.StudyRoomMapper;
 import com.elice.meetstudy.domain.studyroom.repository.StudyRoomRepository;
 import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
+import com.elice.meetstudy.domain.user.dto.UserJoinDto;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -96,10 +99,28 @@ public class UserStudyRoomService {
         return studyRoomMapper.toUserStudyRoomDTO(savedUserStudyRoom);
     }
 
+    public void quitStudyRoom(Long id) {
+        StudyRoom studyRoom = studyRoomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID: " + id + "]"));
+
+        String userPrincipal = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        final String userEmail = userPrincipal.equals("anonymousUser") ? "test@by.postman.com" : userPrincipal;
+
+        UserStudyRoom userStudyRoom = studyRoom.getUserStudyRooms().stream()
+                .filter((usr) -> Objects.equals(usr.getUser().getEmail(), userEmail))
+                .findAny()
+                .orElseThrow(() -> new EntityNotFoundException("유저가 이미 해당 스터디룸에 존재하지 않습니다. [RoomID: " + id + ", Email: " + userEmail + "]"));
+
+        userStudyRoomRepository.deleteById(userStudyRoom.getId());
+    }
+
     public UserStudyRoomDTO createUserStudyRoom(UserStudyRoomDTO userStudyRoomDTO) {
         UserStudyRoom userStudyRoom = studyRoomMapper.toUserStudyRoom(userStudyRoomDTO);
         userStudyRoom.setJoinDate(new Date());
         UserStudyRoom savedUserStudyRoom = userStudyRoomRepository.save(userStudyRoom);
         return studyRoomMapper.toUserStudyRoomDTO(savedUserStudyRoom);
     }
+
+
 }

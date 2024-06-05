@@ -57,7 +57,7 @@ public class StudyRoomController {
         return studyRoomService.getStudyRoomByEmail(email);
     }
 
-    @Operation(summary = "스터디룸 생성", description = "새로운 스터디룸을 생성합니다.")
+    @Operation(summary = "스터디룸 생성", description = "새로운 스터디룸을 생성합니다. 해당 API를 사용하는 유저는 그 방의 OWNER 권한을 가집니다.")
     @StudyRoomAnnotation.Success(description = "성공적으로 생성됨")
     @PostMapping("/add")
     public ResponseEntity<StudyRoomDTO> createStudyRoom(
