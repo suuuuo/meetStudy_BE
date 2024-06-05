@@ -42,20 +42,17 @@ public class TokenProvider {
     public TokenInfo createToken(User user) {
         long currentTime = (new Date()).getTime();
         Date accessTokenExpireTime = new Date(currentTime + accessToKenValidationInMilliseconds);
-        String tokenId = UUID.randomUUID().toString();
 
         String accessToken = Jwts.builder()
                 .setSubject(String.valueOf(user.getId())) // 사용자의 id를 subject로 설정
                 .claim(AUTHORITIES_KEY, user.getRole())
                 .claim(USERNAME_KEY, user.getUsername())
-                .claim(TOKEN_ID_KEY, tokenId)
                 .signWith(hashKey, SignatureAlgorithm.HS512)
                 .setExpiration(accessTokenExpireTime)
                 .compact();
 
         return TokenInfo.builder()
                 .ownerLoginId(user.getEmail())
-                .tokenId(tokenId)
                 .accessToken(accessToken)
                 .accessTokenExpireTime(accessTokenExpireTime)
                 .build();
@@ -66,20 +63,20 @@ public class TokenProvider {
     public TokenValidationResult validateToken(String token) {
         try{
             Claims claims = Jwts.parserBuilder().setSigningKey(hashKey).build().parseClaimsJws(token).getBody();
-            return new TokenValidationResult(TokenStatus.TOKEN_VALID, TokenType.ACCESS, claims.get(TOKEN_ID_KEY, String.class), claims);
+            return new TokenValidationResult(TokenStatus.TOKEN_VALID, TokenType.ACCESS, claims);
         }catch (ExpiredJwtException e){
             log.info("만료된 JWT 토큰");
             Claims claims = e.getClaims();
-            return new TokenValidationResult(TokenStatus.TOKEN_VALID, TokenType.ACCESS, claims.get(TOKEN_ID_KEY, String.class), null);
+            return new TokenValidationResult(TokenStatus.TOKEN_VALID, TokenType.ACCESS, null);
         }catch (SecurityException | MalformedJwtException e){
             log.info("잘못된 JWT 서명");
-            return new TokenValidationResult(TokenStatus.TOKEN_WRONG_SIGNATURE, null, null, null);
+            return new TokenValidationResult(TokenStatus.TOKEN_WRONG_SIGNATURE, null, null);
         }catch (UnsupportedJwtException e){
             log.info("지원되지 않는 JWT 서명");
-            return new TokenValidationResult(TokenStatus.TOKEN_HASH_NOT_SUPPORTED, null, null, null);
+            return new TokenValidationResult(TokenStatus.TOKEN_HASH_NOT_SUPPORTED, null, null);
         }catch (IllegalArgumentException e){
             log.info("잘못된 JWT 토큰");
-            return new TokenValidationResult(TokenStatus.TOKEN_WRONG_SIGNATURE, null, null, null);
+            return new TokenValidationResult(TokenStatus.TOKEN_WRONG_SIGNATURE, null, null);
         }
     }
 
@@ -95,7 +92,7 @@ public class TokenProvider {
 
     private TokenValidationResult getExpiredTokenValidationResult(ExpiredJwtException e) {
         Claims claims = e.getClaims();
-        return new TokenValidationResult(TokenStatus.TOKEN_EXPIRED, TokenType.ACCESS, claims.get(TOKEN_ID_KEY, String.class), null);
+        return new TokenValidationResult(TokenStatus.TOKEN_EXPIRED, TokenType.ACCESS, null);
     }
 
 
