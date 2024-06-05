@@ -79,7 +79,7 @@ public class EntityFinder {
     // 접근한 유저 정보 가져오는 로직
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-    String userEmail = userPrinciple.getEmail();
+    String userEmail = userPrinciple.getUserId();
     return userRepository.findUserIdByEmail(userEmail);
   }
 
