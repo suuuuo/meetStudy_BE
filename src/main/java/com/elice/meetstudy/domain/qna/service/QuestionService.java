@@ -72,8 +72,6 @@ public class QuestionService {
         }
         return responseQuestionDtoList;
     }
-
-    /** 질문 개별 조회 : 관리자는 다 볼 수 있게 추가 */
     @Transactional
     public ResponseQuestionDto getQuestion(long questionId, String password)
             throws AccessDeniedException {
@@ -112,7 +110,7 @@ public class QuestionService {
                     re.title(), re.content(), re.questionCategory(), re.isSecret(), re.password());
             return questionMapper.toResponseQuestionDto(question1);
         }
-        throw new AccessDeniedException(null);
+        throw new AccessDeniedException("작성한 사람만 수정할 수 있습니다.");
     }
 
     /** 질문 삭제 : 조회 이후 */
@@ -120,9 +118,7 @@ public class QuestionService {
     public void deleteQuestion(long questionId) {
         Optional<Question> question = questionRepository.findById(questionId);
         long userId = getUserId();
-
-        Question question1 = question.get();
-        if(question1.getUser().getId() == userId)
+        if(question.get().getUser().getId() == userId)
             questionRepository.deleteById(questionId);
     }
 

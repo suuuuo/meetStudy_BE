@@ -12,4 +12,11 @@ public class MessageModel {
   private Long chatRoomId;
   private String nickName;
   private String content;
+
+  @Builder
+  public MessageModel(Message message){
+    this.chatRoomId = message.getChatRoom().getId();
+    this.content = message.getContent();
+    this.nickName = message.getSender().getNickname();
+  }
 }

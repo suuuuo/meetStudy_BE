@@ -11,14 +11,12 @@ import com.elice.meetstudy.domain.calendar.mapper.CalendarDetailMapper;
 import com.elice.meetstudy.domain.calendar.repository.CalendarDetailRepository;
 import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
 import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
-import com.elice.meetstudy.domain.studyroom.repository.StudyRoomRepository;
+import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +45,8 @@ public class CalendarDetailService {
    * @param calendarId
    */
   @Transactional
-  public void saveHolidays(String year, String month, long calendarId) {
+  public void saveHolidays(String year, String month, long calendarId)
+      throws EntityNotFoundException {
     List<Holiday> holidayList = holidayService.Holiday(year, month);
     Optional<Calendar> calendar = calendarRepository.findById(calendarId);
 
@@ -64,7 +63,7 @@ public class CalendarDetailService {
           calendarDetailRepository.save(c);
         }
       }
-    } else throw new EntityNotFoundException();
+    } else throw new EntityNotFoundException("캘린더가 존재하지 않습니다.");
   }
 
   /**
@@ -118,7 +117,7 @@ public class CalendarDetailService {
     Optional<Calendar_detail> calendarDetail = calendarDetailRepository.findById(id);
     if (calendarDetail.isPresent()) {
       return calendarDetailMapper.toResponseCalendarDetail(calendarDetail.get());
-    } else throw new EntityNotFoundException();
+    } else throw new EntityNotFoundException("일정이 존재하지 않습니다.");
   }
 
   /**
@@ -157,7 +156,7 @@ public class CalendarDetailService {
       calendarDetail.update( re.title(), re.content(), re.startDay(), re.endDay(),
           re.startTime(), re.endTime());
       return calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
-    } else throw new EntityNotFoundException();
+    } else throw new EntityNotFoundException("일정이 존재하지 않습니다.");
   }
 
   /**
@@ -186,7 +185,7 @@ public class CalendarDetailService {
     try {
       saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
     }catch (EntityNotFoundException e){
-      throw new EntityNotFoundException();
+      throw new EntityNotFoundException("캘린더가 존재하지 않습니다.");
     }
     String Month = String.format("%02d", Integer.parseInt(month));
     String date = year + Month;
