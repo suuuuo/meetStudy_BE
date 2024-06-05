@@ -40,19 +40,15 @@ public class Calendar_detail {
 
     private String content;
 
-    @NotNull
     @JoinColumn(name = "start_day")
     private String startDay;
 
-    @NotNull
     @JoinColumn(name = "end_day")
     private String endDay;
 
-    @NotNull
     @JoinColumn(name = "start_time")
     private String startTime;
 
-    @NotNull
     @JoinColumn(name = "end_time")
     private String endTime;
 
