@@ -1,9 +1,6 @@
 package com.elice.meetstudy.domain.studyroom.controller;
 
-import com.elice.meetstudy.domain.studyroom.DTO.EmailBodyDTO;
-import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.UserStudyRoomDTO;
-import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
 import com.elice.meetstudy.domain.studyroom.service.UserStudyRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/userstudyrooms")
@@ -36,8 +32,8 @@ public class UserStudyRoomController {
             @Parameter(description = "참가할 스터디룸의 ID", required = true)
             @PathVariable Long id,
             @Parameter(description = "참가할 유저의 EMAIL", required = true)
-            @RequestBody EmailBodyDTO emailBodyDTO) {
-        UserStudyRoomDTO createdStudyRoom = userStudyRoomService.joinStudyRoom(id, emailBodyDTO.getEmail());
+            @PathVariable String email) {
+        UserStudyRoomDTO createdStudyRoom = userStudyRoomService.joinStudyRoom(id, email);
         return ResponseEntity.ok(createdStudyRoom);
     }
 }

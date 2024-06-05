@@ -1,15 +1,10 @@
 package com.elice.meetstudy.domain.studyroom.controller;
 
-import com.elice.meetstudy.domain.studyroom.DTO.EmailBodyDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
 import com.elice.meetstudy.domain.studyroom.service.UserStudyRoomService;
-import com.elice.meetstudy.domain.user.dto.UserLoginDto;
-import com.fasterxml.jackson.databind.node.TextNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/studyrooms")
@@ -56,12 +49,12 @@ public class StudyRoomController {
     @Operation(summary = "참가 스터디룸 조회", description = "유저의 이메일을 사용하여, 해당 유저가 참가중인 스터디룸들을 조회합니다.")
     @StudyRoomAnnotation.Success(description = "성공적으로 조회됨")
     @StudyRoomAnnotation.Failure
-    @GetMapping("/user")
+    @GetMapping("/user/{email}")
     public List<StudyRoomDTO> getStudyRoomByUserEmail(
             @Parameter(description = "참여한 스터디룸을 조회할 유저의 이메일", required = true)
-            @RequestBody EmailBodyDTO emailBodyDTO
+            @PathVariable String email
     ) {
-        return studyRoomService.getStudyRoomByEmail(emailBodyDTO.getEmail());
+        return studyRoomService.getStudyRoomByEmail(email);
     }
 
     @Operation(summary = "스터디룸 생성", description = "새로운 스터디룸을 생성합니다.")
