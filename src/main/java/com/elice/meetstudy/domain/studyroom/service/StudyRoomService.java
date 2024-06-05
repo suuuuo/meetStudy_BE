@@ -71,7 +71,7 @@ public class StudyRoomService {
         return studyRoomRepository
                 .findById(id)
                 .map(studyRoomMapper::toStudyRoomDTO)
-                .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID :" + id + "]"));
+                .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID: " + id + "]"));
     }
 
     /**
@@ -151,6 +151,8 @@ public class StudyRoomService {
         return studyRoomMapper.toStudyRoomDTO(savedStudyRoom);
     }
 
+
+
     /**
      * 주어진 ID에 해당하는 스터디룸을 업데이트하고, 업데이트된 스터디룸을 StudyRoomDTO 객체로 반환합니다.
      *
@@ -167,7 +169,7 @@ public class StudyRoomService {
                     existingStudyRoom.setMaxCapacity(studyRoomDTO.getMaxCapacity());
                     return studyRoomMapper.toStudyRoomDTO(studyRoomRepository.save(existingStudyRoom));
                 })
-                .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID :" + id + "]"));
+                .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID: " + id + "]"));
     }
 
     /**
