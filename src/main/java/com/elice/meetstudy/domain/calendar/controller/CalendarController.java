@@ -1,6 +1,7 @@
 package com.elice.meetstudy.domain.calendar.controller;
 
 import com.elice.meetstudy.domain.calendar.dto.RequestCalendarDetail;
+import com.elice.meetstudy.domain.calendar.dto.ResponseAllCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.calendar.service.CalendarDetailService;
 import com.elice.meetstudy.domain.calendar.service.CalendarService;
@@ -65,6 +66,15 @@ public class CalendarController {
             @PathVariable long studyRoomId) {
         return new ResponseEntity<>(
             calendarDetailService.getAllCalendarDetail(year, month, studyRoomId),
+            HttpStatus.OK);
+    }
+
+    @GetMapping("/calendarAll")
+    public ResponseEntity<List<ResponseAllCalendarDetail>> getAllCalendarDetails(
+        @RequestHeader("year") String year,
+        @RequestHeader("month") String month){
+        return new ResponseEntity<>(
+            calendarDetailService.getAllCalendarDetailFromAll(year, month),
             HttpStatus.OK);
     }
 
