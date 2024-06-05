@@ -11,18 +11,18 @@ import java.util.Collection;
 public class UserPrinciple extends User {
 
     private static final String PASSWORD_ERASED_VALUE = "[PASSWORD_ERASED]";
-    private final String email;
+    private final String userId;
 
-    public UserPrinciple(String email, String username,
+    public UserPrinciple(String userId, String username,
                          Collection<? extends GrantedAuthority> authorities) {
         super(username, PASSWORD_ERASED_VALUE, authorities);
-        this.email = email;
+        this.userId = userId;
     }
 
     @Override
     public String toString() {
         return "UserPrinciple(" +
-                "email=" + email +
+                "userId=" + userId +
                 " username=" + getUsername() +
                 " role=" + getAuthorities() +
                 ")";
