@@ -16,10 +16,9 @@ public class TokenValidationResult {
 
     private TokenStatus tokenStatus;
     private TokenType tokenType;
-    private String tokenId;
     private Claims claims;
 
-    public String getLoginId() {
+    public String getUserId() {
         if(claims == null){
             throw new IllegalArgumentException("Claim value is null");
         }

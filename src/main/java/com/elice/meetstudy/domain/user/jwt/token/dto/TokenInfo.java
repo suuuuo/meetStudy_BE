@@ -14,13 +14,11 @@ public class TokenInfo {
 
     private Date accessTokenExpireTime;
     private String ownerLoginId;
-    private String tokenId;
 
     @Builder
-    public TokenInfo(String accessToken, Date accessTokenExpireTime, String ownerLoginId, String tokenId){
+    public TokenInfo(String accessToken, Date accessTokenExpireTime, String ownerLoginId){
         this.accessToken = accessToken;
         this.accessTokenExpireTime = accessTokenExpireTime;
         this.ownerLoginId = ownerLoginId;
-        this.tokenId = tokenId;
     }
 }
