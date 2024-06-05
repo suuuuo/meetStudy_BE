@@ -3,9 +3,6 @@ package com.elice.meetstudy.config;
 import com.elice.meetstudy.domain.user.jwt.JwtAccessDeniedHandler;
 import com.elice.meetstudy.domain.user.jwt.JwtAuthenticationEntryPoint;
 import com.elice.meetstudy.domain.user.jwt.JwtFilter;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,86 +23,58 @@ public class SecurityConfig {
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
   private final JwtFilter jwtFilter;
-  private final String[] adminUrl = {"api/admin/**"};
-  private final String[] userUrl = {"api/mypage/**", "api/post/**"};
+  private final String[] adminUrl = {"api/admin/**", "api/mypage/**"};
+  private final String[] userUrl = {"api/**"};
+  private final String[] publicUrl = {
+    "/",
+    "api/user/public/**",
+    "api/comment/public/**",
+    "api/post/public/**",
+    "api/categories/**",
+    "api/answer/public/**",
+    "api/question/public/**",
+  };
+  private final String[] swaggerUrl = {
+    "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/api-docs/**"
+  };
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
-            .cors(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(handle -> handle
+        .cors(AbstractHttpConfigurer::disable)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(
+            handle ->
+                handle
                     .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                     .accessDeniedHandler(jwtAccessDeniedHandler))
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/user/**").permitAll() // 회원가입, 로그인
-                    .requestMatchers(
-                            "/swagger-ui/**",
-                            "/v3/api-docs/**",
-                            "/swagger-resources/**",
-                            "/swagger-ui.html")
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(publicUrl)
+                    .permitAll() // 회원가입, 로그인, 메인 페이지 등 권한 없이 접근 가능한 api
+                    .requestMatchers(swaggerUrl)
                     .permitAll()
-                    .requestMatchers(adminUrl).hasAuthority("ADMIN")
-                    .requestMatchers(userUrl).hasAuthority("USER")
-                    .anyRequest().authenticated())
-            .logout(logout -> logout
+                    .requestMatchers(adminUrl)
+                    .hasAuthority("ADMIN")
+                    .requestMatchers(userUrl)
+                    .hasAuthority("USER")
+                    .anyRequest()
+                    .authenticated())
+        .logout(
+            logout ->
+                logout
                     .logoutUrl("/api/user/logout") // 로그아웃 요청 URL
                     .logoutSuccessUrl("/login") // 로그아웃 성공 시 리디렉션 URL
                     .invalidateHttpSession(true) // 세션 무효화
                     .deleteCookies("JSESSIONID")) // 쿠키 삭제
-            .build();
+        .build();
   }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
-
-  /** Security 의존성 사용 : 자동으로 추가되는 기본 로그인 화면을 제거 하기 위해 우선적으로 작성함. */
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf(csrf -> csrf.disable()) // 테스트를 위해 잠시 비활성화 //
-        .authorizeRequests()
-        .requestMatchers("/**")
-        .permitAll()
-        .anyRequest()
-        .authenticated();
-    return http.build();
-  }
-
-  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-    String[] excludePath = {
-      "/swagger-ui/index.html",
-      "/swagger-ui/swagger-ui-standalone-preset.js",
-      "/swagger-ui/swagger-initializer.js",
-      "/swagger-ui/swagger-ui-bundle.js",
-      "/swagger-ui/swagger-ui.css",
-      "/swagger-ui/index.css",
-      "/swagger-ui/favicon-32x32.png",
-      "/swagger-ui/favicon-16x16.png",
-      "/api-docs/json/swagger-config",
-      "/api-docs/json"
-    };
-    String path = request.getRequestURI();
-    return Arrays.stream(excludePath).anyMatch(path::startsWith);
-  }
-
-  //  @Bean
-  //  public CorsConfigurationSource corsConfigurationSource() {
-  //    CorsConfiguration config = new CorsConfiguration();
-  //    config.addAllowedOrigin("http://34.47.79.59:8080");
-  //    config.addAllowedMethod("*");
-  //    config.addExposedHeader("Set-Cookie");
-  //    config.addAllowedHeader("*");
-  //    config.setAllowCredentials(true);
-  //    config.addExposedHeader("access");
-  //    config.setMaxAge(3600L);
-  //
-  //    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-  //    source.registerCorsConfiguration("/**", config);
-  //
-  //    return source;
-  //  }
 }
