@@ -23,6 +23,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Calendar_detail {
 
     @Id
@@ -59,7 +60,7 @@ public class Calendar_detail {
     @ColumnDefault("false")
     private boolean isHoliday;
 
-    @Builder
+
     public Calendar_detail(String title, String content, String startDay, String endDay,
         String startTime, String endTime, boolean isHoliday) {
         this.title = title;

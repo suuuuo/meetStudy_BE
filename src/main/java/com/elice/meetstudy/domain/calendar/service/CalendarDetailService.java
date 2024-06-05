@@ -3,15 +3,22 @@ package com.elice.meetstudy.domain.calendar.service;
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
 import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
 import com.elice.meetstudy.domain.calendar.dto.RequestCalendarDetail;
+import com.elice.meetstudy.domain.calendar.dto.ResponseAllCalendarDetail;
 import com.elice.meetstudy.domain.calendar.dto.ResponseCalendarDetail;
 import com.elice.meetstudy.domain.calendar.holiday.domain.Holiday;
 import com.elice.meetstudy.domain.calendar.holiday.service.HolidayService;
 import com.elice.meetstudy.domain.calendar.mapper.CalendarDetailMapper;
 import com.elice.meetstudy.domain.calendar.repository.CalendarDetailRepository;
 import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
+import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
+import com.elice.meetstudy.domain.studyroom.repository.StudyRoomRepository;
+import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
+import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.domain.UserPrinciple;
+import com.elice.meetstudy.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +36,8 @@ public class CalendarDetailService {
   private final CalendarService calendarService;
   private final HolidayService holidayService;
   private final CalendarDetailMapper calendarDetailMapper;
+  private final UserRepository userRepository;
+  private final UserStudyRoomRepository userStudyRoomRepository;
 
   /**
    * 캘린더 공휴일 자동 등록 -> 조회 시 공휴일 표시
@@ -72,30 +81,35 @@ public class CalendarDetailService {
     //접근한 유저 정보 가져오는 로직
     long userId = getUserId();
 
-    Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
-    try {
-      saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
-    }catch (EntityNotFoundException e){
-      throw new EntityNotFoundException();
-    }
-
-    String Month = String.format("%02d", Integer.parseInt(month));
-    String date = year + Month;
-
     List<Calendar_detail> calendarDetailList =
-        calendarDetailRepository.findByStartDayContainingAndCalendar(date, calendar); // 해당 캘린더의 한 달 일정들을 리스트로 출력
-
+        getCalendarDetailsFromCalendar(userId, studyRoomId, year, month);
     List<ResponseCalendarDetail> responseCalendarDetails = new ArrayList<>();
     for (Calendar_detail calendarDetail : calendarDetailList) {
       responseCalendarDetails.add(calendarDetailMapper.toResponseCalendarDetail(calendarDetail));
     }
     return responseCalendarDetails;
+  }
 
+// 개인 캘린더, 공용 캘린더 통합 리턴
+  @Transactional
+  public List<ResponseAllCalendarDetail> getAllCalendarDetailFromAll(
+      String year, String month) {
+    List<ResponseAllCalendarDetail> responseCalendarDetails = new ArrayList<>();
+    //접근한 유저 정보 가져오는 로직
+    long userId = getUserId();
+    Optional<User> user = userRepository.findById(userId);
+    List<UserStudyRoom> byUser = userStudyRoomRepository.findByUser(user.get());
+
+    getCalendarDetails(responseCalendarDetails, year, month, 0L, userId);
+    for(UserStudyRoom userStudyRoom : byUser){
+     getCalendarDetails(responseCalendarDetails,year, month,
+          userStudyRoom.getStudyRoom().getId(), userId);
+    }
+    return responseCalendarDetails;
   }
 
   /**
    * 개별 일정 조회
-   *
    * @param id
    * @return
    */
@@ -163,5 +177,39 @@ public class CalendarDetailService {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
     return Long.parseLong(userPrinciple.getUserId());
+  }
+
+  //캘린더 찾아서 해당 캘린더 한 달 리스트를 반환
+  public List<Calendar_detail> getCalendarDetailsFromCalendar(long userId, long studyRoomId,
+      String year, String month){
+    Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
+    try {
+      saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
+    }catch (EntityNotFoundException e){
+      throw new EntityNotFoundException();
+    }
+    String Month = String.format("%02d", Integer.parseInt(month));
+    String date = year + Month;
+
+    List<Calendar_detail> calendarDetailList =
+        calendarDetailRepository.findByStartDayContainingAndCalendar(date, calendar); // 해당 캘린더의 한 달 일정들을 리스트로 출력
+
+    return calendarDetailList;
+  }
+
+  // 한 달 리스트를 responseAll로 반환
+  public List<ResponseAllCalendarDetail> getCalendarDetails(
+      List<ResponseAllCalendarDetail> responseCalendarDetails,
+      String year, String month, long studyRoomId, long userId){
+
+    List<Calendar_detail> calendarDetailList =
+        getCalendarDetailsFromCalendar(userId, studyRoomId, year, month);
+    System.out.println(calendarDetailList.size());
+
+    for (Calendar_detail calendarDetail : calendarDetailList) {
+      responseCalendarDetails.add(
+          new ResponseAllCalendarDetail(calendarDetail));
+    }
+    return  responseCalendarDetails;
   }
 }
