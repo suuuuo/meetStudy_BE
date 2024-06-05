@@ -26,7 +26,7 @@ public class SecurityConfig {
   private final String[] adminUrl = {"api/admin/**"};
   private final String[] userUrl = {"api/**"};
   private final String[] publicUrl = {
-    "/", "api/user/**", "api/comment/public/**", "/api/post/public/**"
+    "/", "api/user/public/**", "api/comment/public/**", "/api/post/public/**"
   };
   private final String[] swaggerUrl = {
     "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/api-docs/**"
