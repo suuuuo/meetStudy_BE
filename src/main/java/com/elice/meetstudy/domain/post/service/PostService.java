@@ -47,7 +47,7 @@ public class PostService {
   }
 
   /** 특정 게시판에서 게시글 작성 */
-  public PostResponseDTO writeByCategory(Long categoryId, PostWriteDTO postCreate) {
+  public PostResponseDTO writeByCategory(PostWriteDTO postCreate, Long categoryId) {
 
     Category category = entityFinder.findCategoryById(categoryId);
 
@@ -66,12 +66,14 @@ public class PostService {
   /** 게시글 수정 */
   public PostResponseDTO edit(Long postId, PostWriteDTO editRequest) {
 
+    Long userId = entityFinder.getUser().getId();
     Post post = entityFinder.findPost(postId);
     Category category = entityFinder.findCategoryById(editRequest.getCategoryId());
 
-    if (entityFinder.getUser().getId() != post.getUser().getId()) {
+    if (userId != post.getUser().getId()) {
       throw new EntityNotFoundException("해당 게시글을 수정할 권한이 없습니다");
     } else {
+      // editRequest, post로 분기처리하고 객체 생성
       PostEditDTO editPost =
           post.toEdit()
               .categoryId(
@@ -92,26 +94,29 @@ public class PostService {
 
   /** 게시글 삭제 - (이미 삭제된 게시글이어도 204) */
   public void delete(Long postId) {
-    if (entityFinder.getUser().getId() != entityFinder.findPost(postId).getUser().getId()) {
+
+    Long userId = entityFinder.getUser().getId();
+    // 게시글 조회
+    Post post = entityFinder.findPost(postId);
+
+    if (userId != post.getUser().getId()) {
       throw new EntityNotFoundException("해당 게시글을 삭제할 권한이 없습니다");
     }
-    postRepository.deleteByIdAndUserId(postId, entityFinder.getUser().getId());
+    postRepository.deleteById(postId);
   }
 
   /** 게시판 별 게시글 조회 - (공학게시판/교육게시판 등) */
   public List<PostResponseDTO> getPostBycategory(Long categoryId, int page, int size) {
     Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
-
     return postRepository.findByCategoryId(categoryId, defaultPageable).stream()
         .map(PostResponseDTO::new)
         .collect(Collectors.toList());
   }
 
   /** 내가 작성한 글 조회 - (최근 작성된 순으로) */
-  public List<PostResponseDTO> getPostByUser(int page, int size) {
+  public List<PostResponseDTO> getPostByUser(Long userId, int page, int size) {
     Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
-
-    return postRepository.findByUserId(entityFinder.getUser().getId(), defaultPageable).stream()
+    return postRepository.findByUserId(userId, defaultPageable).stream()
         .map(PostResponseDTO::new)
         .collect(Collectors.toList());
   }
@@ -135,7 +140,9 @@ public class PostService {
 
     return PostResponseDTO.builder()
         .id(post.getId())
+        // .categoryId(post.getCategory().getId())
         .category(post.getCategory().getName())
+        // .userId(post.getUser().getId())
         .nickname(post.getUser().getNickname())
         .title(post.getTitle())
         .content(post.getContent())

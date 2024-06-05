@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/post")
 @RequiredArgsConstructor
-@Tag(name = "F. 게시글", description = "게시글 관련 API 입니다.")
+@Tag(name = "게시글", description = "게시글 관련 API 입니다.")
 @Slf4j
 public class PostController {
 
@@ -39,7 +39,7 @@ public class PostController {
   @PostMapping("/category/direct/{categoryId}")
   public ResponseEntity<PostResponseDTO> createPostByCategory(
       @RequestBody @Valid PostWriteDTO postCreate, @PathVariable Long categoryId) {
-    return ResponseEntity.ok().body(postService.writeByCategory(categoryId, postCreate));
+    return ResponseEntity.ok().body(postService.writeByCategory(postCreate, categoryId));
   }
 
   @Operation(summary = "게시글 수정")
@@ -57,7 +57,7 @@ public class PostController {
   }
 
   @Operation(summary = "게시판 별 게시글 조회 - (공학게시판/교육게시판 등)")
-  @GetMapping("public/category/{categoryId}")
+  @GetMapping("/category/{categoryId}")
   public ResponseEntity<List<PostResponseDTO>> getPostByCategory(
       @PathVariable Long categoryId,
       @RequestParam(defaultValue = "0") int page,
@@ -66,27 +66,29 @@ public class PostController {
   }
 
   @Operation(summary = "내가 작성한 글 조회 - (최근 작성된 순으로)")
-  @GetMapping("/user")
+  @GetMapping("/user/{userId}")
   public ResponseEntity<List<PostResponseDTO>> getPostByUser(
-      @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
-    return ResponseEntity.ok(postService.getPostByUser(page, size));
+      @PathVariable Long userId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "15") int size) {
+    return ResponseEntity.ok(postService.getPostByUser(userId, page, size));
   }
 
   @Operation(summary = "전체 게시글 조회 - (최근 작성된 순으로)")
-  @GetMapping("/public")
+  @GetMapping
   public ResponseEntity<List<PostResponseDTO>> getPostAll(
       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
     return ResponseEntity.ok(postService.getPostAll(page, size));
   }
 
   @Operation(summary = "게시글 상세 조회(postId) - (사용자가 게시글 제목을 클릭했을때)")
-  @GetMapping("/public/{postId}")
+  @GetMapping("/{postId}")
   public ResponseEntity<PostResponseDTO> getPost(@PathVariable Long postId) {
     return ResponseEntity.ok(postService.getPost(postId));
   }
 
   @Operation(summary = "특정 게시판 내 게시글 키워드 검색 - (최근 작성된 순으로)")
-  @GetMapping("/public/category/{categoryId}/search")
+  @GetMapping("/category/{categoryId}/search")
   public ResponseEntity<List<PostResponseDTO>> searchPostInBoard(
       @PathVariable Long categoryId,
       @RequestParam String keyword,
@@ -96,7 +98,7 @@ public class PostController {
   }
 
   @Operation(summary = "전체 게시판 내 게시글 키워드 검색 - (최근 작성된 순으로)")
-  @GetMapping("/public/search")
+  @GetMapping("/search")
   public ResponseEntity<List<PostResponseDTO>> searchPost(
       @RequestParam String keyword,
       @RequestParam(defaultValue = "0") int page,
