@@ -65,7 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private void handleMissingToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain ) throws IOException, ServletException{
         request.setAttribute("result",
-                new TokenValidationResult(TokenStatus.WRONG_AUTH_HEADER, null, null, null));
+                new TokenValidationResult(TokenStatus.WRONG_AUTH_HEADER, null, null));
         filterChain.doFilter(request, response);
     }
 
