@@ -14,16 +14,5 @@ public class ScrapInsertDTO {
   public ScrapInsertDTO(Long categoryId, Long postId) {
     this.categoryId = categoryId;
     this.postId = postId;
-    //    if (categoryId != null) {
-    //      this.categoryId = categoryId;
-    //    } else {
-    //      this.categoryId = null;
-    //    }
-    //
-    //    if (postId != null) {
-    //      this.postId = postId;
-    //    } else {
-    //      this.postId = null;
-    //    }
   }
 }

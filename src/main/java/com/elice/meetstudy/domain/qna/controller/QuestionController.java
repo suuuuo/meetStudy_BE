@@ -2,16 +2,13 @@ package com.elice.meetstudy.domain.qna.controller;
 
 import com.elice.meetstudy.domain.qna.dto.RequestQuestionDto;
 import com.elice.meetstudy.domain.qna.dto.ResponseQuestionDto;
-import com.elice.meetstudy.domain.qna.mapper.QuestionMapper;
 import com.elice.meetstudy.domain.qna.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api")
-@Tag(name = "문의", description = "문의 게시판 관련 API 입니다.")
+@Tag(name = "M. 문의", description = "문의 게시판 관련 API 입니다.")
 public class QuestionController {
 
   private final QuestionService questionService;
