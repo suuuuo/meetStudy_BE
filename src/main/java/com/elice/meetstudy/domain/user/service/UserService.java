@@ -10,11 +10,7 @@ import com.elice.meetstudy.domain.user.jwt.token.TokenProvider;
 import com.elice.meetstudy.domain.user.jwt.token.dto.TokenInfo;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-  private static final Pattern PASSWORD_PATTERN = Pattern.compile(PASSWORD_REGEX);
   private static final int MAX_LENGTH = 10;
 
   private final UserRepository userRepository;

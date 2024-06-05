@@ -11,17 +11,13 @@ import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
 import com.elice.meetstudy.domain.user.jwt.token.TokenProvider;
-import com.elice.meetstudy.domain.user.jwt.token.TokenType;
-import com.elice.meetstudy.domain.user.jwt.token.dto.TokenValidationResult;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
-import io.jsonwebtoken.Claims;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,10 +29,7 @@ public class MyPageService {
 
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final UserStudyRoomRepository userStudyRoomRepository;
     private final ScrapRepository scrapRepository;
-    private final TokenProvider tokenProvider;
-    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -67,17 +60,14 @@ public class MyPageService {
         User updateUser = userRepository.findUserByUserId(userId);
 
         if (userUpdateDto.getPassword() != null && !userUpdateDto.getPassword().isEmpty()) {
-            userService.passwordCheck(userUpdateDto.getPassword());
             updateUser.setPassword(passwordEncoder.encode(userUpdateDto.getPassword()));
         }
 
         if (userUpdateDto.getUsername() != null && !userUpdateDto.getUsername().isEmpty()) {
-            userService.usernameCheck(userUpdateDto.getUsername());
             updateUser.setUsername(userUpdateDto.getUsername());
         }
 
         if (userUpdateDto.getNickname() != null && !userUpdateDto.getNickname().isEmpty()) {
-            userService.nicknameCheck(userUpdateDto.getNickname());
             updateUser.setNickname(userUpdateDto.getNickname());
         }
 
