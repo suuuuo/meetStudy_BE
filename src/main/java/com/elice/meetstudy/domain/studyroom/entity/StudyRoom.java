@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.studyroom.entity;
 
+import com.elice.meetstudy.domain.chatroom.domain.ChatRoom;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,4 +38,6 @@ public class StudyRoom {
         userStudyRoom.setStudyRoom(this);
     }
 
+    @OneToMany(mappedBy = "studyRoom")
+    private List<ChatRoom> chatRooms = new ArrayList<>();
 }

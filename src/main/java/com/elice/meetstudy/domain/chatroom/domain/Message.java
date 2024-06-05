@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.chatroom.domain;
 
+import com.elice.meetstudy.domain.chatroom.dto.OutputMessageModel;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +15,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
+@Builder
 public class Message {
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +27,7 @@ public class Message {
 
   @ManyToOne
   @JoinColumn(name="user_id",nullable = false)
-  private User user;
+  private User sender;
 
   @Column(name = "content")
   private String content;
@@ -33,11 +35,5 @@ public class Message {
   @Column(name = "create_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private LocalDateTime createAt;
 
-  @Builder
-  public Message(ChatRoom chatRoom, User user, String content, LocalDateTime createAt) {
-    this.chatRoom = chatRoom;
-    this.user = user;
-    this.content = content;
-    this.createAt = createAt;
-  }
+
 }

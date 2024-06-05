@@ -8,15 +8,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.web.socket.WebSocketSession;
 
 @Entity
 @Getter
@@ -26,7 +23,7 @@ public class ChatRoom {
   @Column(name = "chat_room_id")
   private Long id;
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "study_room_id")
   private StudyRoom studyRoom;
 
