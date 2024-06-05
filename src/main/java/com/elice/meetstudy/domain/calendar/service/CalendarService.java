@@ -72,7 +72,6 @@ public class CalendarService {
   public void deleteCalendar() {
     //접근한 유저 정보 가져오는 로직
     long userId = getUserId();
-
     Optional<Calendar> calendar = calendarRepository.findByUserIdAndStudyRoomIsNull(userId);
     calendarRepository.deleteById(calendar.get().getId());
   }
