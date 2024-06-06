@@ -33,7 +33,6 @@ public class Category {
   private String description;
 
   @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
-  @JsonManagedReference
   private List<Post> posts = new ArrayList<>();
 
   @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)

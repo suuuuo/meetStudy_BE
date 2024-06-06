@@ -35,7 +35,6 @@ public class Post {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "category_id")
-  @JsonBackReference
   private Category category;
 
   @ManyToOne(fetch = FetchType.LAZY)
