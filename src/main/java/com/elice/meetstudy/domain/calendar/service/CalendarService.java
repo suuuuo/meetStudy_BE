@@ -1,4 +1,3 @@
-
 package com.elice.meetstudy.domain.calendar.service;
 
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
@@ -58,14 +57,10 @@ public class CalendarService {
     }
   }
 
-  /**
-   * 개인 캘린더 삭제
-   *
-   */
+  /** 개인 캘린더 삭제 */
   @Transactional
   public void deleteCalendar() {
-    //접근한 유저 정보 가져오는 로직
-    //long userId = getUserId();
+    // 접근한 유저 정보 가져오는 로직
     Long userId = entityFinder.getUser().getId();
     Optional<Calendar> calendar = calendarRepository.findByUserIdAndStudyRoomIsNull(userId);
     calendarRepository.deleteById(calendar.get().getId());
@@ -81,13 +76,4 @@ public class CalendarService {
     Optional<Calendar> calendar = calendarRepository.findByStudyRoomId(studyRoomId);
     calendarRepository.deleteById(calendar.get().getId());
   }
-
-//  @Transactional
-//  public long getUserId(){
-//    //접근한 유저 정보 가져오는 로직
-//    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-//    return Long.parseLong(userPrinciple.getUserId());
-//  }
 }
-
