@@ -28,6 +28,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   // 게시글 수정
 
   // 게시글 삭제
+  void deleteByIdAndUserId(Long postId, Long userId);
 
   // 내가 작성한 글 조회
   List<Post> findByUserId(Long userId, Pageable pageable);

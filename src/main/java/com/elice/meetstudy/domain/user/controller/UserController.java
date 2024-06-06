@@ -9,32 +9,32 @@ import com.elice.meetstudy.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "유저", description = "유저 접속 관련 API 입니다.")
+@Tag(name = "A. 유저", description = "유저 접속 관련 API 입니다.")
 public class UserController {
 
   private final UserService userService;
 
   @Operation(summary = "회원가입")
   @PostMapping("/join")
-  public ApiResponseJson join(@RequestBody @Valid UserJoinDto userJoinDto){
+  public ApiResponseJson join(@RequestBody @Valid UserJoinDto userJoinDto) {
 
     User user = userService.join(userJoinDto);
-    return new ApiResponseJson(HttpStatus.OK, Map.of(
+    return new ApiResponseJson(
+        HttpStatus.OK,
+        Map.of(
             "email", user.getEmail(),
-            "username", user.getUsername()
-    ));
+            "username", user.getUsername()));
   }
 
   @Operation(summary = "회원가입 - 이메일 중복확인, 이메일 인증")

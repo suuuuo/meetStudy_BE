@@ -5,8 +5,6 @@ import com.elice.meetstudy.domain.chatroom.dto.OutputMessageModel;
 import com.elice.meetstudy.domain.chatroom.service.ChatRoomService;
 import com.elice.meetstudy.domain.chatroom.service.MessageService;
 import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

@@ -3,12 +3,20 @@ package com.elice.meetstudy.domain.scrap.service;
 import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.scrap.domain.Scrap;
-import com.elice.meetstudy.domain.scrap.dto.ScrapResponseDTO;
+import com.elice.meetstudy.domain.scrap.dto.ScrapCategoryResponseDTO;
+import com.elice.meetstudy.domain.scrap.dto.ScrapPostResponseDTO;
 import com.elice.meetstudy.domain.scrap.repository.ScrapRepository;
+import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.domain.user.service.UserService;
 import com.elice.meetstudy.util.EntityFinder;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,54 +31,49 @@ public class ScrapService {
   private final EntityFinder entityFinder;
 
   /** 게시글 스크랩 */
-  public ScrapResponseDTO scrapPost(Long postId) {
-    Long userId = 13L;
-    //    User user = entityFinder.getUser();
+  public ScrapPostResponseDTO scrapPost(Long postId) {
     Post post = entityFinder.findPost(postId);
+    Optional<Scrap> scrapPost = entityFinder.findScrapPost(postId);
 
+    if (scrapPost.isPresent()) {
+      throw new EntityNotFoundException("이미 스크랩한 게시글입니다.");
+    }
     // Scrap 엔티티 생성
-    Scrap newScrap =
-        Scrap.builder()
-            .userId(userId)
-            // category(category)
-            .post(post)
-            .build();
+    Scrap newScrap = Scrap.builder().user(entityFinder.getUser()).post(post).build();
 
-    return new ScrapResponseDTO(scrapRepository.save(newScrap));
+    return new ScrapPostResponseDTO(scrapRepository.save(newScrap));
   }
 
   /** 게시글 스크랩 삭제 - (이미 삭제되었어도 204) */
-  public void scrapDeletePost(Long scrapId) {
-    // Long userId = entityFinder.getUserId();
-    Long userId = 13L;
-    scrapRepository.deleteByPostIdAndUserId(scrapId, userId);
+  public void scrapDeletePost(Long postId) {
+    scrapRepository.deleteByUserIdAndPostId(entityFinder.getUser().getId(), postId);
   }
 
   /** 게시판 스크랩 */
-  public ScrapResponseDTO scrapCategory(Long categoryId) {
-    Long userId = 1L;
-    //    User user = entityFinder.getUser();
+  public ScrapCategoryResponseDTO scrapCategory(Long categoryId) {
     Category category = entityFinder.findCategoryById(categoryId);
+    Optional<Scrap> scrapCategory = entityFinder.findScrapCategory(categoryId);
 
+    if (scrapCategory.isPresent()) {
+      throw new EntityNotFoundException("이미 스크랩한 게시판입니다.");
+    }
     // Scrap 엔티티 생성
-    Scrap newScrap = Scrap.builder().userId(userId).category(category).build();
+    Scrap newScrap = Scrap.builder().user(entityFinder.getUser()).category(category).build();
 
-    return new ScrapResponseDTO(scrapRepository.save(newScrap));
+    return new ScrapCategoryResponseDTO(scrapRepository.save(newScrap));
   }
 
   /** 게시판 스크랩 삭제 - (이미 삭제되었어도 204) */
-  public void scrapDeleteCategory(Long scrapId) {
-    // Long userId = entityFinder.getUserId();
-    Long userId = 1L;
-    scrapRepository.deleteByPostIdAndUserId(scrapId, userId);
+  public void scrapDeleteCategory(Long categoryId) {
+    scrapRepository.deleteByUserIdAndCategoryId(entityFinder.getUser().getId(), categoryId);
   }
 
   /** 게시판 스크랩 목록 조회 */
-//  public List<ScrapResponseDTO> getScrapAll(int page, int size) {
-//    Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
-//    Long userId = 1L;
-//    List<Scrap> scrapList = scrapRepository.findAllByUserId(userId, defaultPageable);
-//
-//    return scrapList.stream().map(ScrapResponseDTO::new).collect(Collectors.toList());
-//  }
+  public List<ScrapCategoryResponseDTO> getScrapAll(int page, int size) {
+    Pageable defaultPageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
+    List<ScrapCategoryResponseDTO> scrapList =
+        scrapRepository.findCategoryAndCreatedAtByUserId(entityFinder.getUser().getId());
+
+    return scrapList;
+  }
 }

@@ -4,15 +4,16 @@ import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "scrap")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Scrap {
 
   @Id
@@ -40,12 +41,9 @@ public class Scrap {
   }
 
   @Builder
-  public Scrap(User user, Category category, Long userId, Post post) {
+  public Scrap(User user, Category category, Post post) {
     this.user = user;
     this.category = category;
     this.post = post;
-    if (userId != null) {
-      this.user = User.builder().id(userId).build();
-    }
   }
 }

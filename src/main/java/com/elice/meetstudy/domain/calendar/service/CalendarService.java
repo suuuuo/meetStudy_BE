@@ -6,17 +6,10 @@ import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
 import com.elice.meetstudy.domain.studyroom.repository.StudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
-import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.YearMonth;
+import com.elice.meetstudy.util.EntityFinder;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +20,7 @@ public class CalendarService {
   private final CalendarRepository calendarRepository;
   private final UserRepository userRepository;
   private final StudyRoomRepository studyRoomRepository;
+  private final EntityFinder entityFinder;
 
   /**
    * 캘린더 조회(생성 )
@@ -71,7 +65,8 @@ public class CalendarService {
   @Transactional
   public void deleteCalendar() {
     //접근한 유저 정보 가져오는 로직
-    long userId = getUserId();
+    //long userId = getUserId();
+    Long userId = entityFinder.getUser().getId();
     Optional<Calendar> calendar = calendarRepository.findByUserIdAndStudyRoomIsNull(userId);
     calendarRepository.deleteById(calendar.get().getId());
   }
@@ -87,12 +82,12 @@ public class CalendarService {
     calendarRepository.deleteById(calendar.get().getId());
   }
 
-  @Transactional
-  public long getUserId(){
-    //접근한 유저 정보 가져오는 로직
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-    return Long.parseLong(userPrinciple.getUserId());
-  }
+//  @Transactional
+//  public long getUserId(){
+//    //접근한 유저 정보 가져오는 로직
+//    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
+//    return Long.parseLong(userPrinciple.getUserId());
+//  }
 }
 

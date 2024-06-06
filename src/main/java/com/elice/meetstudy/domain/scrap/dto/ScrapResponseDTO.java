@@ -16,18 +16,18 @@ public class ScrapResponseDTO {
   private LocalDateTime createdAt;
 
   public ScrapResponseDTO(Scrap scrap) {
-    if (scrap.getCategory() != null) {
-      this.category = scrap.getCategory().getName();
-    } else {
+    if (scrap.getCategory().getName() == null) {
       this.category = null;
+    } else {
+      this.category = scrap.getCategory().getName();
     }
 
-    if (scrap.getPost() != null) {
-      this.title = scrap.getPost().getTitle();
-      this.content = scrap.getPost().getContent();
-    } else {
+    if (scrap.getPost() == null) {
       this.title = null;
       this.content = null;
+    } else {
+      this.title = scrap.getPost().getTitle();
+      this.content = scrap.getPost().getContent();
     }
 
     this.createdAt = scrap.getCreatedAt();
