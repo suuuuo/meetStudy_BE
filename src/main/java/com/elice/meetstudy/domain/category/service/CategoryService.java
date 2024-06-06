@@ -1,12 +1,14 @@
 package com.elice.meetstudy.domain.category.service;
 
-import com.elice.meetstudy.domain.category.dto.CategoryDto;
 import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.category.repository.CategoryRepository;
-import jakarta.persistence.Entity;
+import com.elice.meetstudy.domain.post.domain.Post;
+import com.elice.meetstudy.domain.post.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final PostRepository postRepository;
 
     // 모든 카테고리를 조회
     public List<Category> findAllCategories() {
@@ -49,6 +52,16 @@ public class CategoryService {
         Category foundCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(EntityNotFoundException::new);
 
+        // 페이지네이션을 위한 Pageable 객체 생성
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+
+        // 해당 카테고리에 속한 게시글 삭제
+        List<Post> posts = postRepository.findByCategoryId(categoryId, pageable);
+        for (Post post : posts) {
+            postRepository.deleteByIdAndUserId(post.getId(), post.getUser().getId());
+        }
+
+        // 카테고리 삭제
         categoryRepository.delete(foundCategory);
     }
 }
