@@ -19,8 +19,8 @@ public class AdminUserService {
     private final UserRepository userRepository;
 
     // 모든 회원 조회
-    public Page<User> findAllUsers(Pageable pageable) {
-        return userRepository.findByRoleIn(Collections.singletonList("USER"), pageable);
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
     }
 
     // id로 회원 조회

@@ -20,10 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   Optional<User> findByEmail(String email);
 
-  Page<User> findByRoleIn(List<String> roles, Pageable pageable);
-
-  Optional<User> findById(Long id);
-
   @Query("SELECT u FROM User u WHERE u.id = :userId")
   User findUserByUserId(Long userId);
 
