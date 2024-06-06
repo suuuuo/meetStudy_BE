@@ -15,13 +15,13 @@ public class MeetstudyApplication {
     SpringApplication.run(MeetstudyApplication.class, args);
   }
 
-  @Bean
-  public WebMvcConfigurer corsConfigurer() { // 전역적으로 cors에러 해결법 Spring mvc에서 사용
-    return new WebMvcConfigurer() {
-      //      public void addCorsMappings(CorsRegistry registry) {
-      //
-      // registry.addMapping("/**").allowedMethods("*").allowedOrigins("http://localhost:3000");
-      //      }
-    };
-  }
+  //  @Bean
+  //  public WebMvcConfigurer corsConfigurer() { // 전역적으로 cors에러 해결법 Spring mvc에서 사용
+  //    return new WebMvcConfigurer() {
+  //      public void addCorsMappings(CorsRegistry registry) {
+  //
+  //        registry.addMapping("/**").allowedMethods("*").allowedOrigins("http://localhost:3000");
+  //      }
+  //    };
+  //  }
 }

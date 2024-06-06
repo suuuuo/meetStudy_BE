@@ -39,7 +39,8 @@ public class SecurityConfig {
     "/api/post/public/**",
     "/api/categories/**",
     "/api/answer/public/**",
-    "/api/question/public/**"
+    "/api/question/public/**",
+    "/api/admin/categories/public/**"
   };
   private final String[] swaggerUrl = {
     "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/api-docs/**"
@@ -49,6 +50,7 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
         //        .cors(AbstractHttpConfigurer::disable)
+//        .cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement(

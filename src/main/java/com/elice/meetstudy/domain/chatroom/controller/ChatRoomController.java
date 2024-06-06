@@ -20,42 +20,41 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-@Tag(name = "채팅방", description = "채팅방 관련 API 입니다.")
+@Tag(name = "K. 채팅방", description = "채팅방 관련 API 입니다.")
 @RequiredArgsConstructor
 public class ChatRoomController {
 
-  @Autowired
-  private ChatRoomService chatRoomService;
+  @Autowired private ChatRoomService chatRoomService;
 
   @Operation(summary = "채팅방 생성")
   @PostMapping("/chatroom/add")
-  public ResponseEntity<CreateChatRoomDto> createChatRoom(@RequestBody CreateChatRoomDto requestChatRoomDto){
+  public ResponseEntity<CreateChatRoomDto> createChatRoom(
+      @RequestBody CreateChatRoomDto requestChatRoomDto) {
     return ResponseEntity.ok(chatRoomService.createchatRoom(requestChatRoomDto));
   }
 
   @Operation(summary = "채팅방 조회")
   @GetMapping("/chatroom/{chatRoomId}")
-  public ResponseEntity<ChatRoomDto> chatRoomDto(@PathVariable Long chatRoomId){
+  public ResponseEntity<ChatRoomDto> chatRoomDto(@PathVariable Long chatRoomId) {
     return ResponseEntity.ok(chatRoomService.findByChatRoomId(chatRoomId));
   }
 
   @Operation(summary = "채팅방 삭제")
   @DeleteMapping("/chatroom/{chatRoomId}")
-  public ResponseEntity<Void> deleteChatroom(@PathVariable Long chatRoomId){
+  public ResponseEntity<Void> deleteChatroom(@PathVariable Long chatRoomId) {
     chatRoomService.deleteChatRoom(chatRoomId);
     return ResponseEntity.noContent().build();
-    }
+  }
 
   @Operation(summary = "스터디룸에 해당하는 채팅방 리스트 불러오기")
   @GetMapping("/studyrooms/{studyRoomId}/chatroom")
-  public ResponseEntity<List<ChatRoomDto>> chatRoomList(@PathVariable Long studyRoomId){
+  public ResponseEntity<List<ChatRoomDto>> chatRoomList(@PathVariable Long studyRoomId) {
     return ResponseEntity.ok(chatRoomService.chatRoomList(studyRoomId));
   }
 
   @Operation(summary = "공지사항 수정")
   @PutMapping("/chatroom/notice")
-  public ResponseEntity<ChatRoomDto> createNotice(@RequestBody ChatRoomDto chatRoomDto){
+  public ResponseEntity<ChatRoomDto> createNotice(@RequestBody ChatRoomDto chatRoomDto) {
     return ResponseEntity.ok(chatRoomService.createNotice(chatRoomDto));
   }
-
 }

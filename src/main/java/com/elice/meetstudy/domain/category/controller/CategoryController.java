@@ -20,13 +20,13 @@ public class CategoryController {
   }
 
   // 모든 카테고리 조회
-  @GetMapping
+  @GetMapping("/public")
   public ResponseEntity<List<Category>> getAllCategories() {
     return ResponseEntity.ok(categoryService.findAllCategories());
   }
 
   // id에 해당하는 카테고리 조회
-  @GetMapping("/{id}")
+  @GetMapping("/public/{id}")
   public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
     return ResponseEntity.ok(categoryService.findCategory(id));
   }
