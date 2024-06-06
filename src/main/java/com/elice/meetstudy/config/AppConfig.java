@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class AppConfig {
@@ -23,4 +25,18 @@ public class AppConfig {
     source.registerCorsConfiguration("/**", config);
     return new CorsFilter(source);
   }
+
+  // 스택오버플로우(디코 링크) 참고해서 수정해보았습니다
+  //  @Bean
+  //  public WebMvcConfigurer corsConfigurer() {
+  //    return new WebMvcConfigurer() {
+  //      @Override
+  //      public void addCorsMappings(CorsRegistry registry) {
+  //        registry.addMapping("/api/**")
+  //            .allowedOrigins("http://localhost:3000/")
+  //            .allowedMethods("*")
+  //            .maxAge(360);
+  //      }
+  //    };
+  //  }
 }
