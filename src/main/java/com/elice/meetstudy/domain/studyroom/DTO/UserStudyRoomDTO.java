@@ -18,7 +18,7 @@ public class UserStudyRoomDTO {
     private Long id;
 
     private Date joinDate;
-    private String permission;
+    private String permission; // OWNER or MEMBER
 
     private Long studyRoomId;
     private UserLoginDto user;

@@ -22,11 +22,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChatRoom {
 
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "chat_room_id")
   private Long id;
 
-  @Column(name="title")
+  @Column(name = "title")
   private String title;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -36,20 +37,17 @@ public class ChatRoom {
   @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Message> messages = new ArrayList<>();
 
-  @Column(name="notice")
+  @Column(name = "notice")
   private String notice;
 
-
   @Builder
-  public ChatRoom(StudyRoom studyRoom,String title,String notice) {
+  public ChatRoom(StudyRoom studyRoom, String title, String notice) {
     this.title = title;
     this.notice = notice;
     this.studyRoom = studyRoom;
   }
 
-  public void updateNotice(String notice){
-    this.notice =notice;
+  public void updateNotice(String notice) {
+    this.notice = notice;
   }
-
-
 }

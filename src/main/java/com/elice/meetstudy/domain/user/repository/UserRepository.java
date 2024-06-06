@@ -1,7 +1,12 @@
 package com.elice.meetstudy.domain.user.repository;
 
 import com.elice.meetstudy.domain.user.domain.User;
+
+import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +19,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
   boolean existsByNickname(String nickname);
 
   Optional<User> findByEmail(String email);
+
+  Page<User> findByRoleIn(List<String> roles, Pageable pageable);
+
+  Optional<User> findById(Long id);
 
   @Query("SELECT u FROM User u WHERE u.id = :userId")
   User findUserByUserId(Long userId);
