@@ -5,11 +5,11 @@ import com.elice.meetstudy.domain.qna.domain.AnswerStatus;
 import com.elice.meetstudy.domain.qna.domain.Question;
 import com.elice.meetstudy.domain.qna.dto.RequestAnswerDto;
 import com.elice.meetstudy.domain.qna.dto.ResponseAnswerDto;
+import com.elice.meetstudy.domain.qna.exception.SingleResponseViolationException;
 import com.elice.meetstudy.domain.qna.mapper.AnswerMapper;
 import com.elice.meetstudy.domain.qna.repository.AnswerRepository;
 import com.elice.meetstudy.domain.qna.repository.QuestionRepository;
 import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
-import com.elice.meetstudy.domain.user.domain.Role;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.util.EntityFinder;
@@ -30,12 +30,9 @@ public class AnswerService {
   private final UserRepository userRepository;
   private final EntityFinder entityFinder;
 
-
   /** 답변 조회 */
-
   public ResponseAnswerDto getAnswer(long questionId) {
     Optional<Question> question = questionRepository.findById(questionId);
-    System.out.println(question.get().getId());
     if (question.isPresent()) {
       Answer answer = question.get().getAnswer();
       if(answer == null || answer.getId() == null){
@@ -50,59 +47,44 @@ public class AnswerService {
   @Transactional
   public ResponseAnswerDto addAnswer(RequestAnswerDto requestAnswerDto, long questionId)
       throws AccessDeniedException {
-    //    Optional<User> user = userRepository.findById(getUserId());
     Optional<User> user = userRepository.findById(entityFinder.getUser().getId());
 
-    if(user.get().getRole() == Role.ADMIN){
       Optional<Question> question = questionRepository.findById(questionId);
-      if (question.isPresent()) {
+      if (question.isPresent() && question.get().getAnswer() == null) { //질문이 있고, 답변이 없으면
         Answer answer = new Answer(requestAnswerDto.content());
         answer.setQuestion(question.get());
         question.get().setAnswerStatus(AnswerStatus.COMPLETED); // 질문의 답변 상태 변경
         question.get().setAnswer(answer);
         return answerMapper.toResponseAnswerDto(answerRepository.save(answer));
       }
-      throw new EntityNotFoundException("질문이 존재하지 않습니다.");
-    }throw new AccessDeniedException("관리자만 접근 가능합니다.");
-  }
+      else if( question.get().getAnswer() != null)
+        throw new SingleResponseViolationException("질문 하나에는 답변 하나만 등록할 수 있습니다.");
+      else throw new EntityNotFoundException("질문이 존재하지 않습니다.");
+    }
 
   /** 답변 수정 */
   @Transactional
   public ResponseAnswerDto updateAnswer(RequestAnswerDto requestAnswerDto, long answerId)
       throws AccessDeniedException {
-//    Optional<User> user = userRepository.findById(getUserId());
     Optional<User> user = userRepository.findById(entityFinder.getUser().getId());
 
-    if(user.get().getRole() == Role.ADMIN){
       Optional<Answer> answer = answerRepository.findById(answerId);
       if (answer.isPresent()) {
         Answer answer1 = answer.get();
         answer1.update(requestAnswerDto.content());
         return answerMapper.toResponseAnswerDto(answer1);
       } throw new EntityNotFoundException("존재하는 답변이 아닙니다.");
-    } throw new AccessDeniedException("관리자만 접근 가능합니다.");
   }
 
   /** 답변 삭제 */
   @Transactional
   public void deleteAnswer(long answerId) throws AccessDeniedException {
-//    Optional<User> user = userRepository.findById(getUserId());
     Optional<User> user = userRepository.findById(entityFinder.getUser().getId());
 
-    if(user.get().getRole() == Role.ADMIN){
       Question question = questionRepository.findByAnswerId(answerId);
       question.setAnswerStatus(AnswerStatus.PENDING); //답변 상태 수정
       question.setAnswer(null);
       answerRepository.deleteById(answerId);
-      return;
-    } throw new AccessDeniedException("관리자만 접근 가능합니다.");
-  }
+      }
 
-//  @Transactional
-//  public long getUserId() {
-//    // 접근한 유저 정보 가져오는 로직
-//    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-//    return Long.parseLong(userPrinciple.getUserId());
-//  }
 }
