@@ -76,9 +76,9 @@ public class CalendarDetailService {
   @Transactional
   public List<ResponseCalendarDetail> getAllCalendarDetail(
       String year, String month, Long studyRoomId) {
-    //접근한 유저 정보 가져오는 로직
-    //long userId = getUserId();
-    Long userId = entityFinder.getUser().getId();;
+
+    Long userId = entityFinder.getUser().getId();
+
     List<Calendar_detail> calendarDetailList =
         getCalendarDetailsFromCalendar(userId, studyRoomId, year, month);
     List<ResponseCalendarDetail> responseCalendarDetails = new ArrayList<>();
@@ -88,28 +88,27 @@ public class CalendarDetailService {
     return responseCalendarDetails;
   }
 
-// 개인 캘린더, 공용 캘린더 통합 리턴
+  // 개인 캘린더, 공용 캘린더 통합 리턴
   @Transactional
-  public List<ResponseAllCalendarDetail> getAllCalendarDetailFromAll(
-      String year, String month) {
+  public List<ResponseAllCalendarDetail> getAllCalendarDetailFromAll(String year, String month) {
     List<ResponseAllCalendarDetail> responseCalendarDetails = new ArrayList<>();
-    //접근한 유저 정보 가져오는 로직
-    //long userId = getUserId();
-    Long userId = entityFinder.getUser().getId();;
+
+    Long userId = entityFinder.getUser().getId();
 
     Optional<User> user = userRepository.findById(userId);
     List<UserStudyRoom> byUser = userStudyRoomRepository.findByUser(user.get());
 
     getCalendarDetails(responseCalendarDetails, year, month, 0L, userId);
-    for(UserStudyRoom userStudyRoom : byUser){
-     getCalendarDetails(responseCalendarDetails,year, month,
-          userStudyRoom.getStudyRoom().getId(), userId);
+    for (UserStudyRoom userStudyRoom : byUser) {
+      getCalendarDetails(
+          responseCalendarDetails, year, month, userStudyRoom.getStudyRoom().getId(), userId);
     }
     return responseCalendarDetails;
   }
 
   /**
    * 개별 일정 조회
+   *
    * @param id
    * @return
    */
@@ -131,10 +130,8 @@ public class CalendarDetailService {
   @Transactional
   public ResponseCalendarDetail saveCalendarDetail(
       RequestCalendarDetail requestCalendarDetail, Long studyRoomId) { // request로 받으면
-    //접근한 유저 정보 가져오는 로직
-//    long userId = getUserId();
 
-    Long userId = entityFinder.getUser().getId();;
+    Long userId = entityFinder.getUser().getId();
     Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
     calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
@@ -150,14 +147,14 @@ public class CalendarDetailService {
    * @return
    */
   @Transactional
-  public ResponseCalendarDetail putCalendarDetail(RequestCalendarDetail re,
-      long calendarDetailId) {
-    Optional<Calendar_detail> originCalendarDetail = calendarDetailRepository.findById(calendarDetailId);
+  public ResponseCalendarDetail putCalendarDetail(RequestCalendarDetail re, long calendarDetailId) {
+    Optional<Calendar_detail> originCalendarDetail =
+        calendarDetailRepository.findById(calendarDetailId);
 
     if (originCalendarDetail.isPresent()) {
       Calendar_detail calendarDetail = originCalendarDetail.get();
-      calendarDetail.update( re.title(), re.content(), re.startDay(), re.endDay(),
-          re.startTime(), re.endTime());
+      calendarDetail.update(
+          re.title(), re.content(), re.startDay(), re.endDay(), re.startTime(), re.endTime());
       return calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
     } else throw new EntityNotFoundException("일정이 존재하지 않습니다.");
   }
@@ -171,30 +168,23 @@ public class CalendarDetailService {
   @Transactional
   public void deleteCalendarDetail(long id) {
     calendarDetailRepository.deleteById(id);
-      }
+  }
 
-//  @Transactional
-//  public long getUserId(){
-//    //접근한 유저 정보 가져오는 로직
-//    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//    UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-//    return Long.parseLong(userPrinciple.getUserId());
-//  }
-
-  //캘린더 찾아서 해당 캘린더 한 달 리스트를 반환
-  public List<Calendar_detail> getCalendarDetailsFromCalendar(long userId, long studyRoomId,
-      String year, String month){
+  // 캘린더 찾아서 해당 캘린더 한 달 리스트를 반환
+  public List<Calendar_detail> getCalendarDetailsFromCalendar(
+      long userId, long studyRoomId, String year, String month) {
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
     try {
       saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
-    }catch (EntityNotFoundException e){
+    } catch (EntityNotFoundException e) {
       throw new EntityNotFoundException("캘린더가 존재하지 않습니다.");
     }
     String Month = String.format("%02d", Integer.parseInt(month));
     String date = year + Month;
 
+    // 해당 캘린더의 한 달 일정들을 리스트로 출력
     List<Calendar_detail> calendarDetailList =
-        calendarDetailRepository.findByStartDayContainingAndCalendar(date, calendar); // 해당 캘린더의 한 달 일정들을 리스트로 출력
+        calendarDetailRepository.findByStartDayContainingAndCalendar(date, calendar);
 
     return calendarDetailList;
   }
@@ -202,16 +192,18 @@ public class CalendarDetailService {
   // 한 달 리스트를 responseAll로 반환
   public List<ResponseAllCalendarDetail> getCalendarDetails(
       List<ResponseAllCalendarDetail> responseCalendarDetails,
-      String year, String month, long studyRoomId, long userId){
+      String year,
+      String month,
+      long studyRoomId,
+      long userId) {
 
     List<Calendar_detail> calendarDetailList =
         getCalendarDetailsFromCalendar(userId, studyRoomId, year, month);
     System.out.println(calendarDetailList.size());
 
     for (Calendar_detail calendarDetail : calendarDetailList) {
-      responseCalendarDetails.add(
-          new ResponseAllCalendarDetail(calendarDetail));
+      responseCalendarDetails.add(new ResponseAllCalendarDetail(calendarDetail));
     }
-    return  responseCalendarDetails;
+    return responseCalendarDetails;
   }
 }
