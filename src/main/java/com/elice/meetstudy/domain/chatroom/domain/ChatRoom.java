@@ -1,6 +1,5 @@
 package com.elice.meetstudy.domain.chatroom.domain;
 
-import com.elice.meetstudy.domain.chatroom.dto.ChatRoomDto;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
