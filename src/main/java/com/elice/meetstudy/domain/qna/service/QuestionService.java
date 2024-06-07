@@ -81,9 +81,11 @@ public class QuestionService {
 
     if (Question.isEmpty()) throw new EntityNotFoundException("질문이 없습니다");
     Question question = Question.get();
+    System.out.println("question.getPassword() = " + question.getPassword());
+    System.out.println(" = " +passwordEncoder.encode(password));
 
     if (question.isSecret()) { // 비밀글인 경우
-      if (!passwordEncoder.encode(password).equals(question.getPassword()))
+      if (!passwordEncoder.matches(password, question.getPassword()))
         throw new AccessDeniedException("비밀번호가 일치하지 않습니다.");
     }
     return questionMapper.toResponseQuestionDto(question);
@@ -107,12 +109,18 @@ public class QuestionService {
       throws AccessDeniedException {
     Optional<Question> question = questionRepository.findById(questionId);
     Long userId = entityFinder.getUser().getId();
+    String password;
     if (question.isEmpty()) throw new NotFoundException(null);
+
 
     Question question1 = question.get();
     if (question1.getUser().getId() == userId) {
+      if (re.isSecret()
+          && re.password() != null && !re.password().isEmpty())
+        password = passwordEncoder.encode(question1.getPassword());
+      else password = null;
       question1.update(
-          re.title(), re.content(), re.questionCategory(), re.isSecret(), re.password());
+          re.title(), re.content(), re.questionCategory(), re.isSecret(), password);
       return questionMapper.toResponseQuestionDto(question1);
     }
     throw new AccessDeniedException("작성한 사람만 수정할 수 있습니다.");
