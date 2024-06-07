@@ -34,7 +34,7 @@ public class SecurityConfig {
     "/api/studyroom/**",
     "/api/calendar/**",
     "/api/calendarDetail/**",
-    "/api/calendarAll",
+    "/api/calendarAll"
   };
   private final String[] publicUrl = {
     "/",
