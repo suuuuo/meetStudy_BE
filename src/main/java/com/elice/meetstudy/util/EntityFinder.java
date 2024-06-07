@@ -64,7 +64,7 @@ public class EntityFinder {
   public User getUser() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-    Long userId = Long.valueOf(userPrinciple.getEmail());
+    Long userId = Long.valueOf(userPrinciple.getUserId());
     return userRepository
         .findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 X " + userId));
