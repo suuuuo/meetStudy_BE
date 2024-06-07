@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -75,7 +76,7 @@ public class CalendarController {
   @Operation(summary = "캘린더 통합 조회", description = "jwt 토큰을 기반으로 접근한 유저의 개인, 공용 캘린더를 통합으로 조회합니다. "
       + "공휴일도 함께 조회됩니다.")
   @GetMapping("/calendarAll")
-  public ResponseEntity<List<ResponseAllCalendarDetail>> getAllCalendarDetails(
+  public ResponseEntity<Set<ResponseAllCalendarDetail>> getAllCalendarDetails(
       @RequestHeader("year") String year, @RequestHeader("month") String month) {
     return new ResponseEntity<>(
         calendarDetailService.getAllCalendarDetailFromAll(year, month), HttpStatus.OK);

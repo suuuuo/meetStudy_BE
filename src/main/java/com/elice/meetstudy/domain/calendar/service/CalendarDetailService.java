@@ -19,8 +19,11 @@ import com.elice.meetstudy.util.EntityFinder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,7 +95,7 @@ public class CalendarDetailService {
 
   // 개인 캘린더, 공용 캘린더 통합 리턴
   @Transactional
-  public List<ResponseAllCalendarDetail> getAllCalendarDetailFromAll(String year, String month) {
+  public Set<ResponseAllCalendarDetail> getAllCalendarDetailFromAll(String year, String month) {
     List<ResponseAllCalendarDetail> responseCalendarDetails = new ArrayList<>();
 
     Long userId = entityFinder.getUser().getId();
@@ -105,7 +108,8 @@ public class CalendarDetailService {
       getCalendarDetails(
           responseCalendarDetails, year, month, userStudyRoom.getStudyRoom().getId(), userId);
     }
-    return responseCalendarDetails;
+    Set<ResponseAllCalendarDetail> uniqueDetails = new HashSet<>(responseCalendarDetails);
+    return new HashSet<>(responseCalendarDetails);
   }
 
   /**
@@ -139,15 +143,15 @@ public class CalendarDetailService {
 
     LocalDate startDate = LocalDate.parse(re.startDay(), DateTimeFormatter.BASIC_ISO_DATE);
     LocalDate endDate = LocalDate.parse(re.endDay(), DateTimeFormatter.BASIC_ISO_DATE);
-    String startDay = startDate.format(DateTimeFormatter.ofPattern("yyMMdd"));
-    String endDay = endDate.format(DateTimeFormatter.ofPattern("yyMMdd"));
+    String startDay = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    String endDay = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
     for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
       Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(re);
       Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
       calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
-      calendarDetail.setStartDay(date.format(DateTimeFormatter.ofPattern("yyMMdd")));
-      calendarDetail.setEndDay(date.format(DateTimeFormatter.ofPattern("yyMMdd")));
+      calendarDetail.setStartDay(date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+      calendarDetail.setEndDay(date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
       calendarDetailRepository.save(calendarDetail); // 저장
 
       if(firstCalendarDetail == null){
@@ -217,11 +221,11 @@ public class CalendarDetailService {
 
     List<Calendar_detail> calendarDetailList =
         getCalendarDetailsFromCalendar(userId, studyRoomId, year, month);
-    System.out.println(calendarDetailList.size());
 
     for (Calendar_detail calendarDetail : calendarDetailList) {
       responseCalendarDetails.add(new ResponseAllCalendarDetail(calendarDetail));
     }
     return responseCalendarDetails;
   }
+
 }
