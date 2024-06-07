@@ -3,6 +3,7 @@ package com.elice.meetstudy.domain.calendar.dto;
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
 import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.Objects;
 import lombok.Getter;
 
 @Getter
@@ -18,6 +19,21 @@ public class ResponseAllCalendarDetail{
     private final String startTime;
     private final String endTime;
     private final boolean isHoliday;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ResponseAllCalendarDetail that = (ResponseAllCalendarDetail) o;
+        return Objects.equals(startDay, that.startDay) &&
+            Objects.equals(title, that.title) &&
+            isHoliday == that.isHoliday;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startDay, title, isHoliday);
+    }
 
     public ResponseAllCalendarDetail(Calendar_detail calendarDetail) {
         this.id = calendarDetail.getId();
