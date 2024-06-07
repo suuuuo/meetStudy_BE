@@ -147,6 +147,7 @@ public class CalendarDetailService {
       Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
       calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
       calendarDetail.setStartDay(date.format(DateTimeFormatter.ofPattern("yyMMdd")));
+      calendarDetail.setEndDay(date.format(DateTimeFormatter.ofPattern("yyMMdd")));
       calendarDetailRepository.save(calendarDetail); // 저장
 
       if(firstCalendarDetail == null){
