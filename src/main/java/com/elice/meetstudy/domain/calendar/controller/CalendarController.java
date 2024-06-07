@@ -38,7 +38,8 @@ public class CalendarController {
    * @param month
    * @return
    */
-  @Operation(summary = "캘린더 조회", description = "개인 캘린더 조회입니다. 공휴일도 함께 조회됩니다.")
+  @Operation(summary = "캘린더 조회", description = "jwt 토큰을 기반으로 접근한 유저의 개인 캘린더를 조회합니다. "
+      + "공휴일도 함께 조회됩니다.")
   @GetMapping("/calendar")
   public ResponseEntity<List<ResponseCalendarDetail>> getCalendarDetails(
       @Valid @RequestHeader("year") String year, @Valid @RequestHeader("month") String month) {
@@ -54,7 +55,8 @@ public class CalendarController {
    * @param studyRoomId
    * @return
    */
-  @Operation(summary = "캘린더 조회", description = "공용 캘린더 조회입니다. 공휴일도 함께 조회됩니다.")
+  @Operation(summary = "캘린더 조회", description = "studyRoomId로 공용 캘린더를 조회합니다. "
+      + "공휴일도 함께 조회됩니다.")
   @GetMapping("/calendar/{studyRoomId}")
   public ResponseEntity<List<ResponseCalendarDetail>> getCalendarDetails(
       @RequestHeader("year") String year,
@@ -64,6 +66,14 @@ public class CalendarController {
         calendarDetailService.getAllCalendarDetail(year, month, studyRoomId), HttpStatus.OK);
   }
 
+  /**
+   * 통합 조회
+   * @param year
+   * @param month
+   * @return
+   */
+  @Operation(summary = "캘린더 통합 조회", description = "jwt 토큰을 기반으로 접근한 유저의 개인, 공용 캘린더를 통합으로 조회합니다. "
+      + "공휴일도 함께 조회됩니다.")
   @GetMapping("/calendarAll")
   public ResponseEntity<List<ResponseAllCalendarDetail>> getAllCalendarDetails(
       @RequestHeader("year") String year, @RequestHeader("month") String month) {
@@ -77,7 +87,7 @@ public class CalendarController {
    * @param calendarDetailId
    * @return
    */
-  @Operation(summary = "캘린더 일정 조회", description = "개별 일정 조회입니다.")
+  @Operation(summary = "캘린더 일정 조회", description = "calendarId 로 일정을 개별 조회합니다.")
   @GetMapping("/calendarDetail/{calendarDetailId}")
   public ResponseEntity<ResponseCalendarDetail> getCalendarDetail(
       @PathVariable long calendarDetailId) {
@@ -91,7 +101,7 @@ public class CalendarController {
    * @param requestCalendarDetail
    * @return
    */
-  @Operation(summary = "개인 캘린더 일정 등록", description = "개인 캘린더에 일정을 등록합니다.")
+  @Operation(summary = "개인 캘린더 일정 등록", description = "개인 캘린더에 새로운 일정을 등록합니다.")
   @PostMapping("/calendar")
   public ResponseEntity<ResponseCalendarDetail> postCalendarDetail(
       @RequestBody @Valid RequestCalendarDetail requestCalendarDetail) {
@@ -106,7 +116,7 @@ public class CalendarController {
    * @param studyRoomId
    * @return
    */
-  @Operation(summary = "공용 캘린더 일정 등록", description = "공용 캘린더에 일정을 등록합니다.")
+  @Operation(summary = "공용 캘린더 일정 등록", description = "공용 캘린더에 새로운 일정을 등록합니다.")
   @PostMapping("/calendar/{studyRoomId}")
   public ResponseEntity<ResponseCalendarDetail> postCalendarDetail(
       @RequestBody @Valid RequestCalendarDetail requestCalendarDetail,
@@ -123,7 +133,7 @@ public class CalendarController {
    * @param calendarDetailId
    * @return
    */
-  @Operation(summary = "캘린더 일정 수정", description = "일정을 수정합니다.")
+  @Operation(summary = "캘린더 일정 수정", description = "calendarDetailId 로 기존 일정을 찾아 수정합니다.")
   @PutMapping("/calendarDetail/{calendarDetailId}")
   public ResponseEntity<ResponseCalendarDetail> putCalendarDetail(
       @RequestBody @Valid RequestCalendarDetail requestCalendarDetail,
@@ -139,7 +149,7 @@ public class CalendarController {
    * @param calendarDetailId
    * @return
    */
-  @Operation(summary = "캘린더 일정 삭제", description = "일정을 삭제합니다.")
+  @Operation(summary = "캘린더 일정 삭제", description = "calendarDetailId 로 기존 일정을 찾아 삭제합니다.")
   @DeleteMapping("/calendarDetail/{calendarDetailId}")
   public ResponseEntity<HttpStatus> deleteCalendarDetail(@PathVariable long calendarDetailId) {
     calendarDetailService.deleteCalendarDetail(calendarDetailId);
@@ -151,7 +161,7 @@ public class CalendarController {
    *
    * @return
    */
-  @Operation(summary = "개인 캘린더 삭제", description = "개인 캘린더를 삭제합니다.")
+  @Operation(summary = "개인 캘린더 삭제", description = "접근한 유저의 개인 캘린더를 삭제합니다.")
   @DeleteMapping("/calendar")
   public ResponseEntity<HttpStatus> deleteUserCalendar() {
     calendarService.deleteCalendar();
@@ -164,7 +174,7 @@ public class CalendarController {
    * @param studyRoomId
    * @return
    */
-  @Operation(summary = "공용 캘린더 삭제", description = "공용 캘린더를 삭제합니다.")
+  @Operation(summary = "공용 캘린더 삭제", description = "studyRoomId 에 해당하는 스터디룸의 공용 캘린더를 삭제합니다.")
   @DeleteMapping("/calendar/{studyRoomId}")
   public ResponseEntity<HttpStatus> deleteStudyCalendar(@PathVariable long studyRoomId) {
     calendarService.deleteStudyCalendar(studyRoomId);

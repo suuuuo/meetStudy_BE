@@ -24,16 +24,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api")
+@RequestMapping("/api")
 @Tag(name = "M. 문의", description = "문의 게시판 관련 API 입니다.")
 public class QuestionController {
 
   private final QuestionService questionService;
 
-  /** 질문 전체 조회 (키워드) */
+  /** 질문 전체 조회 (키워드, 페이징, 카테고리) */
   @Operation(
       summary = "질문 조회",
-      description = "키워드나 카테고리를 입력하면 해당되는 질문 조회, 입력하지 않으면 전체 질문 조회가 가능합니다.")
+      description = "키워드나 카테고리를 입력하면 해당되는 질문 조회, 입력하지 않으면 전체 질문 조회가 가능합니다."
+          + "id 기준(등록 기준) 내림차순으로 조회됩니다.")
   @GetMapping("/question/public")
   public ResponseEntity<List<ResponseQuestionDto>> getAllQuestions(
       @RequestParam(defaultValue = "0") int page,
@@ -45,7 +46,8 @@ public class QuestionController {
   }
 
   /** 질문 개별 조회 */
-  @Operation(summary = "질문 조회", description = "질문 id를 통해 개별 조회가 가능합니다.")
+  @Operation(summary = "질문 조회", description = "질문 id를 통해 개별 질문 조회가 가능합니다."
+      + "비밀글일 경우 비밀번호를 확인하고 일치하지 않으면 접근을 제한합니다.")
   @GetMapping("/question/public/{questionId}")
   public ResponseEntity<ResponseQuestionDto> getQuestion(
       @PathVariable long questionId, @RequestParam(required = false) String password)
@@ -57,7 +59,8 @@ public class QuestionController {
    * @param requestQuestionDto
    * @return responseQuestionDto 질문 생성
    */
-  @Operation(summary = "질문 등록", description = "질문 등록이 가능합니다. 상태는 대기중으로 지정됩니다.")
+  @Operation(summary = "질문 등록", description = "새로운 질문을 등록합니다. "
+      + "처음 등록 시 답변 상태는 대기중(PENDING)으로 지정됩니다.")
   @PostMapping("/question")
   public ResponseEntity<ResponseQuestionDto> postQuestion(
       @Validated @RequestBody RequestQuestionDto requestQuestionDto) {
@@ -71,7 +74,8 @@ public class QuestionController {
    * @param questionId
    * @return
    */
-  @Operation(summary = "질문 수정", description = "질문 수정이 가능합니다.")
+  @Operation(summary = "질문 수정", description = "questionId로 질문을 찾고 수정합니다."
+      + " 질문을 등록하지 않은 유저가 수정을 시도하면 제한합니다.")
   @PutMapping("/question/{questionId}")
   public ResponseEntity<ResponseQuestionDto> updateQuestion(
       @RequestBody @Valid RequestQuestionDto requestQuestionDto, @PathVariable long questionId)
@@ -81,8 +85,9 @@ public class QuestionController {
   }
 
   /** 질문 삭제 */
-  @Operation(summary = "질문 삭제", description = "질문 삭제가 가능합니다.")
-  @DeleteMapping("/question/{questionId}")
+  @Operation(summary = "질문 삭제", description = "questionId 로 질문을 찾고 삭제합니다."
+      + "질문을 삭제하면 답변도 함께 삭제됩니다.")
+  @DeleteMapping("/question/public/{questionId}")
   public ResponseEntity<HttpStatus> deleteQuestion(@PathVariable long questionId) {
     questionService.deleteQuestion(questionId);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

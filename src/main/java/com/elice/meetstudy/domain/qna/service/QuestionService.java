@@ -90,7 +90,6 @@ public class QuestionService {
   @Transactional
   public ResponseQuestionDto postQuestion(RequestQuestionDto requestQuestionDto) {
     Question question = questionMapper.toQuestionEntity(requestQuestionDto);
-    //        question.setUser(userRepository.findById(getUserId()).get());
     question.setUser(userRepository.findById(entityFinder.getUser().getId()).get());
 
     return questionMapper.toResponseQuestionDto(questionRepository.save(question));
@@ -101,7 +100,6 @@ public class QuestionService {
   public ResponseQuestionDto updateQuestion(RequestQuestionDto re, long questionId)
       throws AccessDeniedException {
     Optional<Question> question = questionRepository.findById(questionId);
-    //        long userId = getUserId();
     Long userId = entityFinder.getUser().getId();
     if (question.isEmpty()) throw new NotFoundException(null);
 
@@ -118,17 +116,9 @@ public class QuestionService {
   @Transactional
   public void deleteQuestion(long questionId) {
     Optional<Question> question = questionRepository.findById(questionId);
-    //        long userId = getUserId();
     Long userId = entityFinder.getUser().getId();
 
     if (question.get().getUser().getId() == userId) questionRepository.deleteById(questionId);
   }
 
-  //    @Transactional
-  //    public long getUserId() {
-  //        // 접근한 유저 정보 가져오는 로직
-  //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-  //        UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-  //        return Long.parseLong(userPrinciple.getUserId());
-  //    }
 }

@@ -30,7 +30,10 @@ public class SecurityConfig {
     "/api/post/**",
     "/api/question/**",
     "/api/chatroom/**",
-    "/api/studyroom/**"
+    "/api/studyroom/**",
+    "/api/calendar/**",
+    "/api/calendarDetail/**",
+    "/api/calendarAll"
   };
   private final String[] publicUrl = {
     "/",
@@ -39,7 +42,8 @@ public class SecurityConfig {
     "/api/post/public/**",
     "/api/categories/**",
     "/api/answer/public/**",
-    "/api/question/public/**"
+    "/api/question/public/**",
+    "/api/admin/categories/public/**"
   };
   private final String[] swaggerUrl = {
     "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/api-docs/**"
@@ -48,7 +52,8 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
-        .cors(AbstractHttpConfigurer::disable)
+        //        .cors(AbstractHttpConfigurer::disable)
+//        .cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement(
@@ -71,16 +76,14 @@ public class SecurityConfig {
                     .hasAuthority("USER")
                     .anyRequest()
                     .authenticated())
+        .logout(
+            logout ->
+                logout
+                    .logoutUrl("/api/user/logout") // 로그아웃 요청 URL
+                    .logoutSuccessUrl("/login") // 로그아웃 성공 시 리디렉션 URL
+                    .invalidateHttpSession(true) // 세션 무효화
+                    .deleteCookies("JSESSIONID")) // 쿠키 삭제
         .build();
-
-    //        .logout(
-    //            logout ->
-    //                logout
-    //                    .logoutUrl("/api/user/logout") // 로그아웃 요청 URL
-    //                    .logoutSuccessUrl("/login") // 로그아웃 성공 시 리디렉션 URL
-    //                    .invalidateHttpSession(true) // 세션 무효화
-    //                    .deleteCookies("JSESSIONID")) // 쿠키 삭제
-    // .build();
   }
 
   @Bean
