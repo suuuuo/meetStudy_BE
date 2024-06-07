@@ -1,7 +1,5 @@
 package com.elice.meetstudy.domain.chatroom.service;
 
-import static com.elice.meetstudy.domain.user.domain.Role.USER;
-
 import com.elice.meetstudy.domain.chatroom.domain.ChatRoom;
 import com.elice.meetstudy.domain.chatroom.dto.ChatRoomDto;
 import com.elice.meetstudy.domain.chatroom.dto.CreateChatRoomDto;
@@ -24,8 +22,6 @@ public class ChatRoomService {
   @Autowired private final ChatRoomRepository chatRoomRepository;
 
   @Autowired private final EntityFinder entityFinder;
-  //  @Autowired
-  //  private final MessageRepository messageRepository;
 
   @Autowired private final StudyRoomRepository studyRoomRepository;
 
