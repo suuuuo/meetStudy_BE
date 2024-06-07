@@ -15,8 +15,8 @@ public interface StudyRoomRepository extends JpaRepository<StudyRoom, Long> {
 
 
   @Query("select s from StudyRoom s "
-      + "join fetch s.userStudyRooms us "
-      + "where s.id = :id and us.user.id = :userId")
+          + "join fetch s.userStudyRooms us "
+          + "where s.id = :id and us.user.id = :userId")
   Optional<StudyRoom> findStudyRoomByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
 
 }

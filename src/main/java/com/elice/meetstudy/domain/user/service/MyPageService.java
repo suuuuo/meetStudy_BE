@@ -42,9 +42,6 @@ public class MyPageService {
     @Transactional
     public User getUserByUserId(){
 
-//        Long userId = getUserId();
-//        Long userId = 18L;
-
         Long userId = entityFinder.getUser().getId();
         return userRepository.findUserByUserId(userId);
     }
@@ -52,8 +49,6 @@ public class MyPageService {
     @Transactional
     // 회원 정보 수정
     public User updateUser(UserUpdateDto userUpdateDto) {
-//        Long userId = getUserId();
-//        Long userId = 18L;
 
         Long userId = entityFinder.getUser().getId();
 
@@ -80,7 +75,7 @@ public class MyPageService {
             for (Long categoryId : interestIds) {
                 Category category = categoryRepository.findById(categoryId)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + categoryId));
-                Interest interest = Interest.createInterest(updateUser, category); // 관심사를 생성하고 사용자에게 추가
+                Interest interest = Interest.createInterest(category); // 관심사를 생성하고 사용자에게 추가
                 updateUser.addInterest(interest);
             }
         }
@@ -88,13 +83,9 @@ public class MyPageService {
         return userRepository.save(updateUser); // 관심사가 추가된 사용자를 한 번에 저장
     }
 
-
     // 회원 삭제 (탈퇴)
     @Transactional
     public void delete() {
-
-//        Long userId = getUserId();
-//        Long userId = 12L;
 
         Long userId = entityFinder.getUser().getId();
 
@@ -104,18 +95,10 @@ public class MyPageService {
         deleteUser.updateDeletedAt();
     }
 
-//    // 참여한 스터디룸 조회
-//    @Transactional
-//    public List<UserStudyRoom> getStudyRoomsByUserId(String token) {
-//        Long userId = getUserIdFromToken(token);
-//        return userStudyRoomRepository.findStudyRoomsByUserId(userId);
-//    }
-
     // 스크랩 한 게시글 조회
     @Transactional
     public List<Post> getScrappedPostsByUserId() {
         Long userId = entityFinder.getUser().getId();
-//        Long userId = getUserId();
         List<Scrap> scraps = scrapRepository.findScrapsByUserId(userId);
         return scraps.stream()
             .map(Scrap::getPost)
