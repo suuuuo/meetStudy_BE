@@ -39,8 +39,8 @@ public class PostService {
         Post.builder()
             .user(entityFinder.getUser())
             .category(category)
-            .title(postCreate.getTitle())
-            .content(postCreate.getContent())
+            .title(postCreate.getTitle().trim())
+            .content(postCreate.getContent().trim())
             .build();
 
     return new PostResponseDTO(postRepository.save(newPost));
@@ -57,7 +57,7 @@ public class PostService {
             .user(entityFinder.getUser())
             .category(category)
             .title(postCreate.getTitle())
-            .content(postCreate.getContent())
+            .content(postCreate.getContent().trim())
             .build();
 
     return new PostResponseDTO(postRepository.save(newPost));
@@ -78,9 +78,14 @@ public class PostService {
                   editRequest.getCategoryId() != null
                       ? editRequest.getCategoryId()
                       : post.getCategory().getId())
-              .title(editRequest.getTitle() != null ? editRequest.getTitle() : post.getTitle())
+              .title(
+                  editRequest.getTitle() != null
+                      ? editRequest.getTitle().trim()
+                      : post.getTitle().trim())
               .content(
-                  editRequest.getContent() != null ? editRequest.getContent() : post.getContent())
+                  editRequest.getContent() != null
+                      ? editRequest.getContent().trim()
+                      : post.getContent().trim())
               .build();
 
       // post 엔티티 수정
