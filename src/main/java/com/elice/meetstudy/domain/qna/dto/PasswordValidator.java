@@ -13,7 +13,6 @@ public class PasswordValidator implements ConstraintValidator<PasswordCheck, Req
 
     @Override
     public boolean isValid(RequestQuestionDto dto, ConstraintValidatorContext context) {
-        System.out.println(dto.isSecret());
     if (dto.isSecret() && (dto.password() == null || dto.password().isBlank() || dto.password().isEmpty())) {
         throw new PasswordValidationException("비밀번호를 입력해주세요.");
     }
