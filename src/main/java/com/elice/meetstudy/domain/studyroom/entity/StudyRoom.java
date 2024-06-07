@@ -2,6 +2,8 @@ package com.elice.meetstudy.domain.studyroom.entity;
 
 import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.chatroom.domain.ChatRoom;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +17,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
 public class StudyRoom {
 
   @Id
