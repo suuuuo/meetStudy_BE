@@ -16,6 +16,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
@@ -28,6 +29,7 @@ public class QuestionService {
   private final QuestionMapper questionMapper;
   private final UserRepository userRepository;
   private final EntityFinder entityFinder;
+  private final PasswordEncoder passwordEncoder;
 
   /** 질문 리스트 전체 조회 (키워드 설정 o ) */
   @Transactional
@@ -71,17 +73,18 @@ public class QuestionService {
     return responseQuestionDtoList;
   }
 
+  // 질문 개별 조회
   @Transactional
   public ResponseQuestionDto getQuestion(long questionId, String password)
       throws AccessDeniedException {
     Optional<Question> Question = questionRepository.findById(questionId);
 
-    if (Question.isEmpty()) throw new EntityNotFoundException();
+    if (Question.isEmpty()) throw new EntityNotFoundException("질문이 없습니다");
     Question question = Question.get();
 
-    if (question.isSecret()) { // 비밀글인 경우 : 수정
-      if (password == null || !password.equals(question.getPassword()))
-        throw new AccessDeniedException(null);
+    if (question.isSecret()) { // 비밀글인 경우
+      if (!passwordEncoder.encode(password).equals(question.getPassword()))
+        throw new AccessDeniedException("비밀번호가 일치하지 않습니다.");
     }
     return questionMapper.toResponseQuestionDto(question);
   }
@@ -90,6 +93,9 @@ public class QuestionService {
   @Transactional
   public ResponseQuestionDto postQuestion(RequestQuestionDto requestQuestionDto) {
     Question question = questionMapper.toQuestionEntity(requestQuestionDto);
+    if(question.getPassword() != null && !question.getPassword().isEmpty())
+      question.setPassword(passwordEncoder.encode(question.getPassword()));
+
     question.setUser(userRepository.findById(entityFinder.getUser().getId()).get());
 
     return questionMapper.toResponseQuestionDto(questionRepository.save(question));
