@@ -40,14 +40,6 @@ public class MyPageController {
     myPageService.delete();
   }
 
-  //    @Operation(summary = "참여한 스터디룸 조회")
-  //    @GetMapping("/studyroomlist")
-  //    public ResponseEntity<List<UserStudyRoom>>
-  // getStudyRoomsByUserId(@RequestHeader("Authorization") String token) {
-  //        List<UserStudyRoom> studyRooms = myPageService.getStudyRoomsByUserId(token);
-  //        return new ResponseEntity<>(studyRooms, HttpStatus.OK);
-  //    }
-
   @Operation(summary = "스크랩 한 게시글 조회", description = "회원별 스크랩 한 게시글을 조회합니다.")
   @GetMapping("/scraplist")
   public ResponseEntity<List<Post>> getScrappedPosts() {

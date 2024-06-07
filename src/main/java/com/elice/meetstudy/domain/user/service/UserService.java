@@ -68,7 +68,6 @@ public class UserService {
     return userRepository.save(user);
   }
 
-
   // 이메일 중복확인, 이메일 인증
   public boolean checkEmailDuplicate(String email) {
     return userRepository.existsByEmail(email);
@@ -85,7 +84,6 @@ public class UserService {
       throw new IllegalArgumentException("관심분야는 최대 3개까지 허용됩니다.");
     }
   }
-
 
   // 로그인
   public TokenInfo login(String email, String password) {
@@ -118,8 +116,5 @@ public class UserService {
     }
   }
 
-
-
-  // + 소셜 로그인, 비밀번호 찾기
-
+  // + 소셜 로그인
 }
