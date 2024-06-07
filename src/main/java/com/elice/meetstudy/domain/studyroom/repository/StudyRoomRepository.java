@@ -9,4 +9,5 @@ import java.util.List;
 
 @Repository
 public interface StudyRoomRepository extends JpaRepository<StudyRoom, Long> {
+
 }
