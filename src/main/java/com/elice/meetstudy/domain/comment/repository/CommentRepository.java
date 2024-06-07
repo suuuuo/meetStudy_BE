@@ -37,4 +37,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
   @Query("SELECT c FROM Comment c WHERE c.content LIKE %:keyword% ORDER BY c.createdAt DESC")
   List<Comment> findAllByKeywordOrderByCreatedAtDesc(
       @Param("keyword") String keyword, Pageable pageable);
+
+  // 특정 회원이 작성한 댓글 조회
+  List<Comment> findAllByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 }
