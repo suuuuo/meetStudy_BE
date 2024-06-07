@@ -1,37 +1,36 @@
 package com.elice.meetstudy.domain.user.service;
 
+import com.elice.meetstudy.domain.user.domain.User;
+import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.domain.user.util.RedisUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Random;
 
-
+@Slf4j
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class MailService {
     @Autowired
     private JavaMailSender mailSender;
     @Autowired
     private  RedisUtil redisUtil;
     private int authNumber;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public boolean CheckAuthNum(String email,String authNum){
-        if(redisUtil.getData(authNum)==null){
-            return false;
-        }
-        else if(redisUtil.getData(authNum).equals(email)){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    //임의의 6자리 양수를 반환합니다.
+    // 인증코드 생성 - 임의의 6자리 양수
     public void makeRandomNumber() {
         Random r = new Random();
         String randomNumber = "";
@@ -42,7 +41,7 @@ public class MailService {
         authNumber = Integer.parseInt(randomNumber);
     }
 
-    //mail을 어디서 보내는지, 어디로 보내는지 , 인증 번호를 html 형식으로 어떻게 보내는지 작성합니다.
+    // 회원가입 - 이메일 인증 메일 발송
     public String joinEmail(String email) {
         makeRandomNumber();
         String setFrom = "seoyeonkang512@gmail.com";
@@ -56,6 +55,64 @@ public class MailService {
                         "인증번호를 제대로 입력해주세요"; //이메일 내용 삽입
         mailSend(setFrom, toMail, title, content);
         return Integer.toString(authNumber);
+    }
+
+    // 이메일로 보낸 인증코드와 사용자가 적은 인증코드가 일치하는지 확인
+    public boolean CheckAuthNum(String email,String authNum){
+        if(redisUtil.getData(authNum)==null){
+            return false;
+        }
+        else if(redisUtil.getData(authNum).equals(email)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    // 가입한 이메일 존재하는지 확인 - 임시 비밀번호 생성 - 가입한 이메일로 임시 비밀번호 전송 - 임시 비밀번호로 db변경
+    // 이메일로 비밀번호 찾기
+    public String passwordEmail(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (!optionalUser.isPresent()) {
+            throw new IllegalArgumentException("등록되지 않은 이메일입니다.");
+        }
+
+        User user = optionalUser.get();
+        String tempPassword = getTempPassword();
+        String encodedTempPwd = passwordEncoder(tempPassword);
+        user.setPassword(encodedTempPwd); // 필요 시 암호화
+        userRepository.save(user);
+
+        String setFrom = "seoyeonkang512@gmail.com";
+        String toMail = email;
+        String title = "임시 비밀번호 안내 이메일입니다.";
+        String content = "임시 비밀번호는 " + tempPassword + "입니다." +
+                "<br>로그인 후 비밀번호를 변경해주세요.";
+
+        mailSend(setFrom, toMail, title, content);
+
+        return "임시 비밀번호가 발송되었습니다.";
+    }
+
+    // 임시 비밀번호 생성
+    public String getTempPassword(){
+        char[] charSet = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+                'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+
+        StringBuilder tempPwd = new StringBuilder();
+
+        int idx = 0;
+        for (int i = 0; i < 10; i++) {
+            idx = (int) (charSet.length * Math.random());
+            tempPwd.append(charSet[idx]);
+        }
+        return tempPwd.toString();
+    }
+
+    // 임시로 생성한 비번 encoding
+    public String passwordEncoder(String tempPwd){
+        return bCryptPasswordEncoder.encode(tempPwd);
     }
 
     //이메일을 전송합니다.

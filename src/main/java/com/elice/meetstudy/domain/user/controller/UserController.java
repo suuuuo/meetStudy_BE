@@ -82,5 +82,11 @@ public class UserController {
     return new ApiResponseJson(HttpStatus.OK, tokenInfo);
   }
 
-  // + 소셜 로그인, 비밀번호 찾기
+  @Operation(summary = "비밀번호 찾기", description = "이메일로 임시 비밀번호를 발송합니다.")
+  @PostMapping("/findPassword")
+  public String findPassword(@RequestBody @Valid EmailRequestDto emailDto) {
+    return mailService.passwordEmail(emailDto.getEmail());
+  }
+
+  // + 소셜 로그인
 }
