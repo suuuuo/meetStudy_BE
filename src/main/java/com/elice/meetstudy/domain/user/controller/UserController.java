@@ -25,7 +25,7 @@ public class UserController {
 
   private final UserService userService;
 
-  @Operation(summary = "회원가입")
+  @Operation(summary = "회원가입", description = "이메일, 비밀번호, 이름, 닉네임, 관심분야를 입력받아 회원가입합니다.")
   @PostMapping("/join")
   public ApiResponseJson join(@RequestBody @Valid UserJoinDto userJoinDto) {
 
@@ -37,21 +37,21 @@ public class UserController {
             "username", user.getUsername()));
   }
 
-  @Operation(summary = "회원가입 - 이메일 중복확인, 이메일 인증")
+  @Operation(summary = "회원가입 - 이메일 중복확인", description = "이메일을 중복확인합니다. (이메일 인증은 구현보류)")
   @GetMapping("/check-email")
   public ResponseEntity<Boolean> checkEmailDuplicate(@RequestParam String email) {
     boolean isDuplicate = userService.checkEmailDuplicate(email);
     return ResponseEntity.ok(isDuplicate);
   }
 
-  @Operation(summary = "회원가입 - 닉네임 중복확인")
+  @Operation(summary = "회원가입 - 닉네임 중복확인", description = "닉네임을 중복확인합니다.")
   @GetMapping("/check-nickname")
   public ResponseEntity<Boolean> checkNicknameDuplicate(@RequestParam String nickname) {
     boolean isDuplicate = userService.checkNicknameDuplicate(nickname);
     return ResponseEntity.ok(isDuplicate);
   }
 
-  @Operation(summary = "로그인")
+  @Operation(summary = "로그인", description = "이메일, 비밀번호를 입력하여 로그인합니다.")
   @PostMapping("/login")
   public ApiResponseJson login(@RequestBody @Valid UserLoginDto userLoginDto) {
     TokenInfo tokenInfo = userService.login(userLoginDto.getEmail(), userLoginDto.getPassword());
