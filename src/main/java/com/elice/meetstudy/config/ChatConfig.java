@@ -1,8 +1,10 @@
 package com.elice.meetstudy.config;
 
+import com.elice.meetstudy.domain.chatroom.handler.StompHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -13,6 +15,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Slf4j
 @RequiredArgsConstructor
 public class ChatConfig implements WebSocketMessageBrokerConfigurer {
+
+  private final StompHandler stompHandler;
 
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -25,8 +29,13 @@ public class ChatConfig implements WebSocketMessageBrokerConfigurer {
   @Override
   public void configureMessageBroker(MessageBrokerRegistry registry) {
   //메세지를 구독하는 요청 url
-  registry.enableSimpleBroker("/sub");
+  registry.enableSimpleBroker("/room");
   //메세지를 발행하는 요청 url
-    registry.setApplicationDestinationPrefixes("/app");
+    registry.setApplicationDestinationPrefixes("/send");
+  }
+
+  @Override
+  public void configureClientInboundChannel(ChannelRegistration registration) {
+    registration.interceptors(stompHandler);
   }
 }
