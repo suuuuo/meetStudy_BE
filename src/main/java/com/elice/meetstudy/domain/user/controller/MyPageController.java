@@ -22,19 +22,19 @@ public class MyPageController {
 
   private final MyPageService myPageService;
 
-  @Operation(summary = "회원 정보 조회")
+  @Operation(summary = "회원 정보 조회", description = "회원별 정보를 조회합니다.")
   @GetMapping
   public User getUserInfo() {
     return myPageService.getUserByUserId();
   }
 
-  @Operation(summary = "회원 정보 수정")
+  @Operation(summary = "회원 정보 수정", description = "비밀번호, 이름, 닉네임, 관심분야 중 선택하여 수정할 수 있습니다.")
   @PutMapping("/edit")
   public User updateUser(@RequestBody UserUpdateDto userUpdateDto) {
     return myPageService.updateUser(userUpdateDto);
   }
 
-  @Operation(summary = "회원 삭제 (탈퇴)")
+  @Operation(summary = "회원 삭제 (탈퇴)", description = "탈퇴일자에 현재 시간이 들어가며 탈퇴됩니다.")
   @DeleteMapping("/delete")
   public void userDelete() {
     myPageService.delete();
@@ -48,7 +48,7 @@ public class MyPageController {
   //        return new ResponseEntity<>(studyRooms, HttpStatus.OK);
   //    }
 
-  @Operation(summary = "스크랩 한 게시글 조회")
+  @Operation(summary = "스크랩 한 게시글 조회", description = "회원별 스크랩 한 게시글을 조회합니다.")
   @GetMapping("/scraplist")
   public ResponseEntity<List<Post>> getScrappedPosts() {
     List<Post> scrappedPosts = myPageService.getScrappedPostsByUserId();

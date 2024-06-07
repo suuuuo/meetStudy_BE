@@ -46,7 +46,8 @@ public class User {
   @Enumerated(EnumType.STRING)
   private Role role;
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "user_id")
   private List<Interest> interests = new ArrayList<>();
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -73,7 +74,6 @@ public class User {
 
   public void addInterest(Interest interest) {
     interests.add(interest);
-    interest.setUser(this);
   }
 
   public void clearInterests() {

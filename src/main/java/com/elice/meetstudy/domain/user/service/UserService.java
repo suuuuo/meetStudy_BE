@@ -53,16 +53,19 @@ public class UserService {
             .role(Role.USER)
             .build();
 
+    // 먼저 유저를 저장하여 ID를 생성
+    user = userRepository.save(user);
+
     List<Long> interestIds = userJoinDto.getInterests();
     for (Long categoryId : interestIds) {
       Category category = categoryRepository.findById(categoryId)
               .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + categoryId));
-      Interest interest = Interest.createInterest(user, category); // 관심사를 생성하고 사용자에게 추가
+      Interest interest = Interest.createInterest(category);
       user.addInterest(interest);
     }
 
-    // Save the user with interests
-    return userRepository.save(user); // 관심사가 추가된 사용자를 한 번에 저장
+    // 관심사를 포함한 유저를 다시 저장
+    return userRepository.save(user);
   }
 
 
