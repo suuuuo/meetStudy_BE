@@ -44,7 +44,10 @@ public class SecurityConfig {
     "/api/categories/**",
     "/api/answer/public/**",
     "/api/question/public/**",
-    "/api/admin/categories/public/**"
+    "/api/admin/categories/public/**",
+    "/ws/**",
+    "/send/**",
+    "/room/**"
   };
   private final String[] swaggerUrl = {
     "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/api-docs/**"
