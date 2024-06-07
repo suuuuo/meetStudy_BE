@@ -18,7 +18,6 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
   // 이하영
   // 1. 게시글 스크랩 (insert into scrap)
   // 1-1. 이미 스크랩한 게시글인지 확인
-  // @Query("SELECT s FROM scrap WHERE s.user.id = :userId AND s.post.id = :postId")
   Optional<Scrap> findByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long postId);
 
   // 2. 게시글 스크랩 취소 (delete scrap)
@@ -30,7 +29,6 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
 
   // 4. 게시판 즐겨찾기
   // 4-1. 이미 스크랩한 게시판인지 확인
-  // @Query("SELECT s FROM Scrap WHERE s.user.id = :userId AND s.category.id = :categoryId")
   Optional<Scrap> findByUserIdAndCategoryId(
       @Param("userId") Long userId, @Param("categoryId") Long categoryId);
 

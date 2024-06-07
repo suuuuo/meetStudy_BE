@@ -67,20 +67,20 @@ public class CommentController {
     return ResponseEntity.ok(commentService.getByPostAndKeyword(postId, keyword, page, size));
   }
 
-  /** 추후 AdminController로 이동을 고려! API endpoint 변경 예정 */
-  @Operation(summary = "(관리자 페이지 - 전체 댓글 모니터링) 전체 댓글 조회 - (최근 작성된 순으로)")
-  @GetMapping
-  public ResponseEntity<List<CommentResponseDTO>> getComment(
-      @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-    return ResponseEntity.ok(commentService.getAll(page, size));
-  }
-
-  @Operation(summary = "(관리자 페이지 - 전체 댓글 모니터링) 전체 댓글 내 키워드 검색 - (최근 작성된 순으로)")
-  @GetMapping("/search")
-  public ResponseEntity<List<CommentResponseDTO>> getAllCommentByKeyword(
-      @RequestParam String keyword,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size) {
-    return ResponseEntity.ok(commentService.getByKeyword(keyword, page, size));
-  }
+  //  /** 추후 AdminController로 이동을 고려! API endpoint 변경 예정 */
+  //  @Operation(summary = "(관리자 페이지 - 전체 댓글 모니터링) 전체 댓글 조회 - (최근 작성된 순으로)")
+  //  @GetMapping
+  //  public ResponseEntity<List<CommentResponseDTO>> getComment(
+  //      @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+  //    return ResponseEntity.ok(commentService.getAll(page, size));
+  //  }
+  //
+  //  @Operation(summary = "(관리자 페이지 - 전체 댓글 모니터링) 전체 댓글 내 키워드 검색 - (최근 작성된 순으로)")
+  //  @GetMapping("/search")
+  //  public ResponseEntity<List<CommentResponseDTO>> getAllCommentByKeyword(
+  //      @RequestParam String keyword,
+  //      @RequestParam(defaultValue = "0") int page,
+  //      @RequestParam(defaultValue = "10") int size) {
+  //    return ResponseEntity.ok(commentService.getByKeyword(keyword, page, size));
+  //  }
 }
