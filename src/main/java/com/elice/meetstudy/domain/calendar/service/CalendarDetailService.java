@@ -16,6 +16,8 @@ import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.util.EntityFinder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -123,20 +125,35 @@ public class CalendarDetailService {
   /**
    * 일정 추가
    *
-   * @param requestCalendarDetail
+   * @param re
    * @param studyRoomId
    * @return
    */
   @Transactional
   public ResponseCalendarDetail saveCalendarDetail(
-      RequestCalendarDetail requestCalendarDetail, Long studyRoomId) { // request로 받으면
+      RequestCalendarDetail re, Long studyRoomId) { // request로 받으면
 
     Long userId = entityFinder.getUser().getId();
-    Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(requestCalendarDetail);
-    Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
-    calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
-    calendarDetailRepository.save(calendarDetail); // 저장
-    return calendarDetailMapper.toResponseCalendarDetail(calendarDetail); // 반환
+
+    ResponseCalendarDetail firstCalendarDetail = null;
+
+    LocalDate startDate = LocalDate.parse(re.startDay(), DateTimeFormatter.BASIC_ISO_DATE);
+    LocalDate endDate = LocalDate.parse(re.endDay(), DateTimeFormatter.BASIC_ISO_DATE);
+    String startDay = startDate.format(DateTimeFormatter.ofPattern("yyMMdd"));
+    String endDay = endDate.format(DateTimeFormatter.ofPattern("yyMMdd"));
+
+    for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+      Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(re);
+      Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
+      calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
+      calendarDetail.setStartDay(date.format(DateTimeFormatter.ofPattern("yyMMdd")));
+      calendarDetailRepository.save(calendarDetail); // 저장
+
+      if(firstCalendarDetail == null){
+        firstCalendarDetail = calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
+      }
+    }
+    return firstCalendarDetail;// 반환
   }
 
   /**
