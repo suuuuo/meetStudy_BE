@@ -6,6 +6,7 @@ import com.elice.meetstudy.domain.user.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,16 +24,27 @@ public class SecurityConfig {
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
   private final JwtFilter jwtFilter;
-  private final String[] adminUrl = {"api/admin/**", "api/mypage/**"};
-  private final String[] userUrl = {"api/**"};
+  private final String[] adminUrl = {"/api/admin/**"};
+  private final String[] userUrl = {
+    "/api/mypage/**",
+    "/api/comment/**",
+    "/api/post/**",
+    "/api/question/**",
+    "/api/chatroom/**",
+    "/api/studyroom/**",
+    "/api/calendar/**",
+    "/api/calendarDetail/**",
+    "/api/calendarAll"
+  };
   private final String[] publicUrl = {
     "/",
-    "api/user/public/**",
-    "api/comment/public/**",
-    "api/post/public/**",
-    "api/categories/**",
-    "api/answer/public/**",
-    "api/question/public/**",
+    "/api/user/**",
+    "/api/comment/public/**",
+    "/api/post/public/**",
+    "/api/categories/**",
+    "/api/answer/public/**",
+    "/api/question/public/**",
+    "/api/admin/categories/public/**"
   };
   private final String[] swaggerUrl = {
     "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/api-docs/**"
@@ -41,7 +53,9 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
-        .cors(AbstractHttpConfigurer::disable)
+        //        .cors(AbstractHttpConfigurer::disable)
+        .cors(Customizer.withDefaults())
+        .csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -54,7 +68,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(publicUrl)
-                    .permitAll() // 회원가입, 로그인, 메인 페이지 등 권한 없이 접근 가능한 api
+                    .permitAll()
                     .requestMatchers(swaggerUrl)
                     .permitAll()
                     .requestMatchers(adminUrl)
