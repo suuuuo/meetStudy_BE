@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/comment")
+@RequestMapping("/api/admin/comments")
 @Tag(name = "C. 관리자")
 public class AdminCommentController {
 
