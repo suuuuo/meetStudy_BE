@@ -16,10 +16,10 @@ public class AdminUserService {
 
     private final UserRepository userRepository;
 
-    // User를 UserDto로 변환하는 헬퍼 메서드
+    // User를 UserDto로 변환하는 메서드
     private AdminUserDto convertToDto(User user) {
         List<String> interestNames = user.getInterests().stream()
-                .map(interest -> interest.getCategory().getName()) // Category의 이름 가져오기
+                .map(interest -> interest.getCategory().getName())
                 .collect(Collectors.toList());
 
         return new AdminUserDto(
