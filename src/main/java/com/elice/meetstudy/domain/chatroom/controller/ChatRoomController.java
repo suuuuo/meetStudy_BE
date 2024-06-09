@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.chatroom.controller;
 
+import com.elice.meetstudy.domain.chatroom.dto.ChatAdminDto;
 import com.elice.meetstudy.domain.chatroom.dto.ChatRoomDto;
 import com.elice.meetstudy.domain.chatroom.dto.CreateChatRoomDto;
 import com.elice.meetstudy.domain.chatroom.service.ChatRoomService;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChatRoomController {
 
-  @Autowired private ChatRoomService chatRoomService;
+  @Autowired private final ChatRoomService chatRoomService;
 
   @Operation(summary = "채팅방 생성", description = "스터디룸id를 받아와서 채팅방을 생성합니다.")
   @PostMapping("/chatroom/add")
@@ -57,4 +58,11 @@ public class ChatRoomController {
   public ResponseEntity<ChatRoomDto> createNotice(@RequestBody ChatRoomDto chatRoomDto) {
     return ResponseEntity.ok(chatRoomService.createNotice(chatRoomDto));
   }
+
+  @Operation(summary = "채팅방의 방장 변경", description = "채팅방 방장을 변경합니다.")
+  @PutMapping("/chatRoom/chatAdmin")
+  public ResponseEntity<ChatAdminDto> changeChatAdmin(@RequestBody ChatAdminDto chatAdminDto){
+    return ResponseEntity.ok(chatRoomService.changeChatAdmin(chatAdminDto));
+  }
+
 }

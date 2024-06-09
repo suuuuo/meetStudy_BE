@@ -12,6 +12,7 @@ public class ChatRoomDto {
   private Long id;
   private String title;
   private Long studyRoomId;
+  private Long chatAdminId;
   private String notice;
 
   @Builder
@@ -19,6 +20,7 @@ public class ChatRoomDto {
     this.id = chatRoom.getId();
     this.title = chatRoom.getTitle();
     this.studyRoomId = chatRoom.getStudyRoom().getId();
+    this.chatAdminId = chatRoom.getChatAdmin().getId();
     this.notice = chatRoom.getNotice();
   }
 }

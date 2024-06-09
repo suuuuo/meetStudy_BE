@@ -1,6 +1,7 @@
 package com.elice.meetstudy.domain.chatroom.domain;
 
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
+import com.elice.meetstudy.domain.user.domain.User;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.CascadeType;
@@ -13,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -43,14 +45,25 @@ public class ChatRoom {
   @Column(name = "notice")
   private String notice;
 
+  @Column(name = "chat_admin")
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User chatAdmin;
+
   @Builder
-  public ChatRoom(StudyRoom studyRoom, String title, String notice) {
+  public ChatRoom(StudyRoom studyRoom, User chatAdmin, String title, String notice) {
     this.title = title;
     this.notice = notice;
     this.studyRoom = studyRoom;
+    this.chatAdmin = chatAdmin;
   }
 
   public void updateNotice(String notice) {
     this.notice = notice;
+  }
+
+
+  public void changeChatAdmin(User user) {
+    this.chatAdmin = user;
   }
 }
