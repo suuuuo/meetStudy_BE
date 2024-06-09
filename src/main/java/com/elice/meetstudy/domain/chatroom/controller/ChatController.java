@@ -2,9 +2,7 @@ package com.elice.meetstudy.domain.chatroom.controller;
 
 import com.elice.meetstudy.domain.chatroom.dto.MessageModel;
 import com.elice.meetstudy.domain.chatroom.dto.OutputMessageModel;
-import com.elice.meetstudy.domain.chatroom.service.ChatRoomService;
 import com.elice.meetstudy.domain.chatroom.service.MessageService;
-import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
 
   @Autowired
-  private ChatRoomService chatRoomService;
-  @Autowired
-  private StudyRoomService studyRoomService;
-  @Autowired
-  private MessageService messageService;
+  private final MessageService messageService;
 
   /**
     * let chatMessage = {
