@@ -31,8 +31,7 @@ public class AdminStudyRoomController {
     @GetMapping("/{id}")
     public ResponseEntity<StudyRoomDTO> getStudyRoomById(
             @Parameter(description = "조회할 스터디룸의 ID", required = true) @PathVariable Long id) {
-        StudyRoomDTO studyRoomDTO = adminStudyRoomService.getStudyRoomById(id);
-        return ResponseEntity.ok(studyRoomDTO);
+        return ResponseEntity.ok(adminStudyRoomService.getStudyRoomById(id));
     }
 
     @Operation(summary = "특정 회원이 참가한 스터디룸 조회")
