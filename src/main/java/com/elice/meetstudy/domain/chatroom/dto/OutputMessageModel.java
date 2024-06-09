@@ -7,14 +7,13 @@ import lombok.Getter;
 
 @Getter
 public class OutputMessageModel {
-  private Long chatRoomId;
+
   private String nickName;
   private String content;
   private LocalDateTime createdAt;
 
   @Builder
   public OutputMessageModel(Message message) {
-    this.chatRoomId = message.getChatRoom().getId();
     this.nickName = message.getSender().getNickname();
     this.content = message.getContent();
     this.createdAt = message.getCreateAt();
