@@ -24,7 +24,7 @@ public class ChatConfig implements WebSocketMessageBrokerConfigurer {
     registry.addEndpoint("/ws")
             .setAllowedOriginPatterns("*");
 //        .withSockJS();//Websocket를 지원하지 않는 웹브라우저의 경우 다른 방식으로 connection을 유지
-  }
+   }
 
   @Override
   public void configureMessageBroker(MessageBrokerRegistry registry) {

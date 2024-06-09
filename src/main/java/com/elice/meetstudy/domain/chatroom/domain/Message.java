@@ -1,6 +1,5 @@
 package com.elice.meetstudy.domain.chatroom.domain;
 
-import com.elice.meetstudy.domain.chatroom.dto.OutputMessageModel;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,12 +11,11 @@ import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Entity
 @Getter
-@Builder
+@RequiredArgsConstructor
 public class Message {
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +36,11 @@ public class Message {
   @Column(name = "create_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private LocalDateTime createAt;
 
-
-
+  @Builder
+  public Message(ChatRoom chatRoom, User sender, String content, LocalDateTime createAt) {
+    this.chatRoom = chatRoom;
+    this.sender = sender;
+    this.content = content;
+    this.createAt = createAt;
+  }
 }
