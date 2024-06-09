@@ -30,14 +30,6 @@ public class MyPageService {
     private final EntityFinder entityFinder;
 
 
-//    @Transactional
-//    public long getUserId(){
-//        //접근한 유저 정보 가져오는 로직
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        UserPrinciple userPrinciple = (UserPrinciple)authentication.getPrincipal();
-//        return Long.parseLong(userPrinciple.getUserId());
-//    }
-
     // 회원 정보 조회
     @Transactional
     public User getUserByUserId(){
@@ -104,6 +96,4 @@ public class MyPageService {
             .map(Scrap::getPost)
             .collect(Collectors.toList());
     }
-
-    // + 프로필 설정 (보유 자격증 등록)
 }

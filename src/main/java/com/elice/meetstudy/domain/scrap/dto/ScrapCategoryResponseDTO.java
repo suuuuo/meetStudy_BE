@@ -16,7 +16,11 @@ public class ScrapCategoryResponseDTO {
   private LocalDateTime createdAt;
 
   public ScrapCategoryResponseDTO(Scrap scrap) {
-    this.category = scrap.getCategory().getName();
+    if (scrap.getCategory() != null) {
+      this.category = scrap.getCategory().getName();
+    } else {
+      this.category = null; // 카테고리가 null인 경우에는 null을 반환
+    }
     this.createdAt = scrap.getCreatedAt();
   }
 }

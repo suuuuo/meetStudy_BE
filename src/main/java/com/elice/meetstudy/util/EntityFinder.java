@@ -5,6 +5,8 @@ import com.elice.meetstudy.domain.category.repository.CategoryRepository;
 import com.elice.meetstudy.domain.comment.domain.Comment;
 import com.elice.meetstudy.domain.comment.repository.CommentRepository;
 import com.elice.meetstudy.domain.post.domain.Post;
+import com.elice.meetstudy.domain.post.domain.PostLike;
+import com.elice.meetstudy.domain.post.repository.PostLikeRepository;
 import com.elice.meetstudy.domain.post.repository.PostRepository;
 import com.elice.meetstudy.domain.scrap.domain.Scrap;
 import com.elice.meetstudy.domain.scrap.repository.ScrapRepository;
@@ -26,6 +28,7 @@ public class EntityFinder {
   private final UserRepository userRepository;
   private final CategoryRepository categoryRepository;
   private final PostRepository postRepository;
+  private final PostLikeRepository postLikeRepository;
   private final CommentRepository commentRepository;
   private final ScrapRepository scrapRepository;
 
@@ -48,6 +51,11 @@ public class EntityFinder {
     return commentRepository
         .findById(commentId)
         .orElseThrow(() -> new IllegalArgumentException("댓글 찾을 수 X."));
+  }
+
+  /** 이미 좋아요한 게시글인지 확인하기 위한 메서드 */
+  public Optional<PostLike> findLike(Long postId) {
+    return postLikeRepository.findByUserIdAndPostId(getUser().getId(), postId);
   }
 
   /** 이미 스크랩한 게시글인지 확인하기 위한 메서드 */

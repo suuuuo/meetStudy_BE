@@ -37,7 +37,7 @@ public class CommentService {
         Comment.builder()
             .post(post)
             .user(entityFinder.getUser())
-            .content(commentCreate.getContent())
+            .content(commentCreate.getContent().trim())
             .build();
 
     return new CommentResponseDTO(commentRepository.save(newComment));
@@ -56,7 +56,7 @@ public class CommentService {
               .content(
                   editRequest.getContent() != null
                       ? editRequest.getContent()
-                      : comment.getContent())
+                      : comment.getContent().trim())
               .build();
 
       // Comment 엔티티 수정
