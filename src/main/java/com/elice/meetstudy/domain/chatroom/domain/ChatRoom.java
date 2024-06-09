@@ -45,7 +45,6 @@ public class ChatRoom {
   @Column(name = "notice")
   private String notice;
 
-  @Column(name = "chat_admin")
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User chatAdmin;
