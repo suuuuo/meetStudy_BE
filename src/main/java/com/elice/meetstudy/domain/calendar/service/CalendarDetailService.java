@@ -16,7 +16,9 @@ import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.util.EntityFinder;
+import io.lettuce.core.dynamic.annotation.CommandNaming.Strategy;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,22 +55,22 @@ public class CalendarDetailService {
   public void saveHolidays(String year, String month, long calendarId)
       throws EntityNotFoundException {
     List<Holiday> holidayList = holidayService.Holiday(year, month);
-    Optional<Calendar> calendar = calendarRepository.findById(calendarId);
+    Calendar calendar = calendarRepository
+        .findById(calendarId)
+        .orElseThrow(()->new EntityNotFoundException("캘린더가 존재하지 않습니다."));
 
-    if (calendar.isPresent()) {
       for (Holiday holiday : holidayList) {
-        if (calendarDetailRepository.existsByStartDayAndCalendarIdAndIsHolidayIsTrue(
-            holiday.getDate(), calendarId)) {
-        } else { // 현재 캘린더에 공휴일 정보가 없으면 등록함
-          Calendar_detail c = new Calendar_detail();
-          c.setTitle(holiday.getName());
-          c.setStartDay(holiday.getDate());
-          c.setHoliday(true);
-          c.setCalendar(calendar.get());
-          calendarDetailRepository.save(c);
-        }
+      if (calendarDetailRepository.existsByStartDayAndCalendarIdAndIsHolidayIsTrue(
+          holiday.getDate(), calendarId)) {
+      } else { // 현재 캘린더에 공휴일 정보가 없으면 등록함
+        Calendar_detail c = new Calendar_detail();
+        c.setTitle(holiday.getName());
+        c.setStartDay(holiday.getDate());
+        c.setHoliday(true);
+        c.setCalendar(calendar);
+        calendarDetailRepository.save(c);
       }
-    } else throw new EntityNotFoundException("캘린더가 존재하지 않습니다.");
+    }
   }
 
   /**
@@ -88,7 +91,9 @@ public class CalendarDetailService {
         getCalendarDetailsFromCalendar(userId, studyRoomId, year, month);
     List<ResponseCalendarDetail> responseCalendarDetails = new ArrayList<>();
     for (Calendar_detail calendarDetail : calendarDetailList) {
-      responseCalendarDetails.add(calendarDetailMapper.toResponseCalendarDetail(calendarDetail));
+      List<LocalDateTime> times = localDateTimes(calendarDetail);
+      responseCalendarDetails.add(
+          new ResponseCalendarDetail(calendarDetail, times.get(0), times.get(1)));
     }
     return responseCalendarDetails;
   }
@@ -100,15 +105,16 @@ public class CalendarDetailService {
 
     Long userId = entityFinder.getUser().getId();
 
-    Optional<User> user = userRepository.findById(userId);
-    List<UserStudyRoom> byUser = userStudyRoomRepository.findByUser(user.get());
+    User user = userRepository
+        .findById(userId)
+        .orElseThrow(()->new EntityNotFoundException("사용자가 존재하지 않습니다."));
+    List<UserStudyRoom> byUser = userStudyRoomRepository.findByUser(user);
 
     getCalendarDetails(responseCalendarDetails, year, month, 0L, userId);
     for (UserStudyRoom userStudyRoom : byUser) {
       getCalendarDetails(
           responseCalendarDetails, year, month, userStudyRoom.getStudyRoom().getId(), userId);
     }
-    Set<ResponseAllCalendarDetail> uniqueDetails = new HashSet<>(responseCalendarDetails);
     return new HashSet<>(responseCalendarDetails);
   }
 
@@ -120,10 +126,13 @@ public class CalendarDetailService {
    */
   @Transactional
   public ResponseCalendarDetail getCalendarDetail(long id) {
-    Optional<Calendar_detail> calendarDetail = calendarDetailRepository.findById(id);
-    if (calendarDetail.isPresent()) {
-      return calendarDetailMapper.toResponseCalendarDetail(calendarDetail.get());
-    } else throw new EntityNotFoundException("일정이 존재하지 않습니다.");
+    Calendar_detail calendarDetail =
+        calendarDetailRepository
+            .findById(id)
+            .orElseThrow(()->new EntityNotFoundException("일정이 존재하지 않습니다."));
+
+      List<LocalDateTime> times = localDateTimes(calendarDetail);
+      return new ResponseCalendarDetail(calendarDetail, times.get(0), times.get(1));
   }
 
   /**
@@ -134,17 +143,14 @@ public class CalendarDetailService {
    * @return
    */
   @Transactional
-  public ResponseCalendarDetail saveCalendarDetail(
-      RequestCalendarDetail re, Long studyRoomId) { // request로 받으면
-
+  public ResponseCalendarDetail saveCalendarDetail(RequestCalendarDetail re, Long studyRoomId) {
     Long userId = entityFinder.getUser().getId();
-
-    ResponseCalendarDetail firstCalendarDetail = null;
+    Calendar_detail firstCalendarDetail = null;
 
     LocalDate startDate = LocalDate.parse(re.startDay(), DateTimeFormatter.BASIC_ISO_DATE);
     LocalDate endDate = LocalDate.parse(re.endDay(), DateTimeFormatter.BASIC_ISO_DATE);
-    String startDay = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-    String endDay = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+    List<Calendar_detail> calendarDetails = new ArrayList<>();
 
     for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
       Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(re);
@@ -152,13 +158,15 @@ public class CalendarDetailService {
       calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
       calendarDetail.setStartDay(date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
       calendarDetail.setEndDay(date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
-      calendarDetailRepository.save(calendarDetail); // 저장
 
-      if(firstCalendarDetail == null){
-        firstCalendarDetail = calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
-      }
+      calendarDetails.add(calendarDetail);
     }
-    return firstCalendarDetail;// 반환
+
+    calendarDetailRepository.saveAll(calendarDetails);
+
+    firstCalendarDetail = calendarDetails.get(0);
+    List<LocalDateTime> times = localDateTimes(firstCalendarDetail);
+    return new ResponseCalendarDetail(firstCalendarDetail, times.get(0), times.get(1));
   }
 
   /**
@@ -177,7 +185,10 @@ public class CalendarDetailService {
       Calendar_detail calendarDetail = originCalendarDetail.get();
       calendarDetail.update(
           re.title(), re.content(), re.startDay(), re.endDay(), re.startTime(), re.endTime());
-      return calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
+
+      List<LocalDateTime> times = localDateTimes(calendarDetail);
+      return new ResponseCalendarDetail(calendarDetail, times.get(0), times.get(1));
+
     } else throw new EntityNotFoundException("일정이 존재하지 않습니다.");
   }
 
@@ -196,11 +207,7 @@ public class CalendarDetailService {
   public List<Calendar_detail> getCalendarDetailsFromCalendar(
       long userId, long studyRoomId, String year, String month) {
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
-    try {
-      saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
-    } catch (EntityNotFoundException e) {
-      throw new EntityNotFoundException("캘린더가 존재하지 않습니다.");
-    }
+    saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
     String Month = String.format("%02d", Integer.parseInt(month));
     String date = year + Month;
 
@@ -223,9 +230,32 @@ public class CalendarDetailService {
         getCalendarDetailsFromCalendar(userId, studyRoomId, year, month);
 
     for (Calendar_detail calendarDetail : calendarDetailList) {
-      responseCalendarDetails.add(new ResponseAllCalendarDetail(calendarDetail));
+      List<LocalDateTime> times = localDateTimes(calendarDetail);
+
+      responseCalendarDetails.add(new ResponseAllCalendarDetail(calendarDetail, times.get(0), times.get(1)));
     }
     return responseCalendarDetails;
   }
 
+  public List<LocalDateTime> localDateTimes(Calendar_detail calendarDetail) {
+    String startDay = calendarDetail.getStartDay();
+    String startTime = calendarDetail.getStartTime();
+    String endDay = calendarDetail.getEndDay();
+    String endTime = calendarDetail.getEndTime();
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss");
+
+    if (endDay == null) endDay = startDay;
+    if (startTime == null) startTime = "00:00:00";
+    if (endTime == null) endTime = "23:59:59";
+
+    LocalDateTime startDateTime = LocalDateTime.parse(startDay + " " + startTime, formatter);
+    LocalDateTime endDateTime = LocalDateTime.parse(endDay + " " + endTime, formatter);
+
+    List<LocalDateTime> dateTimeList = new ArrayList<>();
+    dateTimeList.add(startDateTime);
+    dateTimeList.add(endDateTime);
+
+    return dateTimeList;
+  }
 }
