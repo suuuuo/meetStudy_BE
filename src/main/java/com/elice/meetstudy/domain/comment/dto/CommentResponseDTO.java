@@ -10,6 +10,7 @@ public class CommentResponseDTO {
 
   private final String ninkname;
   private Long postId;
+  private Long commentId;
   private String content;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy.MM.dd HH:mm")
@@ -18,9 +19,8 @@ public class CommentResponseDTO {
   public CommentResponseDTO(Comment comment) {
     this.ninkname = comment.getUser().getNickname();
     this.postId = comment.getPost().getId();
+    this.commentId = comment.getId();
     this.content = comment.getContent();
     this.createdAt = comment.getCreatedAt();
   }
-
-
 }
