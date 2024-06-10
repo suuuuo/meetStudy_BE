@@ -16,7 +16,9 @@ import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.util.EntityFinder;
+import io.lettuce.core.dynamic.annotation.CommandNaming.Strategy;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,7 +91,8 @@ public class CalendarDetailService {
         getCalendarDetailsFromCalendar(userId, studyRoomId, year, month);
     List<ResponseCalendarDetail> responseCalendarDetails = new ArrayList<>();
     for (Calendar_detail calendarDetail : calendarDetailList) {
-      responseCalendarDetails.add(calendarDetailMapper.toResponseCalendarDetail(calendarDetail));
+      List<LocalDateTime> times = localDateTimes(calendarDetail);
+      responseCalendarDetails.add(new ResponseCalendarDetail(calendarDetail,times.get(0), times.get(1)));
     }
     return responseCalendarDetails;
   }
@@ -120,9 +124,13 @@ public class CalendarDetailService {
    */
   @Transactional
   public ResponseCalendarDetail getCalendarDetail(long id) {
+    System.out.println("조회 시작!!!!!!!!!!!");
     Optional<Calendar_detail> calendarDetail = calendarDetailRepository.findById(id);
     if (calendarDetail.isPresent()) {
-      return calendarDetailMapper.toResponseCalendarDetail(calendarDetail.get());
+      List<LocalDateTime> times = localDateTimes(calendarDetail.get());
+
+      System.out.println(calendarDetail.get().getTitle());
+      return new ResponseCalendarDetail(calendarDetail.get(),times.get(0), times.get(1));
     } else throw new EntityNotFoundException("일정이 존재하지 않습니다.");
   }
 
@@ -155,7 +163,10 @@ public class CalendarDetailService {
       calendarDetailRepository.save(calendarDetail); // 저장
 
       if(firstCalendarDetail == null){
-        firstCalendarDetail = calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
+
+        List<LocalDateTime> times = localDateTimes(calendarDetail);
+
+        firstCalendarDetail = new ResponseCalendarDetail(calendarDetail,times.get(0), times.get(1));
       }
     }
     return firstCalendarDetail;// 반환
@@ -177,7 +188,10 @@ public class CalendarDetailService {
       Calendar_detail calendarDetail = originCalendarDetail.get();
       calendarDetail.update(
           re.title(), re.content(), re.startDay(), re.endDay(), re.startTime(), re.endTime());
-      return calendarDetailMapper.toResponseCalendarDetail(calendarDetail);
+
+      List<LocalDateTime> times = localDateTimes(calendarDetail);
+      return new ResponseCalendarDetail(calendarDetail,times.get(0), times.get(1));
+
     } else throw new EntityNotFoundException("일정이 존재하지 않습니다.");
   }
 
@@ -226,6 +240,28 @@ public class CalendarDetailService {
       responseCalendarDetails.add(new ResponseAllCalendarDetail(calendarDetail));
     }
     return responseCalendarDetails;
+  }
+
+  public List<LocalDateTime> localDateTimes(Calendar_detail calendarDetail){
+    String startDay = calendarDetail.getStartDay();
+    String startTime = calendarDetail.getStartTime();
+    String endDay = calendarDetail.getEndDay();
+    String endTime = calendarDetail.getEndTime();
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss");
+
+    if(endDay == null) endDay = startDay;
+    if(startTime == null) startTime = "00:00:00";
+    if(endTime == null) endTime = "23:59:59";
+
+    LocalDateTime startDateTime = LocalDateTime.parse(startDay + " " + startTime, formatter);
+    LocalDateTime endDateTime = LocalDateTime.parse(endDay + " " + endTime, formatter);
+
+    List<LocalDateTime> dateTimeList = new ArrayList<>();
+    dateTimeList.add(startDateTime);
+    dateTimeList.add(endDateTime);
+
+    return dateTimeList;
   }
 
 }
