@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
 @Entity
 @Getter
 @RequiredArgsConstructor
@@ -23,11 +24,11 @@ public class Message {
   @Column(name = "message_id")
   private Long id;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "chat_room_id")
   private ChatRoom chatRoom;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name="user_id",nullable = false)
   private User sender;
 
