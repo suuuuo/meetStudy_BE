@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.admin.controller;
 
+import com.elice.meetstudy.domain.admin.dto.AdminUserDto;
 import com.elice.meetstudy.domain.admin.service.AdminUserService;
 import com.elice.meetstudy.domain.user.domain.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,14 +24,14 @@ public class AdminUserController {
   // 모든 회원 조회
   @Operation(summary = "모든 회원 조회")
   @GetMapping
-  public ResponseEntity<List<User>> getAllUsers() {
+  public ResponseEntity<List<AdminUserDto>> getAllUsers() {
     return ResponseEntity.ok(adminUserService.findAllUsers());
   }
 
   // id로 회원 조회
   @Operation(summary = "id로 회원 조회")
   @GetMapping("/{id}")
-  public ResponseEntity<User> getUser(@PathVariable Long id) {
+  public ResponseEntity<AdminUserDto> getUser(@PathVariable Long id) {
     return ResponseEntity.ok(adminUserService.findUser(id));
   }
 

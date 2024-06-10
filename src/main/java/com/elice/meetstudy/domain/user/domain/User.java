@@ -1,14 +1,11 @@
 package com.elice.meetstudy.domain.user.domain;
 
-import com.elice.meetstudy.domain.chatroom.domain.Message;
 import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
-import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
-import org.springframework.cglib.core.Local;
 
 /** user Entity */
 @Entity
@@ -53,8 +50,8 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   private List<UserStudyRoom> userStudyRooms = new ArrayList<>();
 
-  @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
-  private List<Message> messages = new ArrayList<>();
+//  @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+//  private List<Message> messages = new ArrayList<>();
 
 
   public void updateDeletedAt() {
