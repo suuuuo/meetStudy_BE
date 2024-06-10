@@ -7,6 +7,7 @@ import com.elice.meetstudy.domain.scrap.domain.Scrap;
 import com.elice.meetstudy.domain.scrap.repository.ScrapRepository;
 import com.elice.meetstudy.domain.user.domain.Interest;
 import com.elice.meetstudy.domain.user.domain.User;
+import com.elice.meetstudy.domain.user.dto.MyPageDto;
 import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.util.EntityFinder;
@@ -32,11 +33,20 @@ public class MyPageService {
 
     // 회원 정보 조회
     @Transactional
-    public User getUserByUserId(){
-
+    public MyPageDto getUserByUserId() {
         Long userId = entityFinder.getUser().getId();
-        return userRepository.findUserByUserId(userId);
+        User user = userRepository.findUserByUserId(userId);
+
+        MyPageDto myPageDto = new MyPageDto();
+        myPageDto.setEmail(user.getEmail());
+        myPageDto.setPassword(user.getPassword());
+        myPageDto.setUsername(user.getUsername());
+        myPageDto.setNickname(user.getNickname());
+        myPageDto.setInterests(user.getInterests().stream().map(Interest::getId).collect(Collectors.toList()));
+
+        return myPageDto;
     }
+
 
     @Transactional
     // 회원 정보 수정
