@@ -92,7 +92,8 @@ public class CalendarDetailService {
     List<ResponseCalendarDetail> responseCalendarDetails = new ArrayList<>();
     for (Calendar_detail calendarDetail : calendarDetailList) {
       List<LocalDateTime> times = localDateTimes(calendarDetail);
-      responseCalendarDetails.add(new ResponseCalendarDetail(calendarDetail,times.get(0), times.get(1)));
+      responseCalendarDetails.add(
+          new ResponseCalendarDetail(calendarDetail, times.get(0), times.get(1)));
     }
     return responseCalendarDetails;
   }
@@ -130,7 +131,7 @@ public class CalendarDetailService {
       List<LocalDateTime> times = localDateTimes(calendarDetail.get());
 
       System.out.println(calendarDetail.get().getTitle());
-      return new ResponseCalendarDetail(calendarDetail.get(),times.get(0), times.get(1));
+      return new ResponseCalendarDetail(calendarDetail.get(), times.get(0), times.get(1));
     } else throw new EntityNotFoundException("일정이 존재하지 않습니다.");
   }
 
@@ -142,17 +143,16 @@ public class CalendarDetailService {
    * @return
    */
   @Transactional
-  public ResponseCalendarDetail saveCalendarDetail(
-      RequestCalendarDetail re, Long studyRoomId) { // request로 받으면
-
+  public ResponseCalendarDetail saveCalendarDetail(RequestCalendarDetail re, Long studyRoomId) {
     Long userId = entityFinder.getUser().getId();
-
-    ResponseCalendarDetail firstCalendarDetail = null;
+    Calendar_detail firstCalendarDetail = null;
 
     LocalDate startDate = LocalDate.parse(re.startDay(), DateTimeFormatter.BASIC_ISO_DATE);
     LocalDate endDate = LocalDate.parse(re.endDay(), DateTimeFormatter.BASIC_ISO_DATE);
     String startDay = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
     String endDay = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+    List<Calendar_detail> calendarDetails = new ArrayList<>();
 
     for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
       Calendar_detail calendarDetail = calendarDetailMapper.toCalendarDetail(re);
@@ -160,16 +160,15 @@ public class CalendarDetailService {
       calendarDetail.setCalendar(calendar); // 캘린더 추가해주고
       calendarDetail.setStartDay(date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
       calendarDetail.setEndDay(date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
-      calendarDetailRepository.save(calendarDetail); // 저장
 
-      if(firstCalendarDetail == null){
-
-        List<LocalDateTime> times = localDateTimes(calendarDetail);
-
-        firstCalendarDetail = new ResponseCalendarDetail(calendarDetail,times.get(0), times.get(1));
-      }
+      calendarDetails.add(calendarDetail);
     }
-    return firstCalendarDetail;// 반환
+
+    calendarDetailRepository.saveAll(calendarDetails);
+
+    firstCalendarDetail = calendarDetails.get(0);
+    List<LocalDateTime> times = localDateTimes(firstCalendarDetail);
+    return new ResponseCalendarDetail(firstCalendarDetail, times.get(0), times.get(1));
   }
 
   /**
@@ -190,7 +189,7 @@ public class CalendarDetailService {
           re.title(), re.content(), re.startDay(), re.endDay(), re.startTime(), re.endTime());
 
       List<LocalDateTime> times = localDateTimes(calendarDetail);
-      return new ResponseCalendarDetail(calendarDetail,times.get(0), times.get(1));
+      return new ResponseCalendarDetail(calendarDetail, times.get(0), times.get(1));
 
     } else throw new EntityNotFoundException("일정이 존재하지 않습니다.");
   }
@@ -242,7 +241,7 @@ public class CalendarDetailService {
     return responseCalendarDetails;
   }
 
-  public List<LocalDateTime> localDateTimes(Calendar_detail calendarDetail){
+  public List<LocalDateTime> localDateTimes(Calendar_detail calendarDetail) {
     String startDay = calendarDetail.getStartDay();
     String startTime = calendarDetail.getStartTime();
     String endDay = calendarDetail.getEndDay();
@@ -250,9 +249,9 @@ public class CalendarDetailService {
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss");
 
-    if(endDay == null) endDay = startDay;
-    if(startTime == null) startTime = "00:00:00";
-    if(endTime == null) endTime = "23:59:59";
+    if (endDay == null) endDay = startDay;
+    if (startTime == null) startTime = "00:00:00";
+    if (endTime == null) endTime = "23:59:59";
 
     LocalDateTime startDateTime = LocalDateTime.parse(startDay + " " + startTime, formatter);
     LocalDateTime endDateTime = LocalDateTime.parse(endDay + " " + endTime, formatter);
@@ -263,5 +262,4 @@ public class CalendarDetailService {
 
     return dateTimeList;
   }
-
 }
