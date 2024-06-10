@@ -149,8 +149,6 @@ public class CalendarDetailService {
 
     LocalDate startDate = LocalDate.parse(re.startDay(), DateTimeFormatter.BASIC_ISO_DATE);
     LocalDate endDate = LocalDate.parse(re.endDay(), DateTimeFormatter.BASIC_ISO_DATE);
-    String startDay = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-    String endDay = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
     List<Calendar_detail> calendarDetails = new ArrayList<>();
 
@@ -209,11 +207,7 @@ public class CalendarDetailService {
   public List<Calendar_detail> getCalendarDetailsFromCalendar(
       long userId, long studyRoomId, String year, String month) {
     Calendar calendar = calendarService.findCalendar(userId, studyRoomId); // 캘린더 찾아서
-    try {
-      saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
-    } catch (EntityNotFoundException e) {
-      throw new EntityNotFoundException("캘린더가 존재하지 않습니다.");
-    }
+    saveHolidays(year, month, calendar.getId()); // 공휴일 일정 등록
     String Month = String.format("%02d", Integer.parseInt(month));
     String date = year + Month;
 
