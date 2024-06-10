@@ -2,6 +2,7 @@ package com.elice.meetstudy.domain.user.controller;
 
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.user.domain.User;
+import com.elice.meetstudy.domain.user.dto.MyPageDto;
 import com.elice.meetstudy.domain.user.dto.UserUpdateDto;
 import com.elice.meetstudy.domain.user.service.MyPageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +25,7 @@ public class MyPageController {
 
   @Operation(summary = "회원 정보 조회", description = "회원별 정보를 조회합니다.")
   @GetMapping
-  public User getUserInfo() {
+  public MyPageDto getUserInfo() {
     return myPageService.getUserByUserId();
   }
 
