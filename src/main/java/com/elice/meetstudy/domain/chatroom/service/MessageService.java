@@ -7,7 +7,6 @@ import com.elice.meetstudy.domain.chatroom.repository.ChatRoomRepository;
 import com.elice.meetstudy.domain.chatroom.repository.MessageRepository;
 import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.domain.user.domain.User;
-import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.util.EntityFinder;
 import java.time.LocalDateTime;
@@ -18,8 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,11 +56,13 @@ public class MessageService {
 }
 
   //채팅방의 메세지 조회
-  public Page<OutputMessageModel> messages (Long chatRoomId) {
-    Pageable pageable = PageRequest.of(0,50, Sort.by("createAt").descending());
+  public Page<OutputMessageModel> messages (Long chatRoomId,int page) {
+
+    Pageable pageable = PageRequest.of(page,20, Sort.by("createAt").descending());
 
     Page<Message> messages = messageRepository.findMessagesWithChatRoomAndUsers(
-        chatRoomId, pageable);
+        chatRoomId,entityFinder.getUser().getId(),pageable);
+
     return messages.map(message -> new OutputMessageModel(message));
   }
 
