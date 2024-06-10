@@ -1,6 +1,7 @@
 package com.elice.meetstudy.domain.chatroom.dto;
 
 import com.elice.meetstudy.domain.chatroom.domain.Message;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +11,8 @@ public class OutputMessageModel {
 
   private String nickName;
   private String content;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy.MM.dd HH:mm")
   private LocalDateTime createdAt;
 
   @Builder
@@ -18,5 +21,4 @@ public class OutputMessageModel {
     this.content = message.getContent();
     this.createdAt = message.getCreateAt();
   }
-
 }
