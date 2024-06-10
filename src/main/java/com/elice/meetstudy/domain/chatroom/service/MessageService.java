@@ -59,8 +59,8 @@ public class MessageService {
 }
 
   //채팅방의 메세지 조회
-  public Page<OutputMessageModel> messages (Long chatRoomId) {
-    Pageable pageable = PageRequest.of(0,50, Sort.by("createAt").descending());
+  public Page<OutputMessageModel> messages (Long chatRoomId,int page) {
+    Pageable pageable = PageRequest.of(page,5, Sort.by("createAt").descending());
 
     Page<Message> messages = messageRepository.findMessagesWithChatRoomAndUsers(
         chatRoomId, pageable);
