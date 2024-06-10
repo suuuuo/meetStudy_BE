@@ -4,6 +4,7 @@ import com.elice.meetstudy.domain.chatroom.dto.OutputMessageModel;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,7 +14,6 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
 @Entity
 @Getter
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class Message {
   @JoinColumn(name = "chat_room_id")
   private ChatRoom chatRoom;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="user_id",nullable = false)
   private User sender;
 
