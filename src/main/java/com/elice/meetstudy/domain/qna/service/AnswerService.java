@@ -32,59 +32,74 @@ public class AnswerService {
 
   /** 답변 조회 */
   public ResponseAnswerDto getAnswer(long questionId) {
-    Optional<Question> question = questionRepository.findById(questionId);
-    if (question.isPresent()) {
-      Answer answer = question.get().getAnswer();
-      if(answer == null || answer.getId() == null){
+    Question question =
+        questionRepository.findById(questionId)
+            .orElseThrow(()->new NotFoundException("질문이 존재하지 않습니다."));
+
+      Answer answer = question.getAnswer();
+      if (answer == null || answer.getId() == null) {
         throw new EntityNotFoundException("답변이 등록되지 않았습니다.");
       }
       return answerMapper.toResponseAnswerDto(answerRepository.findById(answer.getId()).get());
-    }
-    throw new NotFoundException("질문이 존재하지 않습니다.");
+
   }
 
   /** 답변 생성 */
   @Transactional
   public ResponseAnswerDto addAnswer(RequestAnswerDto requestAnswerDto, long questionId)
       throws AccessDeniedException {
-    Optional<User> user = userRepository.findById(entityFinder.getUser().getId());
+    User user =
+        userRepository
+            .findById(entityFinder.getUser().getId())
+            .orElseThrow(() -> new EntityNotFoundException("사용자가 존재하지 않습니다."));
 
-      Optional<Question> question = questionRepository.findById(questionId);
-      if (question.isPresent() && question.get().getAnswer() == null) { //질문이 있고, 답변이 없으면
-        Answer answer = new Answer(requestAnswerDto.content());
-        answer.setQuestion(question.get());
-        question.get().setAnswerStatus(AnswerStatus.COMPLETED); // 질문의 답변 상태 변경
-        question.get().setAnswer(answer);
-        return answerMapper.toResponseAnswerDto(answerRepository.save(answer));
-      }
-      else if( question.get().getAnswer() != null)
-        throw new SingleResponseViolationException("질문 하나에는 답변 하나만 등록할 수 있습니다.");
-      else throw new EntityNotFoundException("질문이 존재하지 않습니다.");
+    Question question =
+        questionRepository
+            .findById(questionId)
+            .orElseThrow(() -> new EntityNotFoundException("질문이 존재하지 않습니다."));
+
+    if (question.getAnswer() != null) {
+      throw new SingleResponseViolationException("질문 하나에는 답변 하나만 등록할 수 있습니다.");
     }
+
+    Answer answer = new Answer(requestAnswerDto.content());
+    answer.setQuestion(question);
+    question.setAnswerStatus(AnswerStatus.COMPLETED); // 질문의 답변 상태 변경
+    question.setAnswer(answer);
+
+    return answerMapper.toResponseAnswerDto(answerRepository.save(answer));
+  }
 
   /** 답변 수정 */
   @Transactional
   public ResponseAnswerDto updateAnswer(RequestAnswerDto requestAnswerDto, long answerId)
       throws AccessDeniedException {
-    Optional<User> user = userRepository.findById(entityFinder.getUser().getId());
+    User user =
+        userRepository
+            .findById(entityFinder.getUser().getId())
+            .orElseThrow(() -> new EntityNotFoundException("사용자가 존재하지 않습니다."));
 
-      Optional<Answer> answer = answerRepository.findById(answerId);
-      if (answer.isPresent()) {
-        Answer answer1 = answer.get();
-        answer1.update(requestAnswerDto.content());
-        return answerMapper.toResponseAnswerDto(answer1);
-      } throw new EntityNotFoundException("존재하는 답변이 아닙니다.");
+    Answer answer =
+        answerRepository
+            .findById(answerId)
+            .orElseThrow(() -> new EntityNotFoundException("존재하는 답변이 아닙니다."));
+
+    Answer answer1 = answer;
+    answer1.update(requestAnswerDto.content());
+    return answerMapper.toResponseAnswerDto(answer1);
   }
 
   /** 답변 삭제 */
   @Transactional
   public void deleteAnswer(long answerId) throws AccessDeniedException {
-    Optional<User> user = userRepository.findById(entityFinder.getUser().getId());
+    User user =
+        userRepository
+            .findById(entityFinder.getUser().getId())
+            .orElseThrow(() -> new EntityNotFoundException("사용자가 존재하지 않습니다."));
 
-      Question question = questionRepository.findByAnswerId(answerId);
-      question.setAnswerStatus(AnswerStatus.PENDING); //답변 상태 수정
-      question.setAnswer(null);
-      answerRepository.deleteById(answerId);
-      }
-
+    Question question = questionRepository.findByAnswerId(answerId);
+    question.setAnswerStatus(AnswerStatus.PENDING); // 답변 상태 수정
+    question.setAnswer(null);
+    answerRepository.deleteById(answerId);
+  }
 }
