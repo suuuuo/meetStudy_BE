@@ -7,6 +7,7 @@ import com.elice.meetstudy.domain.chatroom.repository.ChatRoomRepository;
 import com.elice.meetstudy.domain.chatroom.repository.MessageRepository;
 import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.domain.user.domain.User;
+import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.util.EntityFinder;
 import java.time.LocalDateTime;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,11 +47,11 @@ public class MessageService {
     User user = userRepository.findUserByUserId(messageModel.getUserId());
 
     Message message = Message.builder()
-          .chatRoom(chatRoomRepository.findChatRoomByIdAndUserId(chatRoomId, messageModel.getUserId())
-              .orElseThrow(()->new EntityNotFoundException("채팅방에 참여할 수 없습니다.")))
-          .createAt(LocalDateTime.now())
-          .sender(user)
-          .content(messageModel.getContent())
+        .chatRoom(chatRoomRepository.findChatRoomByIdAndUserId(chatRoomId, messageModel.getUserId())
+            .orElseThrow(()->new EntityNotFoundException("채팅방에 참여할 수 없습니다.")))
+        .createAt(LocalDateTime.now())
+        .sender(user)
+        .content(messageModel.getContent())
           .build();
       messageRepository.save(message);
 
@@ -65,7 +68,9 @@ public class MessageService {
   }
 
   public OutputMessageModel enterMessage(Long chatRoomId){
-    User user = entityFinder.getUser();
+
+//    User user = entityFinder.getUser();
+    User user = userRepository.findUserByUserId(1L);
 
     Message message = Message.builder()
         .chatRoom(chatRoomRepository.findChatRoomByIdAndUserId(chatRoomId, user.getId())
