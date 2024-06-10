@@ -2,7 +2,9 @@ package com.elice.meetstudy.domain.calendar.dto;
 
 import com.elice.meetstudy.domain.calendar.domain.Calendar;
 import com.elice.meetstudy.domain.calendar.domain.Calendar_detail;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.Getter;
 
@@ -14,10 +16,10 @@ public class ResponseAllCalendarDetail{
     private final String studyRoomId;
     private final String title;
     private final String content;
-    private final String startDay;
-    private final String endDay;
-    private final String startTime;
-    private final String endTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy.MM.dd HH:mm")
+    private final LocalDateTime startDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy.MM.dd HH:mm")
+    private final LocalDateTime endDate;
     private final boolean isHoliday;
 
     @Override
@@ -25,17 +27,18 @@ public class ResponseAllCalendarDetail{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ResponseAllCalendarDetail that = (ResponseAllCalendarDetail) o;
-        return Objects.equals(startDay, that.startDay) &&
+        return Objects.equals(startDate, that.startDate) &&
             Objects.equals(title, that.title) &&
             isHoliday == that.isHoliday;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(startDay, title, isHoliday);
+        return Objects.hash(startDate, title, isHoliday);
     }
 
-    public ResponseAllCalendarDetail(Calendar_detail calendarDetail) {
+    public ResponseAllCalendarDetail(Calendar_detail calendarDetail, LocalDateTime startDate,
+        LocalDateTime endDate) {
         this.id = calendarDetail.getId();
         if (calendarDetail.getCalendar() != null
             && calendarDetail.getCalendar().getStudyRoom() != null) {
@@ -45,10 +48,8 @@ public class ResponseAllCalendarDetail{
         }
         this.title = calendarDetail.getTitle() != null ? calendarDetail.getTitle() : "";
         this.content = calendarDetail.getContent() != null ? calendarDetail.getContent() : "";
-        this.startDay = calendarDetail.getStartDay() != null ? calendarDetail.getStartDay() : "";
-        this.endDay = calendarDetail.getEndDay() != null ? calendarDetail.getEndDay() : "";
-        this.startTime = calendarDetail.getStartTime() != null ? calendarDetail.getStartTime() : "";
-        this.endTime = calendarDetail.getEndTime() != null ? calendarDetail.getEndTime() : "";
+        this.startDate =  startDate;
+        this.endDate = endDate;
         this.isHoliday = calendarDetail.isHoliday();
     }
 }

@@ -55,22 +55,22 @@ public class CalendarDetailService {
   public void saveHolidays(String year, String month, long calendarId)
       throws EntityNotFoundException {
     List<Holiday> holidayList = holidayService.Holiday(year, month);
-    Optional<Calendar> calendar = calendarRepository.findById(calendarId);
+    Calendar calendar = calendarRepository
+        .findById(calendarId)
+        .orElseThrow(()->new EntityNotFoundException("캘린더가 존재하지 않습니다."));
 
-    if (calendar.isPresent()) {
       for (Holiday holiday : holidayList) {
-        if (calendarDetailRepository.existsByStartDayAndCalendarIdAndIsHolidayIsTrue(
-            holiday.getDate(), calendarId)) {
-        } else { // 현재 캘린더에 공휴일 정보가 없으면 등록함
-          Calendar_detail c = new Calendar_detail();
-          c.setTitle(holiday.getName());
-          c.setStartDay(holiday.getDate());
-          c.setHoliday(true);
-          c.setCalendar(calendar.get());
-          calendarDetailRepository.save(c);
-        }
+      if (calendarDetailRepository.existsByStartDayAndCalendarIdAndIsHolidayIsTrue(
+          holiday.getDate(), calendarId)) {
+      } else { // 현재 캘린더에 공휴일 정보가 없으면 등록함
+        Calendar_detail c = new Calendar_detail();
+        c.setTitle(holiday.getName());
+        c.setStartDay(holiday.getDate());
+        c.setHoliday(true);
+        c.setCalendar(calendar);
+        calendarDetailRepository.save(c);
       }
-    } else throw new EntityNotFoundException("캘린더가 존재하지 않습니다.");
+    }
   }
 
   /**
@@ -105,15 +105,16 @@ public class CalendarDetailService {
 
     Long userId = entityFinder.getUser().getId();
 
-    Optional<User> user = userRepository.findById(userId);
-    List<UserStudyRoom> byUser = userStudyRoomRepository.findByUser(user.get());
+    User user = userRepository
+        .findById(userId)
+        .orElseThrow(()->new EntityNotFoundException("사용자가 존재하지 않습니다."));
+    List<UserStudyRoom> byUser = userStudyRoomRepository.findByUser(user);
 
     getCalendarDetails(responseCalendarDetails, year, month, 0L, userId);
     for (UserStudyRoom userStudyRoom : byUser) {
       getCalendarDetails(
           responseCalendarDetails, year, month, userStudyRoom.getStudyRoom().getId(), userId);
     }
-    Set<ResponseAllCalendarDetail> uniqueDetails = new HashSet<>(responseCalendarDetails);
     return new HashSet<>(responseCalendarDetails);
   }
 
@@ -125,14 +126,13 @@ public class CalendarDetailService {
    */
   @Transactional
   public ResponseCalendarDetail getCalendarDetail(long id) {
-    System.out.println("조회 시작!!!!!!!!!!!");
-    Optional<Calendar_detail> calendarDetail = calendarDetailRepository.findById(id);
-    if (calendarDetail.isPresent()) {
-      List<LocalDateTime> times = localDateTimes(calendarDetail.get());
+    Calendar_detail calendarDetail =
+        calendarDetailRepository
+            .findById(id)
+            .orElseThrow(()->new EntityNotFoundException("일정이 존재하지 않습니다."));
 
-      System.out.println(calendarDetail.get().getTitle());
-      return new ResponseCalendarDetail(calendarDetail.get(), times.get(0), times.get(1));
-    } else throw new EntityNotFoundException("일정이 존재하지 않습니다.");
+      List<LocalDateTime> times = localDateTimes(calendarDetail);
+      return new ResponseCalendarDetail(calendarDetail, times.get(0), times.get(1));
   }
 
   /**
@@ -236,7 +236,9 @@ public class CalendarDetailService {
         getCalendarDetailsFromCalendar(userId, studyRoomId, year, month);
 
     for (Calendar_detail calendarDetail : calendarDetailList) {
-      responseCalendarDetails.add(new ResponseAllCalendarDetail(calendarDetail));
+      List<LocalDateTime> times = localDateTimes(calendarDetail);
+
+      responseCalendarDetails.add(new ResponseAllCalendarDetail(calendarDetail, times.get(0), times.get(1)));
     }
     return responseCalendarDetails;
   }
