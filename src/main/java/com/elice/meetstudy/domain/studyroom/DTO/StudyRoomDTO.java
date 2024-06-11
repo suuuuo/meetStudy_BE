@@ -1,9 +1,12 @@
 package com.elice.meetstudy.domain.studyroom.DTO;
 
+import com.elice.meetstudy.domain.category.dto.CategoryDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +25,6 @@ public class StudyRoomDTO {
   private Date createdDate;
 
   private Long userCapacity;
-  // private Long categoryId;
+  private CategoryDto category;
   @Builder.Default private List<UserStudyRoomDTO> userStudyRooms = new ArrayList<>();
 }
