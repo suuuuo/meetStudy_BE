@@ -69,6 +69,27 @@ public class UserStudyRoomService {
     }
 
     /**
+     * API를 사용하는 유저의 스터디룸 소속 정보를 조회하여 유저스터디룸 DTO 리스트로 반환합니다.
+     *
+     * @return 모든 유저의 UserStudyRoomDTO 객체 리스트
+     */
+    public List<UserStudyRoomDTO> getUserStudyRoomsByUser() {
+        // 유저 가져오기
+        UserPrinciple userPrincipal = (UserPrinciple)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = Long.valueOf(userPrincipal.getUserId());
+
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 User를 찾을 수 없습니다. [Email: " + userId + "]"));
+
+        return userStudyRoomRepository
+                .findByUser(user)
+                .stream()
+                .map(studyRoomMapper::toUserStudyRoomDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 주어진 스터디룸 ID에 유저를 참가시킨 뒤, 해당 스터디룸을 UserStudyRoomDTO 객체로 변환하여 반환합니다.
      *
      * @param studyRoomId 참가할 스터디룸 ID
@@ -114,7 +135,7 @@ public class UserStudyRoomService {
         UserStudyRoom userStudyRoom = studyRoom.getUserStudyRooms().stream()
                 .filter((usr) -> Objects.equals(usr.getUser().getId(), userId))
                 .findAny()
-                .orElseThrow(() -> new EntityNotFoundException("유저가 이미 해당 스터디룸에 존재하지 않습니다. [RoomID: " + id + ", Email: " + userId + "]"));
+                .orElseThrow(() -> new EntityNotFoundException("유저가 이미 해당 스터디룸에 존재하지 않습니다. [RoomID: " + id + ", UserID: " + userId + "]"));
 
 
         studyRoom.getUserStudyRooms().remove(userStudyRoom);
