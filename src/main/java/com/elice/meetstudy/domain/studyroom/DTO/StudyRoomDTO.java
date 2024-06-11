@@ -21,7 +21,7 @@ public class StudyRoomDTO {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy.MM.dd HH:mm")
   private Date createdDate;
 
-  private Long maxCapacity;
+  private Long userCapacity;
   // private Long categoryId;
   @Builder.Default private List<UserStudyRoomDTO> userStudyRooms = new ArrayList<>();
 }

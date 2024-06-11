@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.studyroom.service;
 
+import com.elice.meetstudy.domain.studyroom.DTO.CreateStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.UserStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
@@ -53,11 +54,13 @@ public class StudyRoomService {
      * @return 모든 스터디룸의 StudyRoomDTO 객체 리스트
      */
     public List<StudyRoomDTO> getAllStudyRooms() {
-        return studyRoomRepository
-                .findAll()
-                .stream()
-                .map(studyRoomMapper::toStudyRoomDTO)
-                .collect(Collectors.toList());
+        throw new EntityNotFoundException("더 이상 사용되지 않는 API 입니다. '/api/admin/studyrooms'를 사용해주세요.");
+
+//        return studyRoomRepository
+//                .findAll()
+//                .stream()
+//                .map(studyRoomMapper::toStudyRoomDTO)
+//                .collect(Collectors.toList());
     }
 
     /**
@@ -100,35 +103,19 @@ public class StudyRoomService {
      * @param studyRoomDTO 생성할 스터디룸의 정보를 담고 있는 StudyRoomDTO 객체
      * @return 생성되고 저장된 스터디룸의 StudyRoomDTO 객체
      */
-    public StudyRoomDTO createStudyRoom(StudyRoomDTO studyRoomDTO) {
+    public StudyRoomDTO createStudyRoom(CreateStudyRoomDTO studyRoomDTO) {
 
         // 스터디룸 생성
         StudyRoom studyRoom = studyRoomMapper.toStudyRoom(studyRoomDTO);
         studyRoom.setCreatedDate(new Date());
 
         // 방 생성하는 유저 가져오기
-        String userPrincipal = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserPrinciple userPrincipal = (UserPrinciple)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = Long.valueOf(userPrincipal.getEmail());
 
-        User user = null;
-
-        if (userPrincipal.equals("anonymousUser")) { // PostMan으로 테스트하여, 로그인세션 없이 anonymousUser인 경우
-            UserJoinDto userJoinDto = new UserJoinDto(
-                    "test@by.postman.com",
-                    "TESTPASSWORD1024",
-                    "홍길동",
-                    "Test1024★",
-                    new ArrayList<>()
-            );
-
-            user = userRepository
-                    .findByEmail("test@by.postman.com")
-                    .orElseGet(() -> userService.join(userJoinDto));
-
-        } else {
-            user = userRepository
-                    .findByEmail(userPrincipal) // 실제 유저 상세정보 DB에서 호출
-                    .orElseThrow(() -> new EntityNotFoundException("스터디룸 생성에 실패하였습니다. 존재하지 않는 유저입니다."));
-        }
+        User user = userRepository
+                .findById(userId) // 실제 유저 상세정보 DB에서 호출
+                .orElseThrow(() -> new EntityNotFoundException("스터디룸 생성에 실패하였습니다. 존재하지 않는 유저입니다."));
 
         // 유저스터디룸 생성
         UserStudyRoom userStudyRoom = UserStudyRoom.builder()
@@ -166,7 +153,7 @@ public class StudyRoomService {
                 .map(existingStudyRoom -> {
                     existingStudyRoom.setTitle(studyRoomDTO.getTitle());
                     existingStudyRoom.setDescription(studyRoomDTO.getDescription());
-                    existingStudyRoom.setMaxCapacity(studyRoomDTO.getMaxCapacity());
+                    existingStudyRoom.setUserCapacity(studyRoomDTO.getUserCapacity());
                     return studyRoomMapper.toStudyRoomDTO(studyRoomRepository.save(existingStudyRoom));
                 })
                 .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID: " + id + "]"));
