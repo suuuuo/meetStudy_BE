@@ -8,8 +8,6 @@ import com.elice.meetstudy.domain.user.jwt.token.TokenProvider;
 import com.elice.meetstudy.util.EntityFinder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.security.Principal;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,17 +17,11 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
-import org.springframework.web.bind.annotation.SessionAttributes;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -79,8 +71,8 @@ public class ChatController {
   @Operation(summary = "메세지 조회", description = "채팅룸id를 받아와서 메세지를 page로 조회합니다.")
   @GetMapping("/chat/{chatRoomId}")
   public ResponseEntity<Page<OutputMessageModel>> chatList(@PathVariable Long chatRoomId,
-      @RequestParam int page) {
-    return ResponseEntity.ok(messageService.messages(chatRoomId, page));
+      @RequestParam Long cursor) {
+    return ResponseEntity.ok(messageService.messages(chatRoomId, cursor));
   }
 
 }
