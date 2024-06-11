@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.studyroom.service;
 
+import com.elice.meetstudy.domain.category.service.CategoryService;
 import com.elice.meetstudy.domain.studyroom.DTO.CreateStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.UpdateStudyRoomDTO;
@@ -24,10 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +51,9 @@ public class StudyRoomService {
     private UserStudyRoomService userStudyRoomService;
 
     @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
     private EntityFinder entityFinder;
 
     /**
@@ -61,7 +62,7 @@ public class StudyRoomService {
      * @return 모든 스터디룸의 StudyRoomDTO 객체 리스트
      */
     public List<StudyRoomDTO> getAllStudyRooms() {
-        List<Long> category =  entityFinder.getUser().getInterests()
+        List<Long> category = entityFinder.getUser().getInterests()
             .stream()
             .map(interest -> interest.getCategory().getId())
             .collect(Collectors.toList());
@@ -117,6 +118,7 @@ public class StudyRoomService {
 
         // 스터디룸 생성
         StudyRoom studyRoom = studyRoomMapper.toStudyRoom(studyRoomDTO);
+        studyRoom.setCategory(categoryService.findCategory(studyRoomDTO.getCategoryId()));
         studyRoom.setCreatedDate(new Date());
 
         // 방 생성하는 유저 가져오기
@@ -167,8 +169,9 @@ public class StudyRoomService {
         String title = studyRoomDTO.getTitle();
         String description = studyRoomDTO.getDescription();
         Long userCapacity = studyRoomDTO.getUserCapacity();
+        Long categoryId = studyRoomDTO.getCategoryId();
 
-        if (title == null && description == null && userCapacity == null) {
+        if (title == null && description == null && userCapacity == null && categoryId == null) {
             throw new CustomNotValidException("수정할 스터디룸 정보가 입력되지 않았습니다.");
         }
 
@@ -177,6 +180,7 @@ public class StudyRoomService {
                     if (title != null) existingStudyRoom.setTitle(title);
                     if (description != null) existingStudyRoom.setDescription(description);
                     if (userCapacity != null) existingStudyRoom.setUserCapacity(userCapacity);
+                    if (categoryId != null) existingStudyRoom.setCategory(categoryService.findCategory(categoryId));
                     existingStudyRoom.getUserStudyRooms().stream()
                             .filter(usr -> usr.getUser().getId().equals(userId))
                             .findAny()
@@ -195,6 +199,20 @@ public class StudyRoomService {
      * @param id 삭제할 스터디룸의 ID
      */
     public void deleteStudyRoom(Long id) {
+
+        // 방 수정하는 유저 가져오기
+        UserPrinciple userPrincipal = (UserPrinciple)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = Long.valueOf(userPrincipal.getUserId());
+
+        StudyRoom studyRoom = studyRoomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID: " + id + "]"));
+
+        UserStudyRoom userStudyRoom = studyRoom.getUserStudyRooms().stream()
+                .filter(usr -> Objects.equals(usr.getUser().getId(), userId))
+                .filter(user -> user.getPermission().equals("OWNER"))
+                .findAny()
+                .orElseThrow(() -> new EntityNotFoundException("해당 방의 방장만이 방을 삭제할 수 있습니다. [RoomID: " + id + "]"));
+
         studyRoomRepository.deleteById(id);
     }
 }
