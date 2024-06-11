@@ -12,9 +12,9 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface StudyRoomMapper {
     StudyRoomMapper INSTANCE = Mappers.getMapper(StudyRoomMapper.class);
-
-
     StudyRoomDTO toStudyRoomDTO(StudyRoom studyRoom);
+
+    StudyRoomDTO toFindStudyRoomDTO(StudyRoom studyRoom);
 
     StudyRoom toStudyRoom(StudyRoomDTO studyRoomDTO);
 

@@ -25,6 +25,14 @@ public class UserStudyRoomController {
     return userStudyRoomService.getAllUserStudyRooms();
   }
 
+  @Operation(
+          summary = "현재 유저가 참가 중인 스터디룸에 대한 권한 조회",
+          description = "API를 사용하는 유저가 참여하고 있는 스터디룸들에서의 권한을 모두 조회합니다.")
+  @GetMapping("/mypage")
+  public List<UserStudyRoomDTO> getUsersUserStudyRooms() {
+    return userStudyRoomService.getUserStudyRoomsByUser();
+  }
+
   @PostMapping("/add/{id}")
   @Operation(summary = "스터디룸 참가", description = "해당 API를 사용하는 유저가 스터디룸에 참가시킵니다.")
   @UserStudyRoomAnnotation.Success(description = "성공적으로 참가함")

@@ -1,7 +1,6 @@
 package com.elice.meetstudy.domain.studyroom.DTO;
 
 import com.elice.meetstudy.domain.category.dto.CategoryDto;
-import com.elice.meetstudy.domain.category.entity.Category;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -10,13 +9,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateStudyRoomDTO {
+public class FindStudyRoomDTO {
 
     @NotNull
     private String title;
@@ -30,5 +27,5 @@ public class CreateStudyRoomDTO {
     private Long userCapacity;
 
     @NotNull
-    private Long categoryId;
+    private CategoryDto category;
 }
