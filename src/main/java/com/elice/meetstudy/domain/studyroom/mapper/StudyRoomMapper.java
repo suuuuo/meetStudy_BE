@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.studyroom.mapper;
 
+import com.elice.meetstudy.domain.studyroom.DTO.CreateStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.UserStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
@@ -16,6 +17,8 @@ public interface StudyRoomMapper {
     StudyRoomDTO toStudyRoomDTO(StudyRoom studyRoom);
 
     StudyRoom toStudyRoom(StudyRoomDTO studyRoomDTO);
+
+    StudyRoom toStudyRoom(CreateStudyRoomDTO createStudyRoomDTO);
 
     @Mapping(source="userStudyRoom.studyRoom.id", target= "studyRoomId")
     UserStudyRoomDTO toUserStudyRoomDTO(UserStudyRoom userStudyRoom);
