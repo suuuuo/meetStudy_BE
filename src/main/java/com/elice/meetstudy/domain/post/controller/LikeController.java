@@ -1,6 +1,5 @@
 package com.elice.meetstudy.domain.post.controller;
 
-import com.elice.meetstudy.domain.post.dto.LikeResponseDTO;
 import com.elice.meetstudy.domain.post.service.PostLikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
