@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ChatRoomRepository extends JpaRepository<ChatRoom,Long> {
+public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
   @Query("select c from ChatRoom c "
       + "join fetch c.studyRoom s "
@@ -25,10 +25,13 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom,Long> {
   Optional<ChatRoom> findChatRoomByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
 
   @Query("select c from ChatRoom c "
-          + "join fetch c.studyRoom s "
-          + "join fetch UserStudyRoom us "
-          + "on us.studyRoom = s "
-          + "where us.user.id = :userId")
+      + "join fetch c.studyRoom s "
+      + "join fetch UserStudyRoom us "
+      + "on us.studyRoom = s "
+      + "where us.user.id = :userId")
   List<ChatRoom> findChatRoomsByUserId(@Param("userId") Long userId);
 
+  @Query("select c from ChatRoom "
+      + "c where c.id = :chatRoomId")
+  Optional<ChatRoom> findChatRoomById(Long chatRoomId);
 }
