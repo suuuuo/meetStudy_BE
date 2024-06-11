@@ -26,13 +26,12 @@ public class UserStudyRoomController {
   }
 
   @PostMapping("/add/{id}")
-  @Operation(summary = "스터디룸 참가", description = "유저의 이메일을 사용하여, 해당 유저를 스터디룸에 참가시킵니다.")
+  @Operation(summary = "스터디룸 참가", description = "해당 API를 사용하는 유저가 스터디룸에 참가시킵니다.")
   @UserStudyRoomAnnotation.Success(description = "성공적으로 참가함")
   @StudyRoomAnnotation.Failure
   public ResponseEntity<UserStudyRoomDTO> joinStudyRoom(
-      @Parameter(description = "참가할 스터디룸의 ID", required = true) @PathVariable Long id,
-      @Parameter(description = "참가할 유저의 EMAIL", required = true) @PathVariable String email) {
-    UserStudyRoomDTO createdStudyRoom = userStudyRoomService.joinStudyRoom(id, email);
+      @Parameter(description = "참가할 스터디룸의 ID", required = true) @PathVariable Long id) {
+    UserStudyRoomDTO createdStudyRoom = userStudyRoomService.joinStudyRoom(id);
     return ResponseEntity.ok(createdStudyRoom);
   }
 
