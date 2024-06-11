@@ -29,7 +29,7 @@ public class StudyRoomController {
 
   @Autowired private UserStudyRoomService userStudyRoomService;
 
-  @Operation(summary = "[폐기]모든 스터디룸 조회", description = "모든 스터디룸을 조회합니다. /api/admin/studyrooms를 사용해주세요.")
+  @Operation(summary = "모든 스터디룸 조회", description = "모든 스터디룸을 조회합니다. API 사용자의 관심사를 우선순위로 가집니다.")
   @StudyRoomAnnotation.Success(description = "성공적으로 조회됨")
   @GetMapping
   public List<StudyRoomDTO> getAllStudyRooms() {
