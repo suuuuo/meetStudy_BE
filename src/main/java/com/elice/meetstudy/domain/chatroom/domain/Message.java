@@ -1,6 +1,5 @@
 package com.elice.meetstudy.domain.chatroom.domain;
 
-import com.elice.meetstudy.domain.chatroom.dto.OutputMessageModel;
 import com.elice.meetstudy.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
