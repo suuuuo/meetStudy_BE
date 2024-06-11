@@ -1,14 +1,10 @@
 package com.elice.meetstudy.domain.studyroom.service;
 
-import com.elice.meetstudy.domain.studyroom.DTO.CreateStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
-import com.elice.meetstudy.domain.studyroom.DTO.UpdateStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.UserStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
 import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
-import com.elice.meetstudy.domain.studyroom.exception.CustomNotValidException;
 import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
-import com.elice.meetstudy.domain.studyroom.exception.StudyRoomAuthenticationException;
 import com.elice.meetstudy.domain.studyroom.mapper.StudyRoomMapper;
 import com.elice.meetstudy.domain.studyroom.repository.StudyRoomRepository;
 import com.elice.meetstudy.domain.studyroom.repository.UserStudyRoomRepository;
@@ -17,13 +13,11 @@ import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.dto.UserJoinDto;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.domain.user.service.UserService;
+import com.elice.meetstudy.util.EntityFinder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,19 +48,25 @@ public class StudyRoomService {
     @Autowired
     private UserStudyRoomService userStudyRoomService;
 
+    @Autowired
+    private EntityFinder entityFinder;
+
     /**
      * 모든 스터디룸을 조회하여 스터디룸 DTO 리스트로 반환합니다.
      *
      * @return 모든 스터디룸의 StudyRoomDTO 객체 리스트
      */
     public List<StudyRoomDTO> getAllStudyRooms() {
-        throw new EntityNotFoundException("더 이상 사용되지 않는 API 입니다. '/api/admin/studyrooms'를 사용해주세요.");
+        List<Long> category =  entityFinder.getUser().getInterests()
+            .stream()
+            .map(interest -> interest.getCategory().getId())
+            .collect(Collectors.toList());
 
-//        return studyRoomRepository
-//                .findAll()
-//                .stream()
-//                .map(studyRoomMapper::toStudyRoomDTO)
-//                .collect(Collectors.toList());
+        return studyRoomRepository
+                .findAllByUserInterests(category)
+                .stream()
+                .map(studyRoomMapper::toStudyRoomDTO)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -109,19 +109,35 @@ public class StudyRoomService {
      * @param studyRoomDTO 생성할 스터디룸의 정보를 담고 있는 StudyRoomDTO 객체
      * @return 생성되고 저장된 스터디룸의 StudyRoomDTO 객체
      */
-    public StudyRoomDTO createStudyRoom(CreateStudyRoomDTO studyRoomDTO) {
+    public StudyRoomDTO createStudyRoom(StudyRoomDTO studyRoomDTO) {
 
         // 스터디룸 생성
         StudyRoom studyRoom = studyRoomMapper.toStudyRoom(studyRoomDTO);
         studyRoom.setCreatedDate(new Date());
 
         // 방 생성하는 유저 가져오기
-        UserPrinciple userPrincipal = (UserPrinciple)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = Long.valueOf(userPrincipal.getEmail());
+        String userPrincipal = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        User user = userRepository
-                .findById(userId) // 실제 유저 상세정보 DB에서 호출
-                .orElseThrow(() -> new EntityNotFoundException("스터디룸 생성에 실패하였습니다. 존재하지 않는 유저입니다."));
+        User user = null;
+
+        if (userPrincipal.equals("anonymousUser")) { // PostMan으로 테스트하여, 로그인세션 없이 anonymousUser인 경우
+            UserJoinDto userJoinDto = new UserJoinDto(
+                    "test@by.postman.com",
+                    "TESTPASSWORD1024",
+                    "홍길동",
+                    "Test1024★",
+                    new ArrayList<>()
+            );
+
+            user = userRepository
+                    .findByEmail("test@by.postman.com")
+                    .orElseGet(() -> userService.join(userJoinDto));
+
+        } else {
+            user = userRepository
+                    .findByEmail(userPrincipal) // 실제 유저 상세정보 DB에서 호출
+                    .orElseThrow(() -> new EntityNotFoundException("스터디룸 생성에 실패하였습니다. 존재하지 않는 유저입니다."));
+        }
 
         // 유저스터디룸 생성
         UserStudyRoom userStudyRoom = UserStudyRoom.builder()
@@ -154,32 +170,12 @@ public class StudyRoomService {
      * @return 주어진 ID에 해당하는 업데이트된 StudyRoomDTO 객체를 포함한 Optional 객체,
      *         스터디룸이 존재하지 않으면 빈 Optional 객체
      */
-    public StudyRoomDTO updateStudyRoom(Long id, UpdateStudyRoomDTO studyRoomDTO) {
-
-        // 방 수정하는 유저 가져오기
-        UserPrinciple userPrincipal = (UserPrinciple)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = Long.valueOf(userPrincipal.getEmail());
-
-        String title = studyRoomDTO.getTitle();
-        String description = studyRoomDTO.getDescription();
-        Long userCapacity = studyRoomDTO.getUserCapacity();
-
-        if (title == null && description == null && userCapacity == null) {
-            throw new CustomNotValidException("수정할 스터디룸 정보가 입력되지 않았습니다.");
-        }
-
+    public StudyRoomDTO updateStudyRoom(Long id, StudyRoomDTO studyRoomDTO) {
         return studyRoomRepository.findById(id)
                 .map(existingStudyRoom -> {
-                    if (title != null) existingStudyRoom.setTitle(title);
-                    if (description != null) existingStudyRoom.setDescription(description);
-                    if (userCapacity != null) existingStudyRoom.setUserCapacity(userCapacity);
-                    existingStudyRoom.getUserStudyRooms().stream()
-                            .filter(usr -> usr.getUser().getId().equals(userId))
-                            .findAny()
-                            .ifPresent(user -> {
-                                if (!user.getPermission().equals("OWNER"))
-                                    throw new StudyRoomAuthenticationException("스터디룸의 방장만이 방을 수정할 수 있습니다.");
-                            });
+                    existingStudyRoom.setTitle(studyRoomDTO.getTitle());
+                    existingStudyRoom.setDescription(studyRoomDTO.getDescription());
+                    existingStudyRoom.setMaxCapacity(studyRoomDTO.getMaxCapacity());
                     return studyRoomMapper.toStudyRoomDTO(studyRoomRepository.save(existingStudyRoom));
                 })
                 .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID: " + id + "]"));
