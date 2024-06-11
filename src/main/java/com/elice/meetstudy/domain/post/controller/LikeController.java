@@ -26,11 +26,11 @@ public class LikeController {
   // 게시글 좋아요 (GET)
   @Operation(
       summary = "게시글 좋아요",
-      description =
-          "(회원 권한) 게시글에 있는 버튼을 누르면 좋아요가 추가되고 좋아요한 게시글을 반환합니다. 하지만, 회원이 이미 좋아요한 게시글이면 '좋아요는 한 번만 가능합니다' 를 반환합니다.")
-  @PostMapping("{postId}/like")
-  public ResponseEntity<LikeResponseDTO> insertLike(@PathVariable Long postId) {
-    return ResponseEntity.ok().body(postLikeServicee.insert(postId));
+      description = "(회원 권한) 게시글에 있는 버튼을 누르면 좋아요가 추가(true). 이미 좋아요한 게시글이면 (false)")
+  @PostMapping("/{postId}/like")
+  public ResponseEntity<Boolean> insertLike(@PathVariable Long postId) {
+    boolean likeInserted = postLikeServicee.insert(postId);
+    return ResponseEntity.ok().body(likeInserted);
   }
 
   // 게시글 좋아요 취소 (DELETE)
