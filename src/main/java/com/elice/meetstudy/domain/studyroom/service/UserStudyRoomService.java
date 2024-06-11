@@ -104,17 +104,17 @@ public class UserStudyRoomService {
     }
 
     public void quitStudyRoom(Long id) {
+        // 방 퇴장하는 유저 가져오기
+        UserPrinciple userPrincipal = (UserPrinciple)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = Long.valueOf(userPrincipal.getEmail());
+
         StudyRoom studyRoom = studyRoomRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID: " + id + "]"));
 
-        String userPrincipal = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        final String userEmail = userPrincipal.equals("anonymousUser") ? "test@by.postman.com" : userPrincipal;
-
         UserStudyRoom userStudyRoom = studyRoom.getUserStudyRooms().stream()
-                .filter((usr) -> Objects.equals(usr.getUser().getEmail(), userEmail))
+                .filter((usr) -> Objects.equals(usr.getUser().getId(), userId))
                 .findAny()
-                .orElseThrow(() -> new EntityNotFoundException("유저가 이미 해당 스터디룸에 존재하지 않습니다. [RoomID: " + id + ", Email: " + userEmail + "]"));
+                .orElseThrow(() -> new EntityNotFoundException("유저가 이미 해당 스터디룸에 존재하지 않습니다. [RoomID: " + id + ", Email: " + userId + "]"));
 
 
         studyRoom.getUserStudyRooms().remove(userStudyRoom);
