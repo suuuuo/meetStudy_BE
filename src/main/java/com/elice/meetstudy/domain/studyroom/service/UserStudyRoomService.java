@@ -77,7 +77,7 @@ public class UserStudyRoomService {
     public UserStudyRoomDTO joinStudyRoom(Long studyRoomId) {
         // 방 참가하는 유저 가져오기
         UserPrinciple userPrincipal = (UserPrinciple)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = Long.valueOf(userPrincipal.getEmail());
+        Long userId = Long.valueOf(userPrincipal.getUserId());
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id의 User를 찾을 수 없습니다. [Email: " + userId + "]"));
@@ -106,7 +106,7 @@ public class UserStudyRoomService {
     public void quitStudyRoom(Long id) {
         // 방 퇴장하는 유저 가져오기
         UserPrinciple userPrincipal = (UserPrinciple)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = Long.valueOf(userPrincipal.getEmail());
+        Long userId = Long.valueOf(userPrincipal.getUserId());
 
         StudyRoom studyRoom = studyRoomRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id의 StudyRoom을 찾을 수 없습니다. [ID: " + id + "]"));
