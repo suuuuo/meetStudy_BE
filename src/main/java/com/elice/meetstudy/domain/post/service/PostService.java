@@ -56,7 +56,7 @@ public class PostService {
         Post.builder()
             .user(entityFinder.getUser())
             .category(category)
-            .title(postCreate.getTitle())
+            .title(postCreate.getTitle().trim())
             .content(postCreate.getContent().trim())
             .build();
 
