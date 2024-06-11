@@ -34,28 +34,29 @@ public class StompHandler implements ChannelInterceptor {
 
     StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
-    if(accessor.getCommand() == StompCommand.CONNECT){
-       String authorizationHeader = accessor.getFirstNativeHeader(AUTHORIZATION_HEADER);
+    if (accessor.getCommand() == StompCommand.CONNECT) {
+      String authorizationHeader = accessor.getFirstNativeHeader(AUTHORIZATION_HEADER);
 
-       if(authorizationHeader ==null|| !authorizationHeader.startsWith(BEARER_PREFIX)) {
-         throw new AccessDeniedException("Authorization 헤더가 없거나 유효하지 않습니다.");
-       }
-       String token = authorizationHeader.substring(BEARER_PREFIX.length());
-       TokenValidationResult result = tokenProvider.validateToken(token);
+      if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+        throw new AccessDeniedException("Authorization 헤더가 없거나 유효하지 않습니다.");
+      }
+      String token = authorizationHeader.substring(BEARER_PREFIX.length());
+      TokenValidationResult result = tokenProvider.validateToken(token);
 
-          if(!result.isValid()) {
-            throw new AccessDeniedException(result.getTokenStatus().getMessage());
-          }
+      if (!result.isValid()) {
+        throw new AccessDeniedException(result.getTokenStatus().getMessage());
+      }
       //user 객체 저장
       Authentication authentication = tokenProvider.getAuthentication(token, result.getClaims());
 
       SecurityContextHolder.getContext().setAuthentication(authentication);
-
       User user = entityFinder.getUser();
+      accessor.getSessionAttributes().put("user", user);
 
+      return message;
     }
 
-  return message;
+    return message;
   }
 
 }
