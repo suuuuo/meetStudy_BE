@@ -22,6 +22,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorBodyDTO(404L, ex.getMessage()));
     }
 
+    @ExceptionHandler(CustomNotValidException.class)
+    public ResponseEntity<?> dataValidationException(CustomNotValidException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorBodyDTO(400L, ex.getMessage()));
+    }
+
+    @ExceptionHandler(StudyRoomAuthenticationException.class)
+    public ResponseEntity<?> ownerAuthenticationException(StudyRoomAuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorBodyDTO(403L, ex.getMessage()));
+    }
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> dataValidationException(MethodArgumentNotValidException ex) {
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();

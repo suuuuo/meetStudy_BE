@@ -2,12 +2,14 @@ package com.elice.meetstudy.domain.studyroom.controller;
 
 import com.elice.meetstudy.domain.studyroom.DTO.CreateStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
+import com.elice.meetstudy.domain.studyroom.DTO.UpdateStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
 import com.elice.meetstudy.domain.studyroom.service.UserStudyRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.RequestBody;
 import java.net.URI;
 import java.util.List;
@@ -74,9 +76,9 @@ public class StudyRoomController {
   @StudyRoomAnnotation.Failure
   public ResponseEntity<StudyRoomDTO> updateStudyRoom(
       @Parameter(description = "수정할 스터디룸의 ID", required = true) @PathVariable Long id,
-      @Parameter(description = "수정할 스터디룸 정보 JSON", required = true) @RequestBody
-          StudyRoomDTO studyRoomDTO) {
-    StudyRoomDTO updatedStudyRoom = studyRoomService.updateStudyRoom(id, studyRoomDTO);
+      @Parameter(description = "수정할 스터디룸 정보 JSON", required = true) @Valid @RequestBody
+      UpdateStudyRoomDTO updateStudyRoomDTO) {
+    StudyRoomDTO updatedStudyRoom = studyRoomService.updateStudyRoom(id, updateStudyRoomDTO);
     return ResponseEntity.ok(updatedStudyRoom);
   }
 
