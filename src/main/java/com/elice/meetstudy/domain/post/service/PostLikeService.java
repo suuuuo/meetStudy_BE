@@ -2,9 +2,7 @@ package com.elice.meetstudy.domain.post.service;
 
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.post.domain.PostLike;
-import com.elice.meetstudy.domain.post.dto.LikeResponseDTO;
 import com.elice.meetstudy.domain.post.repository.PostLikeRepository;
-import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.util.EntityFinder;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +20,16 @@ public class PostLikeService {
   private final EntityFinder entityFinder;
 
   // 게시글 좋아요
-  public LikeResponseDTO insert(Long postId) {
+  public boolean insert(Long postId) {
     Post post = entityFinder.findPost(postId);
     Optional<PostLike> postLike = entityFinder.findLike(post.getId());
 
-    if (postLike.isPresent()) {
-      throw new EntityNotFoundException("좋아요는 한 번만 가능합니다.");
-    }
-
     PostLike newLike = PostLike.builder().post(post).user(entityFinder.getUser()).build();
-    return new LikeResponseDTO(postLikeRepository.save(newLike));
+    if (postLike.isPresent()) {
+      return false;
+    }
+    postLikeRepository.save(newLike);
+    return true;
   }
 
   // 게시글 좋아요 취소 - (이미 취소했어도 204)
