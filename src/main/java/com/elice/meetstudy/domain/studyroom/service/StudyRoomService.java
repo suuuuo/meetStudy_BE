@@ -13,6 +13,7 @@ import com.elice.meetstudy.domain.user.domain.UserPrinciple;
 import com.elice.meetstudy.domain.user.dto.UserJoinDto;
 import com.elice.meetstudy.domain.user.repository.UserRepository;
 import com.elice.meetstudy.domain.user.service.UserService;
+import com.elice.meetstudy.util.EntityFinder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -47,14 +48,22 @@ public class StudyRoomService {
     @Autowired
     private UserStudyRoomService userStudyRoomService;
 
+    @Autowired
+    private EntityFinder entityFinder;
+
     /**
      * 모든 스터디룸을 조회하여 스터디룸 DTO 리스트로 반환합니다.
      *
      * @return 모든 스터디룸의 StudyRoomDTO 객체 리스트
      */
     public List<StudyRoomDTO> getAllStudyRooms() {
+        List<Long> category =  entityFinder.getUser().getInterests()
+            .stream()
+            .map(interest -> interest.getCategory().getId())
+            .collect(Collectors.toList());
+
         return studyRoomRepository
-                .findAll()
+                .findAllByUserInterests(category)
                 .stream()
                 .map(studyRoomMapper::toStudyRoomDTO)
                 .collect(Collectors.toList());
