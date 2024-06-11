@@ -79,8 +79,8 @@ public class ChatController {
   @Operation(summary = "메세지 조회", description = "채팅룸id를 받아와서 메세지를 page로 조회합니다.")
   @GetMapping("/chat/{chatRoomId}")
   public ResponseEntity<Page<OutputMessageModel>> chatList(@PathVariable Long chatRoomId,
-      @RequestParam int page) {
-    return ResponseEntity.ok(messageService.messages(chatRoomId, page));
+      @RequestParam Long cursor) {
+    return ResponseEntity.ok(messageService.messages(chatRoomId, cursor));
   }
 
 }
