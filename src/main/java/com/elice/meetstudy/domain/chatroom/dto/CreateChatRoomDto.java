@@ -11,7 +11,6 @@ public class CreateChatRoomDto {
 
     private String title;
     private Long studyRoomId;
-    private Long chatAdminId;
     private String notice;
 
   @Builder
@@ -19,7 +18,6 @@ public class CreateChatRoomDto {
     this.title = chatRoom.getTitle();
     this.studyRoomId = chatRoom.getStudyRoom().getId();
     this.notice = chatRoom.getNotice();
-    this.chatAdminId = chatRoom.getChatAdmin().getId();
   }
 
 }
