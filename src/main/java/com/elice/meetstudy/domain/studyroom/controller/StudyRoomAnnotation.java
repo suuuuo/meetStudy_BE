@@ -19,7 +19,7 @@ public @interface StudyRoomAnnotation {
                         "title": "스프링부트 스터디룸",
                         "description": "스프링부트를 공부하는 스터디룸입니다.",
                         "createdDate": "2024-06-04T08:04:12.294+00:00",
-                        "maxCapacity": "32",
+                        "capacity": "32",
                         "userStudyRooms": [
                                 {
                                     "id": 5,

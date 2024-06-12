@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatAdminDto {
   private Long id;
-  private Long newChatAdminId;
+  private String nickname;
 
   @Builder
   public ChatAdminDto (ChatRoom chatRoom){
     this.id = chatRoom.getId();
-    this.newChatAdminId = chatRoom.getChatAdmin().getId();
+    this.nickname = chatRoom.getChatAdmin().getNickname();
   }
 
 }

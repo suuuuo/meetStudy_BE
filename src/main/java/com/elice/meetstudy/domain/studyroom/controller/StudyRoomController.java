@@ -1,16 +1,23 @@
 package com.elice.meetstudy.domain.studyroom.controller;
 
+import com.elice.meetstudy.domain.studyroom.DTO.CreateStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
+import com.elice.meetstudy.domain.studyroom.DTO.UpdateStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.service.StudyRoomService;
 import com.elice.meetstudy.domain.studyroom.service.UserStudyRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.web.bind.annotation.RequestBody;
 import java.net.URI;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,7 +29,7 @@ public class StudyRoomController {
 
   @Autowired private UserStudyRoomService userStudyRoomService;
 
-  @Operation(summary = "모든 스터디룸 조회", description = "모든 스터디룸을 조회합니다.")
+  @Operation(summary = "모든 스터디룸 조회", description = "모든 스터디룸을 조회합니다. API 사용자의 관심사를 우선순위로 가집니다.")
   @StudyRoomAnnotation.Success(description = "성공적으로 조회됨")
   @GetMapping
   public List<StudyRoomDTO> getAllStudyRooms() {
@@ -55,9 +62,10 @@ public class StudyRoomController {
   @StudyRoomAnnotation.Success(description = "성공적으로 생성됨")
   @PostMapping("/add")
   public ResponseEntity<StudyRoomDTO> createStudyRoom(
-      @Parameter(description = "생성할 스터디룸 정보 JSON", required = true) @RequestBody
-          StudyRoomDTO studyRoomDTO) {
-    StudyRoomDTO createdStudyRoom = studyRoomService.createStudyRoom(studyRoomDTO);
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "생성할 스터디룸 정보 JSON", required = true)
+          @Valid @RequestBody
+          CreateStudyRoomDTO createStudyRoomDTO) {
+    StudyRoomDTO createdStudyRoom = studyRoomService.createStudyRoom(createStudyRoomDTO);
     URI location = URI.create(String.format("/api/studyrooms/%s", createdStudyRoom.getId()));
     return ResponseEntity.created(location).body(createdStudyRoom);
   }
@@ -68,9 +76,9 @@ public class StudyRoomController {
   @StudyRoomAnnotation.Failure
   public ResponseEntity<StudyRoomDTO> updateStudyRoom(
       @Parameter(description = "수정할 스터디룸의 ID", required = true) @PathVariable Long id,
-      @Parameter(description = "수정할 스터디룸 정보 JSON", required = true) @RequestBody
-          StudyRoomDTO studyRoomDTO) {
-    StudyRoomDTO updatedStudyRoom = studyRoomService.updateStudyRoom(id, studyRoomDTO);
+      @Parameter(description = "수정할 스터디룸 정보 JSON", required = true) @Valid @RequestBody
+      UpdateStudyRoomDTO updateStudyRoomDTO) {
+    StudyRoomDTO updatedStudyRoom = studyRoomService.updateStudyRoom(id, updateStudyRoomDTO);
     return ResponseEntity.ok(updatedStudyRoom);
   }
 

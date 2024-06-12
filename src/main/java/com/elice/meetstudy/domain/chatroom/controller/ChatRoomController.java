@@ -2,6 +2,7 @@ package com.elice.meetstudy.domain.chatroom.controller;
 
 import com.elice.meetstudy.domain.chatroom.dto.ChatAdminDto;
 import com.elice.meetstudy.domain.chatroom.dto.ChatRoomDto;
+import com.elice.meetstudy.domain.chatroom.dto.ChatRoomNoticeDto;
 import com.elice.meetstudy.domain.chatroom.dto.CreateChatRoomDto;
 import com.elice.meetstudy.domain.chatroom.service.ChatRoomService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,12 +56,12 @@ public class ChatRoomController {
 
   @Operation(summary = "공지사항 수정", description = "공지사항을 수정힙니다.")
   @PutMapping("/chatroom/notice")
-  public ResponseEntity<ChatRoomDto> createNotice(@RequestBody ChatRoomDto chatRoomDto) {
+  public ResponseEntity<ChatRoomNoticeDto> createNotice(@RequestBody ChatRoomNoticeDto chatRoomDto) {
     return ResponseEntity.ok(chatRoomService.createNotice(chatRoomDto));
   }
 
   @Operation(summary = "채팅방의 방장 변경", description = "채팅방 방장을 변경합니다.")
-  @PutMapping("/chatRoom/chatAdmin")
+  @PutMapping("/chatroom/chatAdmin")
   public ResponseEntity<ChatAdminDto> changeChatAdmin(@RequestBody ChatAdminDto chatAdminDto){
     return ResponseEntity.ok(chatRoomService.changeChatAdmin(chatAdminDto));
   }

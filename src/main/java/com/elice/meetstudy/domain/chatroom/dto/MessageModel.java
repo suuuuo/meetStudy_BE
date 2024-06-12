@@ -9,14 +9,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MessageModel {
 
-  private Long chatRoomId;
-  private Long userId;
   private String content;
 
   @Builder
-  public MessageModel(Message message){
-    this.chatRoomId = message.getChatRoom().getId();
+  public MessageModel(Message message) {
     this.content = message.getContent();
-    this.userId = message.getSender().getId();
   }
 }
