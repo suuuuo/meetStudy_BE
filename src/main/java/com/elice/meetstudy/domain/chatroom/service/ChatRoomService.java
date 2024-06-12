@@ -3,6 +3,7 @@ package com.elice.meetstudy.domain.chatroom.service;
 import com.elice.meetstudy.domain.chatroom.domain.ChatRoom;
 import com.elice.meetstudy.domain.chatroom.dto.ChatAdminDto;
 import com.elice.meetstudy.domain.chatroom.dto.ChatRoomDto;
+import com.elice.meetstudy.domain.chatroom.dto.ChatRoomNoticeDto;
 import com.elice.meetstudy.domain.chatroom.dto.CreateChatRoomDto;
 import com.elice.meetstudy.domain.chatroom.repository.ChatRoomRepository;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
@@ -90,7 +91,7 @@ public class ChatRoomService {
   }
 
   // 공지사항 수정
-  public ChatRoomDto createNotice(ChatRoomDto chatRoomDto) {
+  public ChatRoomNoticeDto createNotice(ChatRoomNoticeDto chatRoomDto) {
     ChatRoom chatRoom = chatRoomRepository
         .findById(chatRoomDto.getId())
         .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
@@ -100,7 +101,7 @@ public class ChatRoomService {
   }
     chatRoom.updateNotice(chatRoomDto.getNotice());
 
-    return new ChatRoomDto(chatRoom);
+    return new ChatRoomNoticeDto(chatRoom);
   }
 
   //방장 변경
@@ -114,7 +115,7 @@ public class ChatRoomService {
       throw new AccessDeniedException("권한이 없습니다.");
     }
 
-    chatRoom.changeChatAdmin(userRepository.findUserByUserId(chatAdminDto.getNewChatAdminId()));
+    chatRoom.changeChatAdmin(userRepository.findUserByNickname(chatAdminDto.getNickname()));
 
     return new ChatAdminDto(chatRoom);
   }
