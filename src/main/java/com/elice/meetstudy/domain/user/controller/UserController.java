@@ -56,7 +56,7 @@ public class UserController {
       return "ok";
     }
     else{
-      throw new NullPointerException("뭔가 잘못!");
+      throw new NullPointerException("잘못된 인증코드입니다.");
     }
   }
 
@@ -88,5 +88,4 @@ public class UserController {
     return mailService.passwordEmail(emailDto.getEmail());
   }
 
-  // + 소셜 로그인
 }
