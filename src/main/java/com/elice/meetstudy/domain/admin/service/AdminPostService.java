@@ -3,9 +3,9 @@ package com.elice.meetstudy.domain.admin.service;
 import com.elice.meetstudy.domain.post.domain.Post;
 import com.elice.meetstudy.domain.post.dto.PostResponseDTO;
 import com.elice.meetstudy.domain.post.repository.PostRepository;
+import com.elice.meetstudy.domain.studyroom.exception.EntityNotFoundException;
 import com.elice.meetstudy.domain.user.domain.User;
 import com.elice.meetstudy.util.EntityFinder;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +51,7 @@ public class AdminPostService {
     // 게시글 삭제
     public void deletePost(Long id) {
         Post foundPost = postRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("해당 id의 게시물을 찾을 수 없습니다. [ID: " + id + "]"));
 
         postRepository.delete(foundPost);
     }
