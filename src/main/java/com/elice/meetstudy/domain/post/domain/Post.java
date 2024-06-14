@@ -4,7 +4,6 @@ import com.elice.meetstudy.domain.category.entity.Category;
 import com.elice.meetstudy.domain.comment.domain.Comment;
 import com.elice.meetstudy.domain.post.dto.PostEditDTO;
 import com.elice.meetstudy.domain.user.domain.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,6 +55,9 @@ public class Post {
 
   @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Comment> comment;
+
+  @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<PostLike> postLikes;
 
   @PrePersist
   protected void onCreate() {
