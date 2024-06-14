@@ -1,5 +1,6 @@
 package com.elice.meetstudy.domain.studyroom.service;
 
+import com.elice.meetstudy.domain.calendar.service.CalendarService;
 import com.elice.meetstudy.domain.studyroom.DTO.UserStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.entity.StudyRoom;
 import com.elice.meetstudy.domain.studyroom.entity.UserStudyRoom;
@@ -35,6 +36,9 @@ public class UserStudyRoomService {
 
     @Autowired
     private StudyRoomMapper studyRoomMapper;
+
+    @Autowired
+    private CalendarService calendarService;
 
 
     /**
@@ -151,6 +155,7 @@ public class UserStudyRoomService {
                                 studyRoomRepository.save(studyRoom);
                             },
                             () -> {
+                                calendarService.deleteStudyCalendar(id);
                                 studyRoomRepository.deleteById(id);
                             });
         } else {
