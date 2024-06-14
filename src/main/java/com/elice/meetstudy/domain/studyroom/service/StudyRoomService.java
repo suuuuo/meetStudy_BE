@@ -1,5 +1,7 @@
 package com.elice.meetstudy.domain.studyroom.service;
 
+import com.elice.meetstudy.domain.calendar.repository.CalendarRepository;
+import com.elice.meetstudy.domain.calendar.service.CalendarService;
 import com.elice.meetstudy.domain.category.service.CategoryService;
 import com.elice.meetstudy.domain.studyroom.DTO.CreateStudyRoomDTO;
 import com.elice.meetstudy.domain.studyroom.DTO.StudyRoomDTO;
@@ -52,6 +54,9 @@ public class StudyRoomService {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private CalendarService calendarService;
 
     @Autowired
     private EntityFinder entityFinder;
@@ -213,6 +218,8 @@ public class StudyRoomService {
                 .findAny()
                 .orElseThrow(() -> new EntityNotFoundException("해당 방의 방장만이 방을 삭제할 수 있습니다. [RoomID: " + id + "]"));
 
+
+        calendarService.deleteStudyCalendar(id);
         studyRoomRepository.deleteById(id);
     }
 }
